@@ -23,12 +23,12 @@ class FoolboxAttack(Attack):
         if "min" in args:
             self.min = args["min"]
         else:
-            self.min = -2.
+            self.min = -2
 
         if "max" in args:
             self.max = args["max"]
         else:
-            self.max = 30000.
+            self.max = 30000
 
     @staticmethod
     def to_unified_format(data_from_attack):
