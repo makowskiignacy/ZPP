@@ -44,15 +44,15 @@ class ZeorthOrderOptimalization(ARTAttack):
 
     def conduct(self, model, data):
         # Ustawiamy atakowany model
-        self.__set_classifier(model)
+        self._set_classifier(model)
         # Ustawiamy atakowany zbiór
-        self.__set_data(data)
+        self._set_data(data)
 
         return ZeorthOrderOptimalization.to_unified_format(
             # Ważne, aby dodać model do listy parametrów podczas tworzenia
             # obiektu z biblioteki ART
             orig_art_zoo_attack(
-                {**self._attack_params, 'classifier' : self._classifier}
+                classifier=self._classifier, **self._attack_params
             )(
                 self._data.x,
                 self._data.y,
