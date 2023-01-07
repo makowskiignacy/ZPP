@@ -1,0 +1,9 @@
+adversarial_robustness_toolbox==1.13.0
+art==5.8
+foolbox==3.3.3
+mlflow==1.29.0
+mlplatformlib==0.0.6
+numpy==1.24.1
+scikit_learn==1.2.0
+tensorflow==2.11.0
+torch==1.12.1
