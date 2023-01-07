@@ -19,6 +19,3 @@ class L1BasicIterative(L1BasicIterativeAttack, FoolboxAttack):
 
         result = super().run(model=model_correct_format, inputs=data.input, criterion=self.criterion, epsilon=self.epsilon)
         return result
-
-
-
