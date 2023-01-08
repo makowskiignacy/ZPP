@@ -1,178 +1,88 @@
-import math
-import sys
+import traceback
 
-from foolbox.attacks import LinearSearchBlendedUniformNoiseAttack
-from foolbox.attacks.brendel_bethge import BrendelBethgeAttack, L0BrendelBethgeAttack, L1BrendelBethgeAttack, L2BrendelBethgeAttack, LinfinityBrendelBethgeAttack
-from foolbox.distances import LpDistance
+from foolbox.attacks.brendel_bethge import L0BrendelBethgeAttack, L1BrendelBethgeAttack, L2BrendelBethgeAttack, LinfinityBrendelBethgeAttack
 
 from attacks.foolbox_attack import FoolboxAttack
 from foolbox.criteria import Misclassification
-import eagerpy as ep
+from abc import ABC
 
+from attacks.helpers.data import Data
+from eagerpy.astensor import astensor
 
-class L0BrendelBethge(FoolboxAttack, L0BrendelBethgeAttack):
-    """L1 variant of the Brendel & Bethge adversarial attack. [#Bren19]_
-    This is a powerful gradient-based adversarial attack that follows the
-    adversarial boundary (the boundary between the space of adversarial and
-    non-adversarial images as defined by the adversarial criterion) to find
-    the minimum distance to the clean image.
-    This is the reference implementation of the Brendel & Bethge attack.
-    References:
-        .. [#Bren19] Wieland Brendel, Jonas Rauber, Matthias Kümmerer,
-           Ivan Ustyuzhaninov, Matthias Bethge,
-           "Accurate, reliable and fast robustness evaluation",
-           33rd Conference on Neural Information Processing Systems (2019)
-           https://arxiv.org/abs/1907.01003
-    """
-
+class BrendelBethge(FoolboxAttack, ABC):
     def __init__(self, args):
-        # super().__init__(args)
         FoolboxAttack.__init__(self, args)
-        BrendelBethgeAttack.__init__(self)
+        self.attack = None
 
-        # FoolboxAttack.__init__(self, args)
-    def generate_starting_points(self, data, model, distance, directions=1000, steps=1000):
-        # default params for LinearSearchBlendedUniformNoiseAttack: distance=None, directions=1000, steps=1000
-        init_attack = LinearSearchBlendedUniformNoiseAttack(distance=distance, directions=directions, steps=steps)
-        originals, _ = ep.astensor_(data.input)
-        starting_points = init_attack.run(model, originals, self.criterion)
-
-        if starting_points is None:
-            print(f'Wrong starting points ({starting_points}) for params: distance={distance}, directions={directions}, steps={steps}')
+        if 'lr' in args:
+            self.lr = args['lr']
         else:
-            print(f'Successful starting points ({starting_points}) for params: distance={distance}, directions={directions}, steps={steps}')
-            # sys.exit(f'Wrong starting points ({starting_points}) for params: distance={dist}, directions={dirs}, steps={stps}')
+            self.lr = 1
 
-        return starting_points
+        if 'epsilons' in args:
+            self.epsilons = args['epsilons']
+        else:
+            self.epsilons = 1
 
-    def generate_starting_points_set(self, data, model):
-        dist = LpDistance(p=2)
-        directions2check = [10, 100, 1000, 10000, 100000, 1000000]
-        steps2check = [10, 100, 1000, 10000, 100000, 1000000]
-        distances2check = [LpDistance(0), LpDistance(1), LpDistance(2), LpDistance(math.inf)]
-        ptsSet = []
-        # stps = 100000
-        # default params for LinearSearchBlendedUniformNoiseAttack: distance=None, directions=1000, steps=1000
-        for dist in distances2check:
-            for dir in directions2check:
-                for step in steps2check:
-                    init_attack = LinearSearchBlendedUniformNoiseAttack(distance=dist, directions=dir, steps=step)
-                    originals, _ = ep.astensor_(data.input)
-                    starting_points = init_attack.run(model, originals, self.criterion)
+        if 'steps' in args:
+            self.steps = args['steps']
+        else:
+            self.steps = 100
 
-                    if starting_points is None:
-                        print(f'Wrong starting points ({starting_points}) for params: distance={dist}, directions={dir}, steps={step}')
-                    else:
-                        print(f'Successful starting points ({starting_points}) for params: distance={dist}, directions={dir}, steps={step}')
-                        # sys.exit(f'Wrong starting points ({starting_points}) for params: distance={dist}, directions={dirs}, steps={stps}')
-                        ptsSet.append(starting_points)
 
-        return ptsSet
+    def verify_bounds(self, data: Data):
+        if hasattr(self, 'min') and hasattr(self, 'max'):
+            return
+        
+        originals, _ = astensor(data.input)
+        self.min = originals.min().item()
+        self.max = originals.max().item()
 
-    def conduct(self, model, data):
+
+    def conduct(self, model, data: Data):
+        outputs = data.output
+        self.verify_bounds(data=data)
         model_correct_format = super().reformat_model(model)
-        outputs = data.output[:, 0]
+
+        if model_correct_format is None:
+            model_correct_format = model
+        else:
+            outputs = data.output[:, 0]
         self.criterion = Misclassification(outputs)
 
-        print("generating starting_points")
-        # starting_points = self.generate_starting_points(data, model_correct_format, 0)
-        starting_points = self.generate_starting_points_set(data, model_correct_format)
-        print("starting_points done -> attack")
 
-        # result = super().run(model=model_correct_format, inputs=data.input, criterion=self.criterion)
-        result = super().run(model=model_correct_format, inputs=data.input, criterion=self.criterion, starting_points=starting_points[0])
+        try:
+            assert(self.attack is not None)
 
-        return result
+            adversarials, _, _ = self.attack(model=model_correct_format, inputs=data.input, criterion=self.criterion, epsilons=self.epsilons)
 
 
-class L1BrendelBethge(FoolboxAttack, L1BrendelBethgeAttack):
-    """L1 variant of the Brendel & Bethge adversarial attack. [#Bren19]_
-    This is a powerful gradient-based adversarial attack that follows the
-    adversarial boundary (the boundary between the space of adversarial and
-    non-adversarial images as defined by the adversarial criterion) to find
-    the minimum distance to the clean image.
-    This is the reference implementation of the Brendel & Bethge attack.
-    References:
-        .. [#Bren19] Wieland Brendel, Jonas Rauber, Matthias Kümmerer,
-           Ivan Ustyuzhaninov, Matthias Bethge,
-           "Accurate, reliable and fast robustness evaluation",
-           33rd Conference on Neural Information Processing Systems (2019)
-           https://arxiv.org/abs/1907.01003
-    """
+            return adversarials
+        except Exception as e:
+            delim = "\n" + "#" * 64 + "\n"
+            print(f"Exception raised:{delim}{e}{delim}{repr(e)}{delim}{traceback.print_exc()}{delim}")
+            return None
+    
 
+class L0BrendelBethge(BrendelBethge):
     def __init__(self, args):
-        # super().__init__(args)
-        FoolboxAttack.__init__(self, args)
-        BrendelBethgeAttack.__init__(self)
-
-        # FoolboxAttack.__init__(self, args)
-
-    def conduct(self, model, data):
-        model_correct_format = super().reformat_model(model)
-        outputs = data.output[:, 0]
-        self.criterion = Misclassification(outputs)
-        result = super().run(model=model_correct_format, inputs=data.input, criterion=self.criterion)
-
-        return result
+        BrendelBethge.__init__(self, args)
+        self.attack = L0BrendelBethgeAttack(lr=self.lr, steps=self.steps)
 
 
-class L2BrendelBethge(FoolboxAttack, L2BrendelBethgeAttack):
-    """L1 variant of the Brendel & Bethge adversarial attack. [#Bren19]_
-    This is a powerful gradient-based adversarial attack that follows the
-    adversarial boundary (the boundary between the space of adversarial and
-    non-adversarial images as defined by the adversarial criterion) to find
-    the minimum distance to the clean image.
-    This is the reference implementation of the Brendel & Bethge attack.
-    References:
-        .. [#Bren19] Wieland Brendel, Jonas Rauber, Matthias Kümmerer,
-           Ivan Ustyuzhaninov, Matthias Bethge,
-           "Accurate, reliable and fast robustness evaluation",
-           33rd Conference on Neural Information Processing Systems (2019)
-           https://arxiv.org/abs/1907.01003
-    """
-
+class L1BrendelBethge(BrendelBethge, L1BrendelBethgeAttack):
     def __init__(self, args):
-        # super().__init__(args)
-        FoolboxAttack.__init__(self, args)
-        BrendelBethgeAttack.__init__(self)
-
-        # FoolboxAttack.__init__(self, args)
-
-    def conduct(self, model, data):
-        model_correct_format = super().reformat_model(model)
-        outputs = data.output[:, 0]
-        self.criterion = Misclassification(outputs)
-        result = super().run(model=model_correct_format, inputs=data.input, criterion=self.criterion)
-
-        return result
+        BrendelBethge.__init__(self, args)
+        self.attack = L1BrendelBethgeAttack(lr=self.lr, steps=self.steps)
 
 
-class LinfinityBrendelBethge(FoolboxAttack, LinfinityBrendelBethgeAttack):
-    """L1 variant of the Brendel & Bethge adversarial attack. [#Bren19]_
-    This is a powerful gradient-based adversarial attack that follows the
-    adversarial boundary (the boundary between the space of adversarial and
-    non-adversarial images as defined by the adversarial criterion) to find
-    the minimum distance to the clean image.
-    This is the reference implementation of the Brendel & Bethge attack.
-    References:
-        .. [#Bren19] Wieland Brendel, Jonas Rauber, Matthias Kümmerer,
-           Ivan Ustyuzhaninov, Matthias Bethge,
-           "Accurate, reliable and fast robustness evaluation",
-           33rd Conference on Neural Information Processing Systems (2019)
-           https://arxiv.org/abs/1907.01003
-    """
-
+class L2BrendelBethge(BrendelBethge):
     def __init__(self, args):
-        # super().__init__(args)
-        FoolboxAttack.__init__(self, args)
-        BrendelBethgeAttack.__init__(self)
+        BrendelBethge.__init__(self, args)
+        self.attack = L2BrendelBethgeAttack(lr=self.lr, steps=self.steps)
 
-        # FoolboxAttack.__init__(self, args)
 
-    def conduct(self, model, data):
-        model_correct_format = super().reformat_model(model)
-        outputs = data.output[:, 0]
-        self.criterion = Misclassification(outputs)
-        result = super().run(model=model_correct_format, inputs=data.input, criterion=self.criterion)
-
-        return result
+class LinfinityBrendelBethge(BrendelBethge, LinfinityBrendelBethgeAttack):
+    def __init__(self, args):
+        BrendelBethge.__init__(self, args)
+        self.attack = LinfinityBrendelBethgeAttack(lr=self.lr, steps=self.steps)
