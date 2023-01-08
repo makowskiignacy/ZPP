@@ -9,15 +9,14 @@ from abc import ABC
 class Attack(ABC):
     # Tworzy obiekt ataku ustawiając jego podstawowe parametry
     @abc.abstractmethod
-    def __init__(self, **params):
+    def __init__(self):
         # Definiujemy zmienne obiektu, jakich będziemy używać
         self._model = None
         self._data = None
-        self._attack_params = None
+        self._attack_params = {}
 
         # Oczywiście ta procedura ma być właściwie napisana w konkretnej klasie
         # implementującej atak
-        raise NotImplementedError
 
     # Przeprowadza atak opisany podczas konstrukcji obiektu na zadanym modelu
     # oraz danych wejściowych
