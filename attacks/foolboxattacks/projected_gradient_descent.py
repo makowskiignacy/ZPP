@@ -12,4 +12,4 @@ class ProjectedGradientDescentInf(FoolboxAttack):
 
     def conduct(self, model, data):
         self._model = super().reformat_model(model)
-        return self.to_unified_format(self._attack(self._model, data[0], data[1], **self._attack_params))
+        return self.to_unified_format(self._attack(self._model, data.input, data.output, **self._attack_params))

@@ -10,7 +10,7 @@ from mlplatformlib.model_building.binary.neural_network import BinaryNeuralNetwo
 class ARTAttack(Attack):
     @staticmethod
     def to_unified_format(data_from_attack):
-        pass
+        return data_from_attack
 
     def __init__(self, args):
         super().__init__(args)
@@ -53,7 +53,7 @@ class ARTAttack(Attack):
     def conduct(self, model, data):
         if self.data is not None and self.mask is not None:
             return ARTAttack.to_unified_format(self.attack.generate(
-                x=self.data.x, y=self.data.y, mask=self.mask, reset_patch=self.reset_patch))
+                x=self.data.input, y=self.data.output, mask=self.mask, reset_patch=self.reset_patch))
         return ARTAttack.to_unified_format(self.attack.generate(x=data.x, y=data.y, reset_patch=self.reset_patch))
 
     def set_data(self, data):

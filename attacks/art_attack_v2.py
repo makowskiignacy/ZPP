@@ -15,7 +15,8 @@ class ARTAttack(Attack):
     # NOTE aktualnie nie zmienia nic, w przyszłości może znaleźc większe użycie
     @staticmethod
     def to_unified_format(data_from_attack):
-        pass
+        # Not implemented yet
+        return data_from_attack
 
     @abc.abstractmethod
     def __init__(self, **params):

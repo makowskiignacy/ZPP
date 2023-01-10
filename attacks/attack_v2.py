@@ -23,4 +23,3 @@ class Attack(ABC):
     @abc.abstractmethod
     def conduct(self, model, data):
         raise NotImplementedError
-    
