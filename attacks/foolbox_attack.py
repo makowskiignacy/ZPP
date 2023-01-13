@@ -28,5 +28,21 @@ class FoolboxAttack(Attack):
 
         return model2
 
+    # This makes sure that the output of experiments used for training has a 1D format,
+    # instead of a faux-2D format, where one of the dimensions has a length of 1.
+    def flatten_output(self,data):
+        if len(data.output.shape) == 2 and len(data.output[1,:]) == 1:
+            output = data.output[:, 0]
+        elif len(data.output.shape) == 2 and len(data.output[:, 1]) == 1:
+            output = data.output[0, :]
+        elif len(data.output.shape) == 1:
+            output = data.output
+        else:
+            print("ERROR")
+            return 0
+
+        return output
+
+
     def conduct(self, model, data):
         pass

@@ -13,10 +13,8 @@ class L1BasicIterative(L1BasicIterativeAttack, FoolboxAttack):
 
         model_correct_format = super().reformat_model(model)
 
-        # outputs = data.output[:,0]
-        # self.criterion = Misclassification(outputs)
-
-        self.criterion = Misclassification(data.output)
+        output = super().flatten_output(data)
+        self.criterion = Misclassification(output)
 
         result = super().run(model=model_correct_format, inputs=data.input, criterion=self.criterion, epsilon=self.epsilon)
         return result
