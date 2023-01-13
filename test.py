@@ -5,7 +5,6 @@ import csv
 import numpy as np
 import torch
 
-
 class Data:
     def __init__(self, x, y):
         self.input = x
@@ -18,6 +17,7 @@ nn_model = ss_nn_pipeline.steps[1][1].module_
 
 dict = {"epsilon": 0.01, "random_start": True}
 attack = L1BasicIterative(dict)
+
 csv_filename = 'data_test.csv'
 
 with open(csv_filename) as f:
@@ -36,8 +36,8 @@ with open(csv_filename) as f:
     result = torch.tensor(result, requires_grad=False, dtype=torch.float)
     data = Data(data, result)
 
+    print("Attack")
     result = attack.conduct(nn_model, data)
 
     print("done!")
     print(result)
-
