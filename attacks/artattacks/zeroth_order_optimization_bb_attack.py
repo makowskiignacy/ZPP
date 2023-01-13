@@ -1,4 +1,4 @@
-from attacks.art_attack_v2 import ARTAttack
+from attacks.art_attack import ARTAttack
 from art.attacks.evasion import ZooAttack as orig_art_zoo_attack
 
 
@@ -62,10 +62,3 @@ class ZeorthOrderOptimalization(ARTAttack):
                 self._data.output
             )
         )
-
-
-
-
-
-
-

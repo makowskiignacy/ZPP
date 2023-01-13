@@ -9,112 +9,82 @@ import numpy as np
 
 
 class AdversarialPatch(ARTAttack):
-    def __init__(self, args):
-        super().__init__(args)
+    def __init__(self, **params):
+        super().__init__(**params)
+        self.attack = None
+        self._attack_params.update({
+            'classifier': None,
+            # rotation_max (float) – The maximum rotation applied to random patches.
+            # The value is expected to be in the range [0, 180].
+            'rotation_max': 22.5,
+            # scale_min (float) – The minimum scaling applied to random patches.
+            # The value should be in the range [0, 1], but less than scale_max.
+            'scale_min': 0.1,
+            'scale_max': 1.0,
+            # learning_rate (float) – The learning rate of the optimization.
+            'learning_rate': 5.0,
+            # max_iter (int) – The number of optimization steps.
+            'max_iter': 500,
+            # batch_size (int) – The size of the training batch.
+            'batch_size': 16,
+            # patch_shape – The shape of the adversarial patch as a tuple of shape (width, height, nb_channels).
+            # Currently only supported for TensorFlowV2Classifier. For classifiers of other frameworks the patch_shape
+            # is set to the shape of the input samples.
+            'patch_shape': None,
+            # targeted (bool) – Indicates whether the attack is targeted (True) or untargeted (False).
+            'targeted': True,
+            # verbose (bool) – Show progress bars.
+            'verbose': True,
+        })
 
-        if "classifier" in args:
-            self.classifier = args["classifier"]
-
-        # rotation_max (float) – The maximum rotation applied to random patches.
-        # The value is expected to be in the range [0, 180].
-        if "rotation_max" in args:
-            self.rotation_max = args["rotation_max"]
-        else:
-            self.rotation_max = 22.5
-
-        # scale_min (float) – The minimum scaling applied to random patches.
-        # The value should be in the range [0, 1], but less than scale_max.
-        if "scale_min" in args:
-            self.scale_min = args["scale_min"]
-        else:
-            self.scale_min = 0.1
-
-        if "scale_max" in args:
-            self.scale_max = args["scale_max"]
-        else:
-            self.scale_max = 1.0
-
-        # learning_rate (float) – The learning rate of the optimization.
-        if "learning_rate" in args:
-            self.learning_rate = args["learning_rate"]
-        else:
-            self.learning_rate = 5.0
-
-        # max_iter (int) – The number of optimization steps.
-        if "max_iter" in args:
-            self.max_iter = args["max_iter"]
-        else:
-            self.max_iter = 500
-
-        # batch_size (int) – The size of the training batch.
-        if "batch_size" in args:
-            self.batch_size = args["batch_size"]
-        else:
-            self.batch_size = 16
-
-        # patch_shape – The shape of the adversarial patch as a tuple of shape (width, height, nb_channels).
-        # Currently only supported for TensorFlowV2Classifier. For classifiers of other frameworks the patch_shape
-        # is set to the shape of the input samples.
-        if "patch_shape" in args:
-            self.patch_shape = args["patch_shape"]
-        else:
-            self.patch_shape = None
-
-        # targeted (bool) – Indicates whether the attack is targeted (True) or untargeted (False).
-        if "targeted" in args:
-            self.targeted = args["targeted"]
-        else:
-            self.targeted = True
-
-        # verbose (bool) – Show progress bars.
-        if "verbose" in args:
-            self.verbose = args["verbose"]
-        else:
-            self.verbose = True
+        # We do not include parameters outside the list!
+        for key in self._attack_params.keys():
+            if key in params.keys():
+                self._attack_params[key] = params[key]
 
         self._attack: Union[AdversarialPatchTensorFlowV2, AdversarialPatchPyTorch, AdversarialPatchNumpy]
-        if isinstance(self.classifier, TensorFlowV2Classifier):
+        if isinstance(self._attack_params.get('classifier'), TensorFlowV2Classifier):
             self._attack = AdversarialPatchTensorFlowV2(
-                classifier=self.classifier,
-                rotation_max=self.rotation_max,
-                scale_min=self.scale_min,
-                scale_max=self.scale_max,
-                learning_rate=self.learning_rate,
-                max_iter=self.max_iter,
-                batch_size=self.batch_size,
-                patch_shape=self.patch_shape,
-                targeted=self.targeted,
-                verbose=self.verbose,
+                classifier=self._attack_params.get('classifier'),
+                rotation_max=self._attack_params.get('rotation_max'),
+                scale_min=self._attack_params.get('scale_min'),
+                scale_max=self._attack_params.get('scale_max'),
+                learning_rate=self._attack_params.get('learning_rate'),
+                max_iter=self._attack_params.get('max_iter'),
+                batch_size=self._attack_params.get('batch_size'),
+                patch_shape=self._attack_params.get('patch_shape'),
+                targeted=self._attack_params.get('targeted'),
+                verbose=self._attack_params.get('verbose'),
             )
-        elif isinstance(self.classifier, PyTorchClassifier):
-            if self.patch_shape is not None:
+        elif isinstance(self._attack_params.get('classifier'), PyTorchClassifier):
+            if self._attack_params.get('patch_shape') is not None:
                 self._attack = AdversarialPatchPyTorch(
-                    estimator=self.classifier,
-                    rotation_max=self.rotation_max,
-                    scale_min=self.scale_min,
-                    scale_max=self.scale_max,
+                    estimator=self._attack_params.get('classifier'),
+                    rotation_max=self._attack_params.get('rotation_max'),
+                    scale_min=self._attack_params.get('scale_min'),
+                    scale_max=self._attack_params.get('scale_max'),
                     distortion_scale_max=0.0,
-                    learning_rate=self.learning_rate,
-                    max_iter=self.max_iter,
-                    batch_size=self.batch_size,
-                    patch_shape=self.patch_shape,
+                    learning_rate=self._attack_params.get('learning_rate'),
+                    max_iter=self._attack_params.get('max_iter'),
+                    batch_size=self._attack_params.get('batch_size'),
+                    patch_shape=self._attack_params.get('patch_shape'),
                     patch_type="circle",
-                    targeted=self.targeted,
-                    verbose=self.verbose,
+                    targeted=self._attack_params.get('targeted'),
+                    verbose=self._attack_params.get('verbose'),
                 )
             else:
                 raise ValueError("`patch_shape` cannot be `None` for `AdversarialPatchPyTorch`.")
         else:
             self._attack = AdversarialPatchNumpy(
-                classifier=self.classifier,
-                rotation_max=self.rotation_max,
-                scale_min=self.scale_min,
-                scale_max=self.scale_max,
-                learning_rate=self.learning_rate,
-                max_iter=self.max_iter,
-                batch_size=self.batch_size,
-                targeted=self.targeted,
-                verbose=self.verbose,
+                classifier=self._attack_params.get('classifier'),
+                rotation_max=self._attack_params.get('rotation_max'),
+                scale_min=self._attack_params.get('scale_min'),
+                scale_max=self._attack_params.get('scale_max'),
+                learning_rate=self._attack_params.get('learning_rate'),
+                max_iter=self._attack_params.get('max_iter'),
+                batch_size=self._attack_params.get('batch_size'),
+                targeted=self._attack_params.get('targeted'),
+                verbose=self._attack_params.get('verbose'),
             )
 
     def generate( self, x: np.ndarray, y: Optional[np.ndarray] = None, **kwargs) -> Tuple[np.ndarray, np.ndarray]:
@@ -144,18 +114,6 @@ class AdversarialPatch(ARTAttack):
         return self._attack.generate(x=x, y=y, **kwargs)
 
     def conduct(self, model, data):
-        super().set_classifier(model)
-        args = {
-            "classifier": self.classifier,
-            "rotation_max": self.rotation_max,
-            "scale_min": self.scale_min,
-            "scale_max": self.scale_max,
-            "learning_rate": self.learning_rate,
-            "max_iter": self.max_iter,
-            "batch_size": self.batch_size,
-            "patch_shape": self.patch_shape,
-            "targeted": self.targeted,
-            "verbose": self.verbose
-        }
-        self.attack = AdversarialPatch(args)
+        self._set_classifier(model)
+        self.attack = AdversarialPatch(**self._attack_params)
         return super().conduct(model, data)

@@ -1,10 +1,10 @@
-from attacks.attack_v2 import Attack
+from attacks.attack import Attack
 from foolbox.models.pytorch import PyTorchModel
 from foolbox.models.numpy import NumPyModel
 from foolbox.models.tensorflow import TensorFlowModel
 from foolbox.models.jax import JAXModel
 import torch
-
+import keras
 
 class FoolboxAttack(Attack):
 
@@ -25,6 +25,8 @@ class FoolboxAttack(Attack):
         bounds = (self.min, self.max)
         if isinstance(model, torch.nn.Module):
             model2 = PyTorchModel(model, bounds)
+        elif isinstance(model, keras.Model):
+            model2 = TensorFlowModel(model2, bounds)
 
         return model2
 

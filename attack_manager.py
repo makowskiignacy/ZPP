@@ -4,7 +4,7 @@ from attacks.artattacks.zeroth_order_optimization_bb_attack\
 from attacks.artattacks.adversarial_patch\
     import AdversarialPatch 
 
-from attacks.attack_v2 import Attack
+from attacks.attack import Attack
 
 
 class AttackManager():

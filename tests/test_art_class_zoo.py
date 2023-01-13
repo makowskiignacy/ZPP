@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
 
-from attacks.attack_v2 import Attack
+from attacks.attack import Attack
 
-from attacks.art_attack_v2 import ARTAttack
+from attacks.art_attack import ARTAttack
 
 from attacks.artattacks.zeroth_order_optimization_bb_attack\
     import ZeorthOrderOptimalization as ZOOAttack
