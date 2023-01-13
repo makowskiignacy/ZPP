@@ -38,6 +38,5 @@ with open(csv_filename) as f:
 
     print("Attack")
     result = attack.conduct(nn_model, data)
-
-    print("done!")
     print(result)
+    print("Done!")
