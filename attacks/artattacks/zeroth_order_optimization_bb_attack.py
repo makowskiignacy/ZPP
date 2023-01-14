@@ -2,6 +2,7 @@ from attacks.art_attack import ARTAttack
 from art.attacks.evasion import ZooAttack as orig_art_zoo_attack
 
 
+
 class ZeorthOrderOptimalization(ARTAttack):
     def __init__(self, **params):
         # inicjalizacja argumentów potrzebnych dla klasyfikatora, będą one wspólne dla wszystkich ataków
@@ -38,9 +39,11 @@ class ZeorthOrderOptimalization(ARTAttack):
         })
         # Jeśli podano inne to podmieniamy, ale nie uwzględniamy
         # parametrów spoza listy!
+
         for key in self._attack_params.keys():
             if key in params.keys():
                 self._attack_params[key] = params[key]
+
 
     def conduct(self, model, data):
         # Ustawiamy atakowany model
@@ -48,9 +51,10 @@ class ZeorthOrderOptimalization(ARTAttack):
         # Ustawiamy atakowany zbiór
         self._set_data(data)
 
-        # Usuwamy niepotrzebne parametry - konieczne, żeby nie rzucało błędów
-        for i in ['mask', 'reset_patch', 'input_shape', 'loss', 'nb_classes', 'optimizer', 'clip_values']:
-            del self._attack_params[i]
+        # Narazie odkomentowane, do usunięcia przy przyjęciu poprawek z art_attack.py
+        #Usuwamy niepotrzebne parametry - konieczne, żeby nie rzucało błędów
+        # for i in ['mask', 'reset_patch', 'input_shape', 'loss', 'nb_classes', 'optimizer', 'clip_values']:
+        #     del self._attack_params[i]
 
         return ZeorthOrderOptimalization.to_unified_format(
             # Ważne, aby dodać model do listy parametrów podczas tworzenia
@@ -58,7 +62,7 @@ class ZeorthOrderOptimalization(ARTAttack):
             orig_art_zoo_attack(
                 classifier=self._classifier, **self._attack_params
             ).generate(
-                self._data.input,
-                self._data.output
+                x = self._data.input,
+                y = self._data.output
             )
         )

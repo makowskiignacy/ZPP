@@ -21,8 +21,9 @@ class ARTAttack(Attack):
     @abc.abstractmethod
     def __init__(self, **params):
         super().__init__()
+
         # Parameters required to initialize the classifier
-        self._attack_params = {
+        self._classifier_params = {
             'mask': None,
             'reset_patch': False,
             'input_shape': None,
@@ -31,6 +32,14 @@ class ARTAttack(Attack):
             'optimizer': None,
             'clip_values': None
         }
+
+        # We separate known classifier parameters from potential attack params
+        for key in self._classifier_params.keys():
+            if key in params.keys():
+                self._classifier_params[key] = params[key]
+                params.pop(key)
+        # On lower levels we can separete further if needed
+        # There is no need to filter params on lower levels
 
     def _set_data(self, data):
         # TODO dorzucić tu lub wyżej sprawdzanie poprawności danych
@@ -44,8 +53,11 @@ class ARTAttack(Attack):
             self._classifier = model.get_sklearn_object()
         elif isinstance(model, torch.nn.Module):
             # Pytorch model
-            if self._attack_params.get('input_shape') and self._attack_params.get('loss') and self._attack_params.get('nb_classes'):
-                self._classifier = PyTorchClassifier(model=model, **{key: self._attack_params.get(key) for key in ['loss', 'optimizer', 'input_shape', 'nb_classes', 'clip_values']})
+            if self._classifier_params.get('input_shape')\
+                and self._classifier_params.get('loss')\
+                and self._classifier_params.get('nb_classes'):
+                
+                self._classifier = PyTorchClassifier(model=model, **{key: self._classifier_params.get(key) for key in ['loss', 'optimizer', 'input_shape', 'nb_classes', 'clip_values']})
             else:
                 raise Exception("PyTorch model needs input_shape, loss and nb_classes to conduct attack")
         elif isinstance(model, sklearn.base.BaseEstimator):

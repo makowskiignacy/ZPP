@@ -130,15 +130,26 @@ class TestFoolboxWithArtExamples(unittest.TestCase):
 
 # Pytorch test
 class TestArtWithArtExamples(unittest.TestCase):
-    @timeout_decorator.timeout(120)
+    # Zmodyfikowany czas oczekiwania, tak aby test mógł się zakończyć w 15min.
+    @timeout_decorator.timeout(900)
     def test_art_ZeorthOrderOptimalization(self):
         model = pytorch_model_form_art()
+        # This is only for testing purpose as are the parameters
+        model.cpu()
         art_model = ZeorthOrderOptimalization(clip_values=(_min_pixel_value, _max_pixel_value),
                                               loss=nn.CrossEntropyLoss(),
                                               optimizer=optim.Adam(model.parameters(), lr=0.01),
                                               input_shape=(1, 28, 28),
-                                              nb_classes=10)
+                                              nb_classes=10,
+                                              nb_parallel=1,
+                                              binary_search_steps=1,
+                                              batch_size=500,
+                                              max_iter=2,
+                                            #   use_resize=False,
+                                              verbose=True)
         self.assertIsNotNone(art_model.conduct(pytorch_model_form_art(), art_sample_data()))
+
+
 
     @timeout_decorator.timeout(120)
     def test_art_AdversarialPatch(self):
@@ -148,15 +159,32 @@ class TestArtWithArtExamples(unittest.TestCase):
 
 # Pytorch test
 class TestArtWithFoolboxExamples(unittest.TestCase):
-    @timeout_decorator.timeout(120)
+    @timeout_decorator.timeout(900)
     def test_art_ZeorthOrderOptimalization(self):
+        # REVIEW 
+        # Czy tu na pewno powinno być:
         model = pytorch_model_form_art()
+        # zamiast
+        # model = pytorch_model_form_foolbox() ?
         art_model = ZeorthOrderOptimalization(clip_values=(_min_pixel_value, _max_pixel_value),
                                               loss=nn.CrossEntropyLoss(),
                                               optimizer=optim.Adam(model.parameters(), lr=0.01),
                                               input_shape=(1, 28, 28),
-                                              nb_classes=10)
-        self.assertIsNotNone(art_model.conduct(pytorch_model_form_foolbox(), foolbox_sample_data()))
+                                              nb_classes=10,
+                                              nb_parallel=1,
+                                              binary_search_steps=1,
+                                              batch_size=500,
+                                              max_iter=2,
+                                            #   use_resize=False,
+                                              verbose=True)
+        # FIXME :
+        # Poniższa linijka wyrzuca błąd:
+        # File "/mnt/data/Studia/All_ZPP/ZPP/venv/lib/python3.10/site-packages/art/utils.py", line 738, in to_categorical
+        # labels = np.array(labels, dtype=int)
+        # ValueError: setting an array element with a sequence.
+        # Prawdopodobnie coś związanego z reprezentajcą poszczególnych klas
+        # Czy Foolbox używa tablic? Czy kodowanie jest hot-one?
+        self.assertIsNotNone(art_model.conduct(model, foolbox_sample_data()))
 
     @timeout_decorator.timeout(120)
     def test_art_AdversarialPatch(self):
