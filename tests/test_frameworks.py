@@ -41,11 +41,20 @@ class Data:
             self.output = self.output[:,0]
         return self
 
+    def convert_tensors_to_numpy(self):
+        if isinstance(self.input, torch.Tensor):
+            self.input = self.input.numpy
+
+        if isinstance(self.output, torch.Tensor):
+            self.input = self.output.numpy
+
+        return self
+
 
 # Declaring global variables for
-_model = models.resnet18(pretrained=True).eval()
-_fmodel = PyTorchModel(_model, bounds=(0, 1))
-_data = ep.astensors(*samples(_fmodel, dataset="imagenet", batchsize=16))
+_foolbox_model = models.resnet18(pretrained=True).eval()
+_fmodel = PyTorchModel(_foolbox_model, bounds=(0, 1))
+_foolbox_data = ep.astensors(*samples(_fmodel, dataset="imagenet", batchsize=16))
 _mnist_data, _, _min_pixel_value, _max_pixel_value = load_mnist()
 
 _keras_art_model = Sequential()
@@ -63,7 +72,7 @@ _keras_foolbox_model = tensorflow.keras.applications.ResNet50(weights="imagenet"
 
 
 def foolbox_sample_data():
-    return Data(_data)
+    return Data(_foolbox_data)
 
 
 def art_sample_data():
@@ -72,7 +81,7 @@ def art_sample_data():
 
 
 def pytorch_model_form_foolbox():
-    return _model
+    return _foolbox_model
 
 
 def pytorch_model_form_art():
@@ -161,11 +170,7 @@ class TestArtWithArtExamples(unittest.TestCase):
 class TestArtWithFoolboxExamples(unittest.TestCase):
     @timeout_decorator.timeout(900)
     def test_art_ZeorthOrderOptimalization(self):
-        # REVIEW 
-        # Czy tu na pewno powinno być:
-        model = pytorch_model_form_art()
-        # zamiast
-        # model = pytorch_model_form_foolbox() ?
+        model = pytorch_model_form_foolbox()
         art_model = ZeorthOrderOptimalization(clip_values=(_min_pixel_value, _max_pixel_value),
                                               loss=nn.CrossEntropyLoss(),
                                               optimizer=optim.Adam(model.parameters(), lr=0.01),
@@ -177,6 +182,7 @@ class TestArtWithFoolboxExamples(unittest.TestCase):
                                               max_iter=2,
                                             #   use_resize=False,
                                               verbose=True)
+
         # FIXME :
         # Poniższa linijka wyrzuca błąd:
         # File "/mnt/data/Studia/All_ZPP/ZPP/venv/lib/python3.10/site-packages/art/utils.py", line 738, in to_categorical
@@ -187,6 +193,7 @@ class TestArtWithFoolboxExamples(unittest.TestCase):
         self.assertIsNotNone(art_model.conduct(model, foolbox_sample_data()))
 
     @timeout_decorator.timeout(120)
+    @unittest.skip("AdversarialPatch is not yet implemented.")
     def test_art_AdversarialPatch(self):
         art_model = AdversarialPatch()
         self.assertIsNotNone(art_model.conduct(pytorch_model_form_foolbox(), foolbox_sample_data()))
@@ -205,8 +212,9 @@ class TestKerasWithArt(unittest.TestCase):
         self.assertIsNotNone(art_model.conduct(keras_model_from_art(), art_sample_data()))
 
     @timeout_decorator.timeout(120)
+    @unittest.skip("AdversarialPatch is not yet implemented.")
     def test_art_AdversarialPatch(self):
-        art_model = AdversarialPatch({})
+        art_model = AdversarialPatch()
         self.assertIsNotNone(art_model.conduct(keras_model_from_art(), art_sample_data()))
 
     @timeout_decorator.timeout(120)
@@ -233,8 +241,9 @@ class TestKerasWithFoolbox(unittest.TestCase):
         self.assertIsNotNone(art_model.conduct(keras_model_from_foolbox(), foolbox_sample_data()))
 
     @timeout_decorator.timeout(120)
+    @unittest.skip("AdversarialPatch is not yet implemented.")
     def test_art_AdversarialPatch(self):
-        art_model = AdversarialPatch({})
+        art_model = AdversarialPatch()
         self.assertIsNotNone(art_model.conduct(keras_model_from_foolbox(), foolbox_sample_data()))
 
     @timeout_decorator.timeout(120)
