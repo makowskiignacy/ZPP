@@ -33,6 +33,8 @@ with open(csv_filename) as f:
     data = data2
     data = torch.tensor(data, requires_grad=False, dtype=torch.float)
     data, result = torch.hsplit(data, [91, ])
+
+    # FIXME: RuntimeError: expected scalar type Long but found Float
     result = torch.tensor(result, requires_grad=False, dtype=torch.float)
     data = Data(data, result)
 

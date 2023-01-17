@@ -1,3 +1,11 @@
+'''
+The file contains simple tests to check the compatibility of attacks with different frameworks and data types.
+
+It is based on sample models and data posted on foolbox and arta repositories
+
+The tests are not intended to check the correctness of the results but only whether the attacks will run correctly
+'''
+
 import unittest
 
 import torchvision.models as models
@@ -113,8 +121,11 @@ def keras_model_from_foolbox():
     return _keras_foolbox_model
 
 
-# Pytorch test
-class TestFoolboxWithFoolboxExamples(unittest.TestCase):
+class TestFoolboxWithPytorchUsingFoolbox(unittest.TestCase):
+    '''
+    Checks attacks from foolboxattacks package using example from:
+    https://github.com/bethgelab/foolbox/blob/master/examples/single_attack_pytorch_resnet18.py
+    '''
     def test_foolbox_ProjectedGradientDescentInf(self):
         foolbox_model = ProjectedGradientDescentInf()
         self.assertIsNotNone(foolbox_model.conduct(pytorch_model_form_foolbox(), foolbox_sample_data()))
@@ -125,7 +136,11 @@ class TestFoolboxWithFoolboxExamples(unittest.TestCase):
 
 
 # Pytorch test
-class TestFoolboxWithArtExamples(unittest.TestCase):
+class TestFoolboxWithPytorchUsingArt(unittest.TestCase):
+    '''
+    Checks attacks from foolboxattacks package using example from:
+    https://github.com/Trusted-AI/adversarial-robustness-toolbox/blob/main/examples/get_started_pytorch.py
+    '''
     def test_foolbox_ProjectedGradientDescentInf(self):
         foolbox_model = ProjectedGradientDescentInf()
         self.assertIsNotNone(foolbox_model.conduct(pytorch_model_form_art(),
@@ -138,7 +153,11 @@ class TestFoolboxWithArtExamples(unittest.TestCase):
 
 
 # Pytorch test
-class TestArtWithArtExamples(unittest.TestCase):
+class TestArtWithPytorchUsingArt(unittest.TestCase):
+    '''
+    Checks attacks from artattacks package using example from:
+    https://github.com/Trusted-AI/adversarial-robustness-toolbox/blob/main/examples/get_started_pytorch.py
+    '''
     # Zmodyfikowany czas oczekiwania, tak aby test mógł się zakończyć w 15min.
     @timeout_decorator.timeout(900)
     def test_art_ZeorthOrderOptimalization(self):
@@ -158,16 +177,17 @@ class TestArtWithArtExamples(unittest.TestCase):
                                               verbose=True)
         self.assertIsNotNone(art_model.conduct(pytorch_model_form_art(), art_sample_data()))
 
-
-
-    @timeout_decorator.timeout(120)
+    @unittest.skip("AdversarialPatch is not yet implemented.")
     def test_art_AdversarialPatch(self):
         art_model = AdversarialPatch()
         self.assertIsNotNone(art_model.conduct(pytorch_model_form_art(), art_sample_data()))
 
 
-# Pytorch test
-class TestArtWithFoolboxExamples(unittest.TestCase):
+class TestArtWithPytorchUsingFoolbox(unittest.TestCase):
+    '''
+    Checks attacks from artattacks package using example from:
+    https://github.com/bethgelab/foolbox/blob/master/examples/single_attack_pytorch_resnet18.py
+    '''
     @timeout_decorator.timeout(900)
     def test_art_ZeorthOrderOptimalization(self):
         model = pytorch_model_form_foolbox()

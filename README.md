@@ -19,3 +19,6 @@ cd \<project-directory>
 python3 -m unittests
 ### Wykonanie testu:
 python3 -m unittest.tests.\<nazwa-odpowiedniej-klasy>
+
+### Wykonanie wszystkich unittestów:
+python3 -m unittest discover
