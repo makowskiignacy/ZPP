@@ -3,6 +3,9 @@
 ### Trello
 https://trello.com/w/zpp58
 
+### Troubleshooting Document
+https://docs.google.com/spreadsheets/d/1DY7JFo9h3nN2REfxSgCWGac-TPBXbPjWFAGx5hqhdkY/edit?usp=sharing
+
 ### Naming convention
 
 https://realpython.com/python-pep8/#naming-styles
