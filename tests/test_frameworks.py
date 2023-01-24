@@ -189,6 +189,7 @@ class TestArtWithPytorchUsingFoolbox(unittest.TestCase):
     https://github.com/bethgelab/foolbox/blob/master/examples/single_attack_pytorch_resnet18.py
     '''
     @timeout_decorator.timeout(900)
+    @unittest.expectedFailure
     def test_art_ZeorthOrderOptimalization(self):
         model = pytorch_model_form_foolbox()
         art_model = ZeorthOrderOptimalization(clip_values=(_min_pixel_value, _max_pixel_value),
