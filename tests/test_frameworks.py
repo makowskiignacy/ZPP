@@ -8,30 +8,30 @@ The tests are not intended to check the correctness of the results but only whet
 
 import unittest
 
-import torchvision.models as models
-import torch.nn.functional as F
 import eagerpy as ep
-import torch.nn as nn
-import torch.optim as optim
 import numpy as np
-import torch
 import tensorflow
-
-from foolbox import PyTorchModel, samples
+import tensorflow.compat.v1 as tf
+import timeout_decorator
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+import torchvision.models as models
 from art.utils import load_mnist
-
-from attacks.artattacks.adversarial_patch import AdversarialPatch
-from attacks.artattacks.zeroth_order_optimization_bb_attack import ZeorthOrderOptimalization
-from attacks.foolboxattacks.projected_gradient_descent import ProjectedGradientDescentInf
-from attacks.foolboxattacks.L1_basic_iterative import L1BasicIterative
-
+from foolbox import PyTorchModel, samples
 from keras.layers import Dense, Flatten, Conv2D, MaxPooling2D
 from keras.losses import categorical_crossentropy
-from keras.optimizers import Adam
 from keras.models import Sequential
+from keras.optimizers import Adam
 
+from attacks.artattacks.adversarial_patch import AdversarialPatch
+from attacks.artattacks.fast_gradient import FastGradient
+from attacks.artattacks.zeroth_order_optimization_bb_attack import ZeorthOrderOptimalization
+from attacks.foolboxattacks.L1_basic_iterative import L1BasicIterative
+from attacks.foolboxattacks.projected_gradient_descent import ProjectedGradientDescentInf
 
-import timeout_decorator
+tf.compat.v1.disable_eager_execution()
 
 
 # Wrapper class providing .input and .output for some of the attacks
@@ -218,6 +218,48 @@ class TestArtWithPytorchUsingFoolbox(unittest.TestCase):
     def test_art_AdversarialPatch(self):
         art_model = AdversarialPatch()
         self.assertIsNotNone(art_model.conduct(pytorch_model_form_foolbox(), foolbox_sample_data()))
+
+
+class TestArtWithKerasUsingArt(unittest.TestCase):
+    # Working example
+    @timeout_decorator.timeout(120)
+    def test_keras_fast_gradient(self):
+        mod = keras_model_from_art()
+
+        attack = FastGradient(clip_values=(_min_pixel_value, _max_pixel_value), use_logits=False)
+
+        self.assertIsNotNone(attack.conduct(mod, Data(load_mnist()[0])))
+
+    @timeout_decorator.timeout(500)
+    @unittest.skip("I dont have that much time to spare.")
+    def test_art_ZeorthOrderOptimalization(self):
+        model = pytorch_model_form_art()
+        art_model = ZeorthOrderOptimalization(clip_values=(_min_pixel_value, _max_pixel_value),
+                                              loss=nn.CrossEntropyLoss(),
+                                              optimizer=optim.Adam(model.parameters(), lr=0.01),
+                                              input_shape=(1, 28, 28),
+                                              nb_classes=10)
+        self.assertIsNotNone(art_model.conduct(keras_model_from_art(), Data(load_mnist()[0])))
+
+    @timeout_decorator.timeout(120)
+    @unittest.skip("AdversarialPatch is not yet implemented.")
+    def test_art_AdversarialPatch(self):
+        art_model = AdversarialPatch()
+        self.assertIsNotNone(art_model.conduct(keras_model_from_art(), Data(load_mnist()[0])))
+
+    # With tf.compat.v1.disable_eager_execution() ValueError: TensorFlowModel requires TensorFlow Eager Mode
+    # Without -"- ValueError: expected model to be callable
+    @timeout_decorator.timeout(120)
+    def test_foolbox_ProjectedGradientDescentInf(self):
+        foolbox_model = ProjectedGradientDescentInf()
+        self.assertIsNotNone(foolbox_model.conduct(keras_model_from_art(), Data(load_mnist()[0])))
+
+    # With tf.compat.v1.disable_eager_execution() ValueError: TensorFlowModel requires TensorFlow Eager Mode
+    # Without -"- ValueError: expected model to be callable
+    @timeout_decorator.timeout(120)
+    def test_foolbox_L1BasicIterative(self):
+        foolbox_model = L1BasicIterative({})
+        self.assertIsNotNone(foolbox_model.conduct(keras_model_from_art(), Data(load_mnist()[0])))
 
 
 if __name__ == '__main__':

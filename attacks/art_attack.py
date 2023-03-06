@@ -1,13 +1,14 @@
 import abc
-import torch
-import sklearn
-from tensorflow import keras
 
-from attacks.attack import Attack
+import sklearn
+import torch
 from art.estimators.classification \
     import KerasClassifier, PyTorchClassifier, SklearnClassifier
 from mlplatformlib.model_building.binary.neural_network \
     import BinaryNeuralNetworkClassifier
+from tensorflow import keras
+
+from attacks.attack import Attack
 
 
 class ARTAttack(Attack):
@@ -30,7 +31,8 @@ class ARTAttack(Attack):
             'loss': None,
             'nb_classes': None,
             'optimizer': None,
-            'clip_values': None
+            'clip_values': None,
+            'use_logits': False
         }
 
         # We separate known classifier parameters from potential attack params
@@ -48,7 +50,9 @@ class ARTAttack(Attack):
     def _set_classifier(self, model):
         if isinstance(model, keras.Model):
             # Setting classifier for Keras model, todo adding optional parameters
-            self._classifier = KerasClassifier(model=model)
+            self._classifier = KerasClassifier(
+                model=model, **{key: self._classifier_params.get(key) for key in
+                                ['clip_values', 'use_logits']})
         elif isinstance(model, BinaryNeuralNetworkClassifier):
             self._classifier = model.get_sklearn_object()
         elif isinstance(model, torch.nn.Module):
@@ -56,8 +60,9 @@ class ARTAttack(Attack):
             if self._classifier_params.get('input_shape')\
                 and self._classifier_params.get('loss')\
                 and self._classifier_params.get('nb_classes'):
-                
-                self._classifier = PyTorchClassifier(model=model, **{key: self._classifier_params.get(key) for key in ['loss', 'optimizer', 'input_shape', 'nb_classes', 'clip_values']})
+                self._classifier = PyTorchClassifier(
+                    model=model, **{key: self._classifier_params.get(key) for key in
+                                    ['loss', 'optimizer', 'input_shape', 'nb_classes', 'clip_values']})
             else:
                 raise Exception("PyTorch model needs input_shape, loss and nb_classes to conduct attack")
         elif isinstance(model, sklearn.base.BaseEstimator):
@@ -65,7 +70,7 @@ class ARTAttack(Attack):
             self._classifier = SklearnClassifier(model=model)
         else:
             # TODO: Implementation of TensorFlow (and V2) classifiers, BlackBox
-            raise Exception("Model type not supported")
+            raise Exception("Model type not supported\n" + str(self.__class__.mro()) + "\n")
 
     @abc.abstractmethod
     def conduct(self, model, data):

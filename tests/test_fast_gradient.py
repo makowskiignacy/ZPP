@@ -3,16 +3,17 @@ A set of simple tests to check the compatibility of the FastGradient attack with
 '''
 
 import unittest
+
 import numpy as np
-import torch.nn as nn
 import tensorflow.compat.v1 as tf
+import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+from art.utils import load_mnist
+from keras.layers import Dense, Flatten, Conv2D, MaxPooling2D
+from keras.models import Sequential
 
 from attacks.artattacks.fast_gradient import FastGradient
-from art.utils import load_mnist
-from keras.models import Sequential
-from keras.layers import Dense, Flatten, Conv2D, MaxPooling2D
 
 
 class Data:
@@ -77,9 +78,9 @@ class TestKeras(unittest.TestCase):
         model.add(Dense(100, activation="relu"))
         model.add(Dense(10, activation="softmax"))
 
-        art_model = FastGradient(model=model, clip_values=(min_pixel_value, max_pixel_value), use_logits=False)
+        art_attack = FastGradient(model=model, clip_values=(min_pixel_value, max_pixel_value), use_logits=False)
 
-        self.assertIsNotNone(art_model.conduct(model, data))
+        self.assertIsNotNone(art_attack.conduct(model, data))
 
 
 class TestPytorch(unittest.TestCase):
