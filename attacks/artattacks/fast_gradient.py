@@ -3,9 +3,9 @@ The parameters are chosen for reduced computational requirements of the script a
 """
 
 import numpy as np
+from art.attacks.evasion import FastGradientMethod
 
 from attacks.art_attack import ARTAttack
-from art.attacks.evasion import FastGradientMethod
 
 
 class FastGradient(ARTAttack):
@@ -13,7 +13,7 @@ class FastGradient(ARTAttack):
         # Initialization of the arguments needed for the classifier
         super().__init__(**params)
 
-        self._attack_params.update({
+        self._attack_params = {
             # norm – The norm of the adversarial perturbation. Possible values: “inf”, np.inf, 1 or 2.
             "norm": np.inf,
             # eps – Attack step size (input variation).
@@ -30,7 +30,7 @@ class FastGradient(ARTAttack):
             "minimal": False,
             # summary_writer – Activate summary writer for TensorBoard.
             "summary_writer": False
-        })
+        }
 
         # Assigning only relevant arguments
         for key in self._attack_params.keys():
