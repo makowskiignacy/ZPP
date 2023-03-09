@@ -43,4 +43,4 @@ class FastGradient(ARTAttack):
 
         # estimator – A trained classifier.
         return self.to_unified_format(FastGradientMethod(estimator=self._classifier, **self._attack_params).generate(
-            x=self._data.input, y=self._data.output, **self._attack_params))
+            x=self._data.input, y=self._data.output, **self._classifier_params))

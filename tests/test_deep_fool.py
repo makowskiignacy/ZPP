@@ -9,7 +9,7 @@ import tensorflow.compat.v1 as tf
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from art.attacks.evasion import DeepFool
+from attacks.artattacks.deep_fool import DeepFool
 from art.utils import load_dataset
 from art.utils import load_mnist
 from keras.layers import Dense, Flatten, Conv2D, MaxPooling2D, Activation, Dropout
@@ -41,7 +41,7 @@ class TestDeepFool(unittest.TestCase):
         model.add(Dense(100, activation="relu"))
         model.add(Dense(10, activation="softmax"))
 
-        art_attack = DeepFool(model=model, clip_values=(min_pixel_value, max_pixel_value), use_logits=False)
+        art_attack = DeepFool(clip_values=(min_pixel_value, max_pixel_value), use_logits=False)
 
         self.assertIsNotNone(art_attack.conduct(model, data))
 
@@ -81,6 +81,7 @@ class TestDeepFool(unittest.TestCase):
 
         self.assertIsNotNone(art_model.conduct(model, data2))
 
+    # Passed after around 600s
     def test_example(self):
         # Configure a logger to capture ART outputs; these are printed in console and the level of detail is set to INFO
         logger = logging.getLogger()
@@ -122,4 +123,4 @@ class TestDeepFool(unittest.TestCase):
 
         model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
 
-        self.assertIsNotNone(DeepFool(clip_values=(min_, max_)).conduct(model, x_test, y_test))
+        self.assertIsNotNone(DeepFool(clip_values=(min_, max_)).conduct(model, Data((x_test, y_test))))
