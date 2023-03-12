@@ -1,10 +1,25 @@
+from attacks.attack import Attack
+
+# Ataki pochodzące z ARTa
+from attacks.artattacks.deep_fool import DeepFool
+from attacks.artattacks.fast_gradient import FastGradient
+from attacks.artattacks.joker import Joker
+
 from attacks.artattacks.zeroth_order_optimization_bb_attack\
     import ZeorthOrderOptimalization as ZOOAttack
 
 from attacks.artattacks.adversarial_patch\
-    import AdversarialPatch 
+    import AdversarialPatch
 
-from attacks.attack import Attack
+# Ataki pochodzące z FoolBoxa
+from attacks.foolboxattacks.brendel_bethge import BrendelBethge 
+from attacks.foolboxattacks.L1_basic_iterative import L1BasicIterative
+from attacks.foolboxattacks.projected_gradient_descent\
+        import ProjectedGradientDescentInf
+from attacks.foolboxattacks.salt_and_pepper import SaltAndPepperNoise
+
+
+
 
 
 class AttackManager():
@@ -14,7 +29,14 @@ class AttackManager():
         return {
             # możliwe, że elementami będą pary (klasa, procedura sprawdzająca)
             "Zeorth Order Optimalization" : ZOOAttack,
-            "AdversarialPatch" : AdversarialPatch
+            "Adversarial Patch" : AdversarialPatch,
+            "DeepFool" : DeepFool,
+            "FastGradient" : FastGradient,
+            "Joker" : Joker,
+            "Brendel Bethge" : BrendelBethge,
+            "L1 Basic Iterative": L1BasicIterative,
+            "Projected Gradient Descent Inf" : ProjectedGradientDescentInf,
+            "Salt And Pepper" : SaltAndPepperNoise
         }
     
     @staticmethod
