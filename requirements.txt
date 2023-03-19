@@ -1,11 +1,11 @@
 art==5.8
 eagerpy==0.30.0
 foolbox==3.3.3
-adversarial-robustness-toolbox==1.13.0
+adversarial-robustness-toolbox==1.14.0
 mlflow==1.29.0
-mlplatformlib==0.0.6
+./mlplatformlib-0.0.6-py3-none-any.whl
 numpy==1.23.5
-scikit_learn==1.2.0
+scikit_learn==1.1.3
 tensorflow==2.11.0
 torch==1.13.1
 
