@@ -15,12 +15,12 @@ from foolbox.utils import accuracy
 from foolbox.models.pytorch import PyTorchModel
 
 
-def simple_test():
+def simple_test(batchsize=4):
     model = tv_models.resnet18(weights=tv_models.ResNet18_Weights.DEFAULT).eval()
     preprocessing = dict(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], axis=-3)
     fmodel = fb.models.pytorch.PyTorchModel(model, bounds=(0, 1), preprocessing=preprocessing)
 
-    images, labels = fb.utils.samples(fmodel, dataset='imagenet', batchsize=4)
+    images, labels = fb.utils.samples(fmodel, dataset='imagenet', batchsize=batchsize)
     data = Data(images, labels)
 
     return fmodel, data
@@ -75,8 +75,8 @@ def conduct(attack: FoolboxAttack, model, data: Data):
 
 
 def main():
-    attack_specific_args = {"steps": 500, "random_start": True}
-    generic_args = {}
+    attack_specific_args = {"steps": 10, "random_start": True}
+    generic_args = {"epsilon": 20}
 
     attack_bi1 = L1BasicIterative(attack_specific_args, generic_args)
     attack_bi2 = L2BasicIterative(attack_specific_args, generic_args)
@@ -85,7 +85,7 @@ def main():
     attack_bi2_a = L2AdamBasicIterative(attack_specific_args, generic_args)
     attack_biinf_a = LinfAdamBasicIterative(attack_specific_args, generic_args)
 
-    smodel, sdata = simple_test()
+    smodel, sdata = simple_test(batchsize=20)
 
     print("Attack bi1 simple")
     result1s = conduct(attack_bi1, smodel, sdata)

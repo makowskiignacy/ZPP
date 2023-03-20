@@ -11,9 +11,9 @@ class FoolboxAttack(Attack):
     def __init__(self, args):
         super().__init__()
         self.criterion = args.get("criterion")
-        self.epsilon = args.get("epsilon", 0.0)
-        self.min = args.get("min", -2)
-        self.max = args.get("max", 30000)
+        self.epsilon = args.get("epsilon", 0.01)
+        self.min = args.get("min")
+        self.max = args.get("max")
 
     @staticmethod
     def to_unified_format(data_from_attack):
