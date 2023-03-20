@@ -16,7 +16,7 @@ from foolbox.models.pytorch import PyTorchModel
 
 
 def simple_test():
-    model = tv_models.resnet18(weights=tv_models.ResNet18_Weights).eval()
+    model = tv_models.resnet18(weights=tv_models.ResNet18_Weights.DEFAULT).eval()
     preprocessing = dict(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], axis=-3)
     fmodel = fb.models.pytorch.PyTorchModel(model, bounds=(0, 1), preprocessing=preprocessing)
 
@@ -75,7 +75,7 @@ def conduct(attack: FoolboxAttack, model, data: Data):
 
 
 def main():
-    attack_specific_args = {"steps": 10, "random_start": True}
+    attack_specific_args = {"steps": 500, "random_start": True}
     generic_args = {}
 
     attack_bi1 = L1BasicIterative(attack_specific_args, generic_args)
