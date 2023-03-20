@@ -1,0 +1,117 @@
+from attacks.foolbox_attack import FoolboxAttack
+from foolbox.criteria import Misclassification
+from foolbox.attacks.basic_iterative_method import L1BasicIterativeAttack, L2BasicIterativeAttack, LinfBasicIterativeAttack
+from foolbox.attacks.basic_iterative_method import L1AdamBasicIterativeAttack, L2AdamBasicIterativeAttack, LinfAdamBasicIterativeAttack
+
+
+class L1BasicIterative(L1BasicIterativeAttack, FoolboxAttack):
+    def __init__(self, attack_specific_args, generic_args):
+        super().__init__(**attack_specific_args)
+
+        FoolboxAttack.__init__(self, generic_args)
+
+    def conduct(self, model, data):
+
+        model_correct_format = super().reformat_model(model)
+        if model_correct_format is None:
+            model_correct_format = model
+
+        output = super().flatten_output(data)
+        self.criterion = Misclassification(output)
+
+        result = super().run(model=model_correct_format, inputs=data.input, criterion=self.criterion, epsilon=self.epsilon)
+        return result
+
+
+class L2BasicIterative(L2BasicIterativeAttack, FoolboxAttack):
+    def __init__(self, attack_specific_args, generic_args):
+        super().__init__(**attack_specific_args)
+
+        FoolboxAttack.__init__(self, generic_args)
+
+    def conduct(self, model, data):
+
+        model_correct_format = super().reformat_model(model)
+        if model_correct_format is None:
+            model_correct_format = model
+
+        output = super().flatten_output(data)
+        self.criterion = Misclassification(output)
+
+        result = super().run(model=model_correct_format, inputs=data.input, criterion=self.criterion, epsilon=self.epsilon)
+        return result
+
+
+class LinfBasicIterative(LinfBasicIterativeAttack, FoolboxAttack):
+    def __init__(self, attack_specific_args, generic_args):
+        super().__init__(**attack_specific_args)
+
+        FoolboxAttack.__init__(self, generic_args)
+
+    def conduct(self, model, data):
+
+        model_correct_format = super().reformat_model(model)
+        if model_correct_format is None:
+            model_correct_format = model
+
+        output = super().flatten_output(data)
+        self.criterion = Misclassification(output)
+
+        result = super().run(model=model_correct_format, inputs=data.input, criterion=self.criterion, epsilon=self.epsilon)
+        return result
+
+
+class L1AdamBasicIterative(L1AdamBasicIterativeAttack, FoolboxAttack):
+    def __init__(self, attack_specific_args, generic_args):
+        super().__init__(**attack_specific_args)
+
+        FoolboxAttack.__init__(self, generic_args)
+
+    def conduct(self, model, data):
+
+        model_correct_format = super().reformat_model(model)
+        if model_correct_format is None:
+            model_correct_format = model
+
+        output = super().flatten_output(data)
+        self.criterion = Misclassification(output)
+
+        result = super().run(model=model_correct_format, inputs=data.input, criterion=self.criterion, epsilon=self.epsilon)
+        return result
+
+class L2AdamBasicIterative(L2AdamBasicIterativeAttack, FoolboxAttack):
+    def __init__(self, attack_specific_args, generic_args):
+        super().__init__(**attack_specific_args)
+
+        FoolboxAttack.__init__(self, generic_args)
+
+    def conduct(self, model, data):
+
+        model_correct_format = super().reformat_model(model)
+        if model_correct_format is None:
+            model_correct_format = model
+
+        output = super().flatten_output(data)
+        self.criterion = Misclassification(output)
+
+        result = super().run(model=model_correct_format, inputs=data.input, criterion=self.criterion, epsilon=self.epsilon)
+        return result
+
+
+class LinfAdamBasicIterative(LinfAdamBasicIterativeAttack, FoolboxAttack):
+    def __init__(self, attack_specific_args, generic_args):
+        super().__init__(**attack_specific_args)
+
+        FoolboxAttack.__init__(self, generic_args)
+
+    def conduct(self, model, data):
+
+        model_correct_format = super().reformat_model(model)
+        if model_correct_format is None:
+            model_correct_format = model
+
+        output = super().flatten_output(data)
+        self.criterion = Misclassification(output)
+
+        result = super().run(model=model_correct_format, inputs=data.input, criterion=self.criterion, epsilon=self.epsilon)
+        return result

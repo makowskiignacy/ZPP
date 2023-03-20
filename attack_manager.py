@@ -13,7 +13,7 @@ from attacks.artattacks.adversarial_patch\
 
 # Ataki pochodzące z FoolBoxa
 from attacks.foolboxattacks.brendel_bethge import BrendelBethge 
-from attacks.foolboxattacks.L1_basic_iterative import L1BasicIterative
+from attacks.foolboxattacks.basic_iterative import L1BasicIterative, L2BasicIterative, LinfBasicIterative
 from attacks.foolboxattacks.projected_gradient_descent\
         import ProjectedGradientDescentInf
 from attacks.foolboxattacks.salt_and_pepper import SaltAndPepperNoise
@@ -35,6 +35,8 @@ class AttackManager():
             "Joker" : Joker,
             "Brendel Bethge" : BrendelBethge,
             "L1 Basic Iterative": L1BasicIterative,
+            "L2 Basic Iterative": L2BasicIterative,
+            "Linf Basic Iterative": LinfBasicIterative,
             "Projected Gradient Descent Inf" : ProjectedGradientDescentInf,
             "Salt And Pepper" : SaltAndPepperNoise
         }
