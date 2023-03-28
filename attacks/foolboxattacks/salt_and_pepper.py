@@ -12,6 +12,8 @@ class SaltAndPepperNoise(SaltAndPepperNoiseAttack, FoolboxAttack):
     def conduct(self, model, data):
 
         model_correct_format = super().reformat_model(model)
+        if model_correct_format is None:
+            model_correct_format = model
 
         output = super().flatten_output(data)
         self.criterion = Misclassification(output)
