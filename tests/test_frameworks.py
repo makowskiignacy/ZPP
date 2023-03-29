@@ -28,7 +28,7 @@ from keras.optimizers import Adam
 from attacks.artattacks.adversarial_patch import AdversarialPatch
 from attacks.artattacks.fast_gradient import FastGradient
 from attacks.artattacks.zeroth_order_optimization_bb_attack import ZeorthOrderOptimalization
-from attacks.foolboxattacks.L1_basic_iterative import L1BasicIterative
+from attacks.foolboxattacks.basic_iterative import L1BasicIterative, L2BasicIterative, LinfBasicIterative
 from attacks.foolboxattacks.projected_gradient_descent import ProjectedGradientDescentInf
 
 tf.compat.v1.disable_eager_execution()
@@ -147,7 +147,17 @@ class TestFoolboxWithPytorchUsingArt(unittest.TestCase):
                                                    art_sample_data().foolbox_pytorch_preprocessing()))
 
     def test_foolbox_L1BasicIterative(self):
-        foolbox_model = L1BasicIterative({})
+        foolbox_model = L1BasicIterative({}, {})
+        self.assertIsNotNone(foolbox_model.conduct(pytorch_model_form_art(),
+                                                   art_sample_data().foolbox_pytorch_preprocessing()))
+
+    def test_foolbox_L2BasicIterative(self):
+        foolbox_model = L2BasicIterative({}, {})
+        self.assertIsNotNone(foolbox_model.conduct(pytorch_model_form_art(),
+                                                   art_sample_data().foolbox_pytorch_preprocessing()))
+
+    def test_foolbox_LinfBasicIterative(self):
+        foolbox_model = LinfBasicIterative({}, {})
         self.assertIsNotNone(foolbox_model.conduct(pytorch_model_form_art(),
                                                    art_sample_data().foolbox_pytorch_preprocessing()))
 
