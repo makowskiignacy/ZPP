@@ -25,12 +25,11 @@ def simple_test():
 
 
 def nn_test():
-    ss_nn_pipeline = mlflow.sklearn.load_model('../ss_nn/')
+    ss_nn_pipeline = mlflow.sklearn.load_model('/ss_nn/')
     if ss_nn_pipeline is not None:
         standard_scaler_from_nn_pipeline = ss_nn_pipeline.steps[0][1]
         nn_model = ss_nn_pipeline.steps[1][1].module_
         
-
         csv_filename = '../data_test.csv'
 
         with open(csv_filename) as f:
