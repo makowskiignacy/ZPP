@@ -4,45 +4,37 @@ from art.attacks.evasion import ZooAttack as orig_art_zoo_attack
 
 
 class ZeorthOrderOptimalization(ARTAttack):
-    def __init__(self, **params):
+    def __init__(self, parameters):
         # inicjalizacja argumentów potrzebnych dla klasyfikatora, będą one wspólne dla wszystkich ataków
-        super().__init__(**params)
+        super().__init__(parameters.classifier_parameters)
         # Definiujemy podstawowe parametry ataku
-        self._attack_params.update({
+        self._attack_params = {
             # Pewność przykładów kontradyktoryjnych
-            'confidence': 0.0,
+            "confidence": parameters.attack_parameters.get("confidence", 0.0),
             # Czy atak ma sie skupić na konkrentej klasie
-            'targeted': False,
+            "targeted": parameters.attack_parameters.get("targeted", False),
             # mniej => lepsze wyniki ale dłużej
-            'learning_rate': 0.01,
+            "learning_rate": parameters.attack_parameters.get("learning_rate", 0.01),
             # To można zwiększyć
-            'max_iter': 10,
+            "max_iter": parameters.attack_parameters.get("max_iter", 10),
             # To również
-            'binary_search_steps': 1,
+            "binary_search_steps": parameters.attack_parameters.get("binary_search_steps", 1),
             # To nie ma znaczenia, gdy powyższe jest 'duże'
-            'initial_const': 0.001,
+            "initial_const": parameters.attack_parameters.get("initial_const", 0.001),
             # Czy w przypadku 'utknięcia' przerwać wcześniej
-            'abort_early': True,
-
-            'use_resize': True,
-
-            'use_importance': True,
+            "abort_early": parameters.attack_parameters.get("abort_early", True),
+            "use_resize": parameters.attack_parameters.get("use_resize", True),
+            "use_importance": parameters.attack_parameters.get("use_importance", True),
             # To można chyba podkręcić
-            'nb_parallel': 128,
-            # Wielkość grup próbek (warto zwrócić uwagę, że wykonywanych jest
-            # nb_parallel na raz, stąd nie powinno być bardzo duże)
-            'batch_size': 1,
+            "nb_parallel": parameters.attack_parameters.get("nb_parallel", 128),
+            # Wielkość grup próbek (warto zwrócić uwagę, że wykonywanych jest nb_parallel na raz, stąd nie powinno być bardzo duże)
+            "batch_size": parameters.attack_parameters.get("batch_size", 1),
             # Zmienna używana do numerycznego przybliżenia pochodnej
-            'variable_h': 0.0001,
+            "variable_h": parameters.attack_parameters.get("variable_h", 0.0001),
             # Czy pokazywać pasek progresu
-            'verbose': False
-        })
-        # Jeśli podano inne to podmieniamy, ale nie uwzględniamy
-        # parametrów spoza listy!
+            "verbose": parameters.attack_parameters.get("verbose", False),
+        }
 
-        for key in self._attack_params.keys():
-            if key in params.keys():
-                self._attack_params[key] = params[key]
 
 
     def conduct(self, model, data):

@@ -150,5 +150,3 @@ class TestProjectedGradientDescent(unittest.TestCase):
         # print(resultinfs)
 
 
-if __name__ == '__main__':
-    main()

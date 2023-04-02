@@ -10,6 +10,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from attacks.artattacks.deep_fool import DeepFool
+from attacks.helpers.parameters import ARTParameters
 from art.utils import load_dataset
 from art.utils import load_mnist
 from keras.layers import Dense, Flatten, Conv2D, MaxPooling2D, Activation, Dropout
@@ -41,7 +42,11 @@ class TestDeepFool(unittest.TestCase):
         model.add(Dense(100, activation="relu"))
         model.add(Dense(10, activation="softmax"))
 
-        art_attack = DeepFool(clip_values=(min_pixel_value, max_pixel_value), use_logits=False)
+        classifier_parameters = {"clip_values": (min_pixel_value, max_pixel_value)}
+        attack_parameters = {"use_logits": False}
+        parameters = ARTParameters(classifier_parameters, attack_parameters)
+
+        art_attack = DeepFool(parameters)
 
         self.assertIsNotNone(art_attack.conduct(model, data))
 
@@ -70,11 +75,11 @@ class TestDeepFool(unittest.TestCase):
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.Adam(model.parameters(), lr=0.01)
 
-        art_model = DeepFool(clip_values=(min_pixel_value, max_pixel_value),
-                                 loss=criterion,
-                                 optimizer=optimizer,
-                                 input_shape=(1, 28, 28),
-                                 nb_classes=10)
+        classifier_parameters = {"clip_values": (min_pixel_value, max_pixel_value), "loss": criterion, "optimizer": optimizer, "input_shape": (1, 28, 28), "nb_classes": 10}
+        attack_parameters={}
+        parameters=ARTParameters(classifier_parameters,attack_parameters)
+
+        art_model = DeepFool(parameters)
 
         # This attack does not need y/output
         data2 = Data((np.transpose(data.input, (0, 3, 1, 2)).astype(np.float32), None))
@@ -123,4 +128,9 @@ class TestDeepFool(unittest.TestCase):
 
         model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
 
-        self.assertIsNotNone(DeepFool(clip_values=(min_, max_)).conduct(model, Data((x_test, y_test))))
+        classifier_parameters = {"clip_values": (min_pixel_value, max_pixel_value)}
+        attack_parameters = {}
+        parameters = ARTParameters(classifier_parameters, attack_parameters)
+
+
+        self.assertIsNotNone(DeepFool(parameters).conduct(model, Data((x_test, y_test))))
