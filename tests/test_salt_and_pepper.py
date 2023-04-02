@@ -9,6 +9,7 @@ import torch
 import torchvision.models as tv_models
 import foolbox as fb
 from attacks.helpers.data import Data
+from attacks.helpers.parameters import FoolboxParameters
 from attacks.foolbox_attack import FoolboxAttack
 from foolbox.utils import accuracy
 
@@ -42,7 +43,7 @@ def nn_test():
             data2 = []
             i = 0
             for row in data:
-                if i < 10000:
+                if i < 100:
                     i = i+1
                     row2 = []
                     for place in range(len(row)):
@@ -79,13 +80,16 @@ def conduct(attack: SaltAndPepperNoise, model, data: Data):
 
 
 def main():
-    attack_specific_args_simple = {"steps": 10, "across_channels": False}
-    generic_args = {}
+    attack_specific_parameters_simple = {"steps": 10, "across_channels": True}
+    attack_specific_parameters_nn = {"steps": 100, "across_channels": True}
+    generic_parameters_simple = {}
+    generic_parameters_nn = {}
+    parameters_simple = FoolboxParameters(attack_specific_parameters_simple, generic_parameters_simple)
+    parameters_nn = FoolboxParameters(attack_specific_parameters_nn, generic_parameters_nn)
 
-    attack_specific_args_nn = {"steps": 1000, "across_channels": False}
 
-    attack_sap_simple = SaltAndPepperNoise(attack_specific_args_simple, generic_args)
-    attack_sap_nn = SaltAndPepperNoise(attack_specific_args_nn, generic_args)
+    attack_sap_simple = SaltAndPepperNoise(parameters_simple)
+    attack_sap_nn = SaltAndPepperNoise(parameters_nn)
 
     smodel, sdata = simple_test(batchsize=4)
 

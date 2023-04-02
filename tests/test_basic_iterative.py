@@ -8,10 +8,10 @@ import torchvision.models as tv_models
 import foolbox as fb
 from attacks.foolboxattacks.basic_iterative import L1BasicIterative, L2BasicIterative, LinfBasicIterative
 from attacks.foolboxattacks.basic_iterative import L1AdamBasicIterative, L2AdamBasicIterative, LinfAdamBasicIterative
+from attacks.helpers.parameters import FoolboxParameters
 from attacks.helpers.data import Data
 from attacks.foolbox_attack import FoolboxAttack
 from foolbox.utils import accuracy
-
 from foolbox.models.pytorch import PyTorchModel
 
 
@@ -75,15 +75,16 @@ def conduct(attack: FoolboxAttack, model, data: Data):
 
 
 def main():
-    attack_specific_args = {"steps": 10, "random_start": True}
-    generic_args = {"epsilon": 20}
+    attack_specific_parameters = {"steps": 10, "random_start": True}
+    generic_parameters = {"epsilon_rate": 0.01}
+    parameters = FoolboxParameters(attack_specific_parameters, generic_parameters)
 
-    attack_bi1 = L1BasicIterative(attack_specific_args, generic_args)
-    attack_bi2 = L2BasicIterative(attack_specific_args, generic_args)
-    attack_biinf = LinfBasicIterative(attack_specific_args, generic_args)
-    attack_bi1_a = L1AdamBasicIterative(attack_specific_args, generic_args)
-    attack_bi2_a = L2AdamBasicIterative(attack_specific_args, generic_args)
-    attack_biinf_a = LinfAdamBasicIterative(attack_specific_args, generic_args)
+    attack_bi1 = L1BasicIterative(parameters)
+    attack_bi2 = L2BasicIterative(parameters)
+    attack_biinf = LinfBasicIterative(parameters)
+    attack_bi1_a = L1AdamBasicIterative(parameters)
+    attack_bi2_a = L2AdamBasicIterative(parameters)
+    attack_biinf_a = LinfAdamBasicIterative(parameters)
 
     smodel, sdata = simple_test(batchsize=20)
 

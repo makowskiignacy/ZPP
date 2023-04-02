@@ -8,6 +8,7 @@ import torchvision.models as tv_models
 import foolbox as fb
 from attacks.foolboxattacks.brendel_bethge import L0BrendelBethge, L1BrendelBethge, L2BrendelBethge, LinfinityBrendelBethge
 from attacks.helpers.data import Data
+from attacks.helpers.parameters import FoolboxParameters
 from attacks.foolbox_attack import FoolboxAttack
 from foolbox.utils import accuracy
 
@@ -29,7 +30,7 @@ def nn_test():
     if ss_nn_pipeline is not None:
         standard_scaler_from_nn_pipeline = ss_nn_pipeline.steps[0][1]
         nn_model = ss_nn_pipeline.steps[1][1].module_
-        
+        fmodel = fb.models.pytorch.PyTorchModel(nn_model, bounds=(-2., 30000.))
 
         csv_filename = '../data_test.csv'
 
@@ -38,18 +39,21 @@ def nn_test():
             data = list(list(line) for line in reader)
             data.pop(0)
             data2 = []
+            i = 0
             for row in data:
-                row2 = []
-                for place in range(len(row)):
-                    row2.append(float(row[place]))
-                data2.append(row2)
+                if i < 100:
+                    i = i+1
+                    row2 = []
+                    for place in range(len(row)):
+                        row2.append(float(row[place]))
+                    data2.append(row2)
             data = data2
             data = torch.tensor(data, requires_grad=False, dtype=torch.float)
             data, result = torch.hsplit(data, [91, ])
             result = torch.tensor(result, requires_grad=False, dtype=torch.float)
             data = Data(data, result)
 
-        return nn_model, data
+        return fmodel, data
     return None, None
 
 
@@ -75,38 +79,46 @@ def conduct(attack: FoolboxAttack, model, data: Data):
 
         
 def main():
-    bb_simple_args_dict = {'epsilons': 1, "lr": 1, 'steps': 100, 'min': 0, 'max': 1}
-    bb_nn_args_dict = {'epsilons': 1, "lr": 1, 'steps': 100, 'min': -1.0, 'max': 28157.0}
+    generic_parameters_simple = {'min': 0, 'max': 1}
+    generic_parameters_nn = {'min': -1.0, 'max': 28157.0}
+    attack_specific_parameters = {"lr": 10, 'steps': 100}
+    parameters_simple = FoolboxParameters(attack_specific_parameters,generic_parameters_simple)
+    parameters_nn = FoolboxParameters(attack_specific_parameters, generic_parameters_nn)
 
-    attack_bb0_simple = L0BrendelBethge(bb_simple_args_dict)
-    attack_bb1_simple = L1BrendelBethge(bb_simple_args_dict)
-    attack_bb2_simple = L2BrendelBethge(bb_simple_args_dict)
-    attack_bbinf_simple = LinfinityBrendelBethge(bb_simple_args_dict)
+    attack_bb0_simple = L0BrendelBethge(parameters_simple)
+    attack_bb1_simple = L1BrendelBethge(parameters_simple)
+    attack_bb2_simple = L2BrendelBethge(parameters_simple)
+    attack_bbinf_simple = LinfinityBrendelBethge(parameters_simple)
 
-    attack_bb1_nn = L1BrendelBethge(bb_nn_args_dict)
-    attack_bb2_nn = L2BrendelBethge(bb_nn_args_dict)
-    attack_bbinf_nn = LinfinityBrendelBethge(bb_nn_args_dict)
+    attack_bb0_nn = L0BrendelBethge(parameters_nn)
+    attack_bb1_nn = L1BrendelBethge(parameters_nn)
+    attack_bb2_nn = L2BrendelBethge(parameters_nn)
+    attack_bbinf_nn = LinfinityBrendelBethge(parameters_nn)
 
     smodel, sdata = simple_test()
 
     print("Attack bb0 simple")
-    result0 = conduct(attack_bb0_simple, smodel, sdata)
-    print(result0)
+    result0s = conduct(attack_bb0_simple, smodel, sdata)
+    print(result0s)
 
-    # print("Attack bb1 simple")
-    # result1 = conduct(attack_bb1_simple, smodel, sdata)
-    # print(result1)
+    print("Attack bb1 simple")
+    result1 = conduct(attack_bb1_simple, smodel, sdata)
+    print(result1)
 
-    # print("Attack bb2 simple")
-    # result2s = conduct(attack_bb2_simple, smodel, sdata)
-    # print(result2s)
+    print("Attack bb2 simple")
+    result2s = conduct(attack_bb2_simple, smodel, sdata)
+    print(result2s)
 
-    # print("Attack bbinf simple")
-    # resultinf = conduct(attack_bbinf_simple, smodel, sdata)
-    # print(resultinf)
+    print("Attack bbinf simple")
+    resultinfs = conduct(attack_bbinf_simple, smodel, sdata)
+    print(resultinfs)
 
     nn_model, nn_data = nn_test()
     if nn_model is not None and nn_data is not None:
+        print("Attack bb0 nn")
+        result0nn = conduct(attack_bb0_nn, nn_model, nn_data)
+        print(result0nn)
+
         print("Attack bb1 nn")
         result1nn = conduct(attack_bb1_nn, nn_model, nn_data)
         print(result1nn)

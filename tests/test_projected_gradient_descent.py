@@ -9,6 +9,7 @@ import foolbox as fb
 from attacks.foolboxattacks.projected_gradient_descent import L1ProjectedGradientDescent, L2ProjectedGradientDescent, LinfProjectedGradientDescent
 from attacks.foolboxattacks.projected_gradient_descent import L1AdamProjectedGradientDescent, L2AdamProjectedGradientDescent, LinfAdamProjectedGradientDescent
 from attacks.helpers.data import Data
+from attacks.helpers.parameters import FoolboxParameters
 from attacks.foolbox_attack import FoolboxAttack
 from foolbox.utils import accuracy
 
@@ -75,67 +76,65 @@ def conduct(attack: FoolboxAttack, model, data: Data):
 
 
 def main():
-    attack_specific_args = {"steps": 10, "random_start": True}
-    generic_args = {"epsilon": 0.01}
+    attack_specific_parameters = {"steps": 100, "random_start": True}
+    generic_parameters_simple = {"epsilon": 0.01}
+    generic_parameters_nn = {"epsilon": 30}
+    parameters_simple = FoolboxParameters(attack_specific_parameters,generic_parameters_simple)
+    parameters_nn = FoolboxParameters(attack_specific_parameters, generic_parameters_nn)
 
-    attack_pgd1 = L1ProjectedGradientDescent(attack_specific_args, generic_args)
-    attack_pgd2 = L2ProjectedGradientDescent(attack_specific_args, generic_args)
-    attack_pgdinf = LinfProjectedGradientDescent(attack_specific_args, generic_args)
-    attack_pgd1_a = L1AdamProjectedGradientDescent(attack_specific_args, generic_args)
-    attack_pgd2_a = L2AdamProjectedGradientDescent(attack_specific_args, generic_args)
-    attack_pgdinf_a = LinfAdamProjectedGradientDescent(attack_specific_args, generic_args)
+    attack_pgd1 = L1ProjectedGradientDescent(parameters_simple)
+    attack_pgd2 = L2ProjectedGradientDescent(parameters_simple)
+    attack_pgdinf = LinfProjectedGradientDescent(parameters_simple)
+    attack_pgd1_a = L1AdamProjectedGradientDescent(parameters_simple)
+    attack_pgd2_a = L2AdamProjectedGradientDescent(parameters_simple)
+    attack_pgdinf_a = LinfAdamProjectedGradientDescent(parameters_simple)
 
     smodel, sdata = simple_test(batchsize=20)
 
     print("Attack pgd1 simple")
     result1s = conduct(attack_pgd1, smodel, sdata)
-    print(result1s)
 
     print("Attack pgd2 simple")
     result2s = conduct(attack_pgd2, smodel, sdata)
-    print(result2s)
 
     print("Attack pgdinf simple")
     resultinfs = conduct(attack_pgdinf, smodel, sdata)
-    print(resultinfs)
 
     print("Attack pgd1 with Adam simple")
-    result1s = conduct(attack_pgd1_a, smodel, sdata)
-    print(result1s)
+    result1as = conduct(attack_pgd1_a, smodel, sdata)
 
     print("Attack pgd2 with Adam simple")
-    result2s = conduct(attack_pgd2_a, smodel, sdata)
-    print(result2s)
+    result2as = conduct(attack_pgd2_a, smodel, sdata)
 
     print("Attack pgdinf with Adam simple")
-    resultinfs = conduct(attack_pgdinf_a, smodel, sdata)
-    print(resultinfs)
+    resultinfas = conduct(attack_pgdinf_a, smodel, sdata)
 
     nn_model, nn_data = nn_test()
     if nn_model is not None and nn_data is not None:
+        attack_pgd1 = L1ProjectedGradientDescent(parameters_nn)
+        attack_pgd2 = L2ProjectedGradientDescent(parameters_nn)
+        attack_pgdinf = LinfProjectedGradientDescent(parameters_nn)
+        attack_pgd1_a = L1AdamProjectedGradientDescent(parameters_nn)
+        attack_pgd2_a = L2AdamProjectedGradientDescent(parameters_nn)
+        attack_pgdinf_a = LinfAdamProjectedGradientDescent(parameters_nn)
+
         print("Attack pgd1 nn")
         result1nn = conduct(attack_pgd1, nn_model, nn_data)
-        print(result1nn)
 
         print("Attack pgd2 nn")
         result2nn = conduct(attack_pgd2, nn_model, nn_data)
-        print(result2nn)
 
         print("Attack pgdinf nn")
         resultinfnn = conduct(attack_pgdinf, nn_model, nn_data)
-        print(resultinfnn)
 
         print("Attack pgd1 with Adam nn")
-        result1nn = conduct(attack_pgd1_a, nn_model, nn_data)
-        print(result1nn)
+        result1ann = conduct(attack_pgd1_a, nn_model, nn_data)
 
         print("Attack pgd2 with Adam nn")
-        result2nn = conduct(attack_pgd2_a, nn_model, nn_data)
-        print(result2nn)
+        result2ann = conduct(attack_pgd2_a, nn_model, nn_data)
 
         print("Attack pgdinf with Adam nn")
-        resultinfnn = conduct(attack_pgdinf_a, nn_model, nn_data)
-        print(resultinfnn)
+        resultinfann = conduct(attack_pgdinf_a, nn_model, nn_data)
 
 
 if __name__ == '__main__':
