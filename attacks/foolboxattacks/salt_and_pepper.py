@@ -1,5 +1,5 @@
 from attacks.foolbox_attack import FoolboxAttack
-from foolbox.criteria import Misclassification
+from foolbox.criteria import Misclassification, TargetedMisclassification
 from foolbox.attacks.saltandpepper import SaltAndPepperNoiseAttack
 
 
@@ -16,7 +16,10 @@ class SaltAndPepperNoise(SaltAndPepperNoiseAttack, FoolboxAttack):
             model_correct_format = model
 
         output = super().flatten_output(data)
-        self.criterion = Misclassification(output)
+        if self.criterion_type == "targeted_misclassification":
+            self.criterion = TargetedMisclassification(output)
+        if self.criterion_type == "misclassification":
+            self.criterion = Misclassification(output)
 
         result = super().run(model=model_correct_format, inputs=data.input, criterion=self.criterion)
         return result
