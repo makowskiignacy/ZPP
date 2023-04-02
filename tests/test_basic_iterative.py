@@ -2,7 +2,8 @@ import time
 import mlflow
 import csv
 import numpy as np
-import torchimport unittest
+import torch
+import unittest
 
 import torchvision.models as tv_models
 import foolbox as fb
