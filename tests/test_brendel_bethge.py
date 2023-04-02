@@ -3,6 +3,7 @@ import mlflow
 import csv
 import numpy as np
 import torch
+import unittest
 
 import torchvision.models as tv_models
 import foolbox as fb
@@ -78,7 +79,7 @@ def conduct(attack: FoolboxAttack, model, data: Data):
 
 
         
-def main():
+class TestBrendelBethge(unittest.TestCase):
     generic_parameters_simple = {'min': 0, 'max': 1}
     generic_parameters_nn = {'min': -1.0, 'max': 28157.0}
     attack_specific_parameters = {"lr": 10, 'steps': 100}
@@ -97,39 +98,37 @@ def main():
 
     smodel, sdata = simple_test()
 
-    print("Attack bb0 simple")
-    result0s = conduct(attack_bb0_simple, smodel, sdata)
-    print(result0s)
+    def test_bb_0_simple(self):
+        result0s = conduct(self.attack_bb0_simple, self.smodel, self.sdata)
+        #print(result0s)
 
-    print("Attack bb1 simple")
-    result1 = conduct(attack_bb1_simple, smodel, sdata)
-    print(result1)
+    def test_bb_1_simple(self):
+        result1s = conduct(self.attack_bb1_simple, self.smodel, self.sdata)
+        #print(result1s)
 
-    print("Attack bb2 simple")
-    result2s = conduct(attack_bb2_simple, smodel, sdata)
-    print(result2s)
+    def test_bb_2_simple(self):
+        result2s = conduct(self.attack_bb2_simple, self.smodel, self.sdata)
+        #print(result2s)
 
-    print("Attack bbinf simple")
-    resultinfs = conduct(attack_bbinf_simple, smodel, sdata)
-    print(resultinfs)
+    def test_bb_inf_simple(self):
+        resultinfs = conduct(self.attack_bbinf_simple, self.smodel, self.sdata)
+        #print(resultinfs)
 
     nn_model, nn_data = nn_test()
-    if nn_model is not None and nn_data is not None:
-        print("Attack bb0 nn")
-        result0nn = conduct(attack_bb0_nn, nn_model, nn_data)
-        print(result0nn)
 
-        print("Attack bb1 nn")
-        result1nn = conduct(attack_bb1_nn, nn_model, nn_data)
-        print(result1nn)
-        
-        print("Attack bb2 nn")
-        result2nn = conduct(attack_bb2_nn, nn_model, nn_data)
-        print(result2nn)
-        
-        print("Attack bbinf nn")
-        resultinfnn = conduct(attack_bbinf_nn, nn_model, nn_data)
-        print(resultinfnn)
+    def test_bb_0_nn(self):
+        result0nn = conduct(self.attack_bb0_nn, self.nn_model, self.nn_data)
+        #print(result0nn)
 
-if __name__ == '__main__':
-    main()
+    def test_bb_1_nn(self):
+        result1nn = conduct(self.attack_bb1_nn, self.nn_model, self.nn_data)
+        #print(result1nn)
+
+    def test_bb_2_nn(self):
+        result2nn = conduct(self.attack_bb2_nn, self.nn_model, self.nn_data)
+        #print(result2nn)
+
+    def test_bb_inf_nn(self):
+        resultinfnn = conduct(self.attack_bbinf_nn, self.nn_model, self.nn_data)
+        #print(resultinfnn)
+

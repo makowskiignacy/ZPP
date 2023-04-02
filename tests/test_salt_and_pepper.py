@@ -5,6 +5,7 @@ import mlflow
 import csv
 import numpy as np
 import torch
+import unittest
 
 import torchvision.models as tv_models
 import foolbox as fb
@@ -79,7 +80,7 @@ def conduct(attack: SaltAndPepperNoise, model, data: Data):
     return adversarials
 
 
-def main():
+class TestSaltAndPepper(unittest.TestCase):
     attack_specific_parameters_simple = {"steps": 10, "across_channels": True}
     attack_specific_parameters_nn = {"steps": 100, "across_channels": True}
     generic_parameters_simple = {}
@@ -91,23 +92,19 @@ def main():
     attack_sap_simple = SaltAndPepperNoise(parameters_simple)
     attack_sap_nn = SaltAndPepperNoise(parameters_nn)
 
-    smodel, sdata = simple_test(batchsize=4)
+    def test_sap_simple_smaller(self):
+        smodel, sdata = simple_test(batchsize=4)
+        result1s = conduct(self.attack_sap_simple, smodel, sdata)
+        # print(result1s)
 
-    print("Attack salt and pepper simple with tiny batchsize")
-    result1s = conduct(attack_sap_simple, smodel, sdata)
+    def test_sap_simple_larger(self):
+        smodel, sdata = simple_test(batchsize=20)
+        result2s = conduct(self.attack_sap_simple, smodel, sdata)
+        # print(result2s)
 
-    smodel, sdata = simple_test(batchsize=20)
-
-    print("Attack salt and pepper simple with sligtly larger batchsize")
-    result2s = conduct(attack_sap_simple, smodel, sdata)
-
-
-    nn_model, nn_data = nn_test()
-    if nn_model is not None and nn_data is not None:
-        print("Attack salt and pepper nn")
-        result1nn = conduct(attack_sap_nn, nn_model, nn_data)
-
+    def test_sap_nn(self):
+        nn_model, nn_data = nn_test()
+        resultnn = conduct(self.attack_sap_nn, nn_model, nn_data)
+        # print(resultnn)
 
 
-if __name__ == '__main__':
-    main()

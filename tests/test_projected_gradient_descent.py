@@ -3,6 +3,7 @@ import mlflow
 import csv
 import numpy as np
 import torch
+import unittest
 
 import torchvision.models as tv_models
 import foolbox as fb
@@ -75,7 +76,7 @@ def conduct(attack: FoolboxAttack, model, data: Data):
     return adversarials
 
 
-def main():
+class TestProjectedGradientDescent(unittest.TestCase):
     attack_specific_parameters = {"steps": 100, "random_start": True}
     generic_parameters_simple = {"epsilon": 0.01}
     generic_parameters_nn = {"epsilon": 30}
@@ -91,50 +92,62 @@ def main():
 
     smodel, sdata = simple_test(batchsize=20)
 
-    print("Attack pgd1 simple")
-    result1s = conduct(attack_pgd1, smodel, sdata)
+    def test_pgd_1_simple(self):
+        result1s = conduct(self.attack_pgd1, self.smodel, self.sdata)
+        # print(result1s)
 
-    print("Attack pgd2 simple")
-    result2s = conduct(attack_pgd2, smodel, sdata)
+    def test_pgd_2_simple(self):
+        result2s = conduct(self.attack_pgd2, self.smodel, self.sdata)
+        # print(result2s)
 
-    print("Attack pgdinf simple")
-    resultinfs = conduct(attack_pgdinf, smodel, sdata)
+    def test_pgd_inf_simple(self):
+        resultinfs = conduct(self.attack_pgdinf, self.smodel, self.sdata)
+        # print(resultinfs)
 
-    print("Attack pgd1 with Adam simple")
-    result1as = conduct(attack_pgd1_a, smodel, sdata)
+    def test_pgd_1_a_simple(self):
+        result1s = conduct(self.attack_pgd1_a, self.smodel, self.sdata)
+        # print(result1s)
 
-    print("Attack pgd2 with Adam simple")
-    result2as = conduct(attack_pgd2_a, smodel, sdata)
+    def test_pgd_2_a_simple(self):
+        result2s = conduct(self.attack_pgd2_a, self.smodel, self.sdata)
+        # print(result2s)
 
-    print("Attack pgdinf with Adam simple")
-    resultinfas = conduct(attack_pgdinf_a, smodel, sdata)
+    def test_pgd_inf_a_simple(self):
+        resultinfs = conduct(self.attack_pgdinf_a, self.smodel, self.sdata)
+        # print(resultinfs)
 
     nn_model, nn_data = nn_test()
-    if nn_model is not None and nn_data is not None:
-        attack_pgd1 = L1ProjectedGradientDescent(parameters_nn)
-        attack_pgd2 = L2ProjectedGradientDescent(parameters_nn)
-        attack_pgdinf = LinfProjectedGradientDescent(parameters_nn)
-        attack_pgd1_a = L1AdamProjectedGradientDescent(parameters_nn)
-        attack_pgd2_a = L2AdamProjectedGradientDescent(parameters_nn)
-        attack_pgdinf_a = LinfAdamProjectedGradientDescent(parameters_nn)
 
-        print("Attack pgd1 nn")
-        result1nn = conduct(attack_pgd1, nn_model, nn_data)
+    attack_pgd1_nn = L1ProjectedGradientDescent(parameters_nn)
+    attack_pgd2_nn = L2ProjectedGradientDescent(parameters_nn)
+    attack_pgdinf_nn = LinfProjectedGradientDescent(parameters_nn)
+    attack_pgd1_a_nn = L1AdamProjectedGradientDescent(parameters_nn)
+    attack_pgd2_a_nn = L2AdamProjectedGradientDescent(parameters_nn)
+    attack_pgdinf_a_nn = LinfAdamProjectedGradientDescent(parameters_nn)
 
-        print("Attack pgd2 nn")
-        result2nn = conduct(attack_pgd2, nn_model, nn_data)
+    def test_pgd_1_nn(self):
+        result1s = conduct(self.attack_pgd1_nn, self.nn_model, self.nn_data)
+        # print(result1s)
 
-        print("Attack pgdinf nn")
-        resultinfnn = conduct(attack_pgdinf, nn_model, nn_data)
+    def test_pgd_2_nn(self):
+        result2s = conduct(self.attack_pgd2_nn, self.nn_model, self.nn_data)
+        # print(result2s)
 
-        print("Attack pgd1 with Adam nn")
-        result1ann = conduct(attack_pgd1_a, nn_model, nn_data)
+    def test_pgd_inf_nn(self):
+        resultinfs = conduct(self.attack_pgdinf_nn, self.nn_model, self.nn_data)
+        # print(resultinfs)
 
-        print("Attack pgd2 with Adam nn")
-        result2ann = conduct(attack_pgd2_a, nn_model, nn_data)
+    def test_pgd_1_a_nn(self):
+        result1s = conduct(self.attack_pgd1_a_nn, self.nn_model, self.nn_data)
+        # print(result1s)
 
-        print("Attack pgdinf with Adam nn")
-        resultinfann = conduct(attack_pgdinf_a, nn_model, nn_data)
+    def test_pgd_2_a_nn(self):
+        result2s = conduct(self.attack_pgd2_a_nn, self.nn_model, self.nn_data)
+        # print(result2s)
+
+    def test_pgd_inf_a_nn(self):
+        resultinfs = conduct(self.attack_pgdinf_a_nn, self.nn_model, self.nn_data)
+        # print(resultinfs)
 
 
 if __name__ == '__main__':
