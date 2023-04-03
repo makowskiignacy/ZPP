@@ -3,7 +3,7 @@ import traceback
 from foolbox.attacks.brendel_bethge import L0BrendelBethgeAttack, L1BrendelBethgeAttack, L2BrendelBethgeAttack, LinfinityBrendelBethgeAttack
 
 from attacks.foolbox_attack import FoolboxAttack
-from foolbox.criteria import Misclassification
+from foolbox.criteria import Misclassification, TargetedMisclassification
 from abc import ABC
 
 from attacks.helpers.data import Data
@@ -48,7 +48,10 @@ class BrendelBethge(FoolboxAttack, ABC):
             model_correct_format = model
         else:
             outputs = data.output[:, 0]
-        self.criterion = Misclassification(outputs)
+        if self.criterion_type == "targeted_misclassification":
+            self.criterion = TargetedMisclassification(outputs)
+        if self.criterion_type == "misclassification":
+            self.criterion = Misclassification(outputs)
 
 
         try:

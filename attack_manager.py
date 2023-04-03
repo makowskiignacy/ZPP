@@ -13,9 +13,10 @@ from attacks.artattacks.adversarial_patch\
 
 # Ataki pochodzące z FoolBoxa
 from attacks.foolboxattacks.brendel_bethge import BrendelBethge 
-from attacks.foolboxattacks.L1_basic_iterative import L1BasicIterative
-from attacks.foolboxattacks.projected_gradient_descent\
-        import ProjectedGradientDescentInf
+from attacks.foolboxattacks.basic_iterative import L1BasicIterative, L2BasicIterative, LinfBasicIterative
+from attacks.foolboxattacks.basic_iterative import L1AdamBasicIterative, L2AdamBasicIterative, LinfAdamBasicIterative
+from attacks.foolboxattacks.projected_gradient_descent import L1ProjectedGradientDescent, L2ProjectedGradientDescent, LinfProjectedGradientDescent
+from attacks.foolboxattacks.projected_gradient_descent import L1AdamProjectedGradientDescent, L2AdamProjectedGradientDescent, LinfAdamProjectedGradientDescent
 from attacks.foolboxattacks.salt_and_pepper import SaltAndPepperNoise
 
 
@@ -35,7 +36,17 @@ class AttackManager():
             "Joker" : Joker,
             "Brendel Bethge" : BrendelBethge,
             "L1 Basic Iterative": L1BasicIterative,
-            "Projected Gradient Descent Inf" : ProjectedGradientDescentInf,
+            "L2 Basic Iterative": L2BasicIterative,
+            "Linf Basic Iterative": LinfBasicIterative,
+            "L1 Adam Basic Iterative": L1AdamBasicIterative,
+            "L2 Adam Basic Iterative": L2AdamBasicIterative,
+            "Linf Adam Basic Iterative": LinfAdamBasicIterative,
+            "L1 Projected Gradient Descent": L1ProjectedGradientDescent,
+            "L2 Projected Gradient Descent": L2ProjectedGradientDescent,
+            "Linf Projected Gradient Descent" : LinfProjectedGradientDescent,
+            "L1 Adam Projected Gradient Descent": L1AdamProjectedGradientDescent,
+            "L2 Adam Projected Gradient Descent": L2AdamProjectedGradientDescent,
+            "Linf Adam Projected Gradient Descent": LinfAdamProjectedGradientDescent,
             "Salt And Pepper" : SaltAndPepperNoise
         }
     
