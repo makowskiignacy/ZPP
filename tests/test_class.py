@@ -19,7 +19,7 @@ class Test:
         self.attack_simple = attack_simple
         self.attack_nn = attack_nn
 
-    def prep_simple_test(batchsize=40):
+    def prep_simple_test(self, batchsize=40):
         model = tv_models.resnet18(weights=tv_models.ResNet18_Weights.DEFAULT).eval()
         preprocessing = dict(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], axis=-3)
         fmodel = fb.models.pytorch.PyTorchModel(model, bounds=(0, 1), preprocessing=preprocessing)
@@ -27,10 +27,11 @@ class Test:
         images, labels = fb.utils.samples(fmodel, dataset='imagenet', batchsize=batchsize)
         data = Data(images, labels)
 
-        return fmodel, data
+        self.fmodel = fmodel
+        self.data = data
 
 
-    def prep_nn_test():
+    def prep_nn_test(self):
         ss_nn_pipeline = mlflow.sklearn.load_model('../ss_nn/')
         if ss_nn_pipeline is not None:
             standard_scaler_from_nn_pipeline = ss_nn_pipeline.steps[0][1]
@@ -58,25 +59,27 @@ class Test:
                 result = torch.tensor(result, requires_grad=False, dtype=torch.float)
                 data = Data(data, result)
 
-            return fmodel, data
-        return None, None
+            self.fmodel = fmodel
+            self.data = data
+        self.fmodel = None
+        self.data = None
 
 
     def conduct(self):
         time_start = time.time()
 
         # print(type(model))
-        if isinstance(self.model, PyTorchModel):
-            print(f"Model accuracy before attack: {fb.utils.accuracy(self.model, self.data.input, self.data.output)}")
+        if isinstance(self.fmodel, PyTorchModel):
+            print(f"Model accuracy before attack: {fb.utils.accuracy(self.fmodel, self.data.input, self.data.output)}")
         print(f"Starting attack. ({time.asctime(time.localtime(time_start))})")
 
-        adversarials = self.attack_simple.conduct(self.model, self.data)
+        adversarials = self.attack_simple.conduct(self.fmodel, self.data)
 
         time_end = time.time()
         print(f"Attack done. ({time.asctime(time.localtime(time_end))})")
         print(f"Took {time_end - time_start}\n")
 
-        if adversarials is not None and isinstance(self.model, PyTorchModel):
-            print(f"Model accuracy after attack: {accuracy(self.model, adversarials, self.data.output)}")
+        if adversarials is not None and isinstance(self.fmodel, PyTorchModel):
+            print(f"Model accuracy after attack: {accuracy(self.fmodel, adversarials, self.data.output)}")
 
         return adversarials
