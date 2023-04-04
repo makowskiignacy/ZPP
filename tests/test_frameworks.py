@@ -12,7 +12,6 @@ import eagerpy as ep
 import numpy as np
 import tensorflow
 import tensorflow.compat.v1 as tf
-import timeout_decorator
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -169,8 +168,6 @@ class TestArtWithPytorchUsingArt(unittest.TestCase):
     Checks attacks from artattacks package using example from:
     https://github.com/Trusted-AI/adversarial-robustness-toolbox/blob/main/examples/get_started_pytorch.py
     '''
-    # Zmodyfikowany czas oczekiwania, tak aby test mógł się zakończyć w 15min.
-    @timeout_decorator.timeout(900)
     def test_art_ZeorthOrderOptimalization(self):
         model = pytorch_model_form_art()
         # This is only for testing purpose as are the parameters
@@ -203,8 +200,6 @@ class TestArtWithPytorchUsingFoolbox(unittest.TestCase):
     Checks attacks from artattacks package using example from:
     https://github.com/bethgelab/foolbox/blob/master/examples/single_attack_pytorch_resnet18.py
     '''
-    @timeout_decorator.timeout(900)
-    @unittest.expectedFailure
     def test_art_ZeorthOrderOptimalization(self):
         model = pytorch_model_form_foolbox()
         classifier_parameters = {"clip_values": (_min_pixel_value, _max_pixel_value),
@@ -231,7 +226,7 @@ class TestArtWithPytorchUsingFoolbox(unittest.TestCase):
         # Czy Foolbox używa tablic? Czy kodowanie jest hot-one?
         self.assertIsNotNone(art_model.conduct(model, foolbox_sample_data()))
 
-    @timeout_decorator.timeout(120)
+
     @unittest.skip("AdversarialPatch is not yet implemented.")
     def test_art_AdversarialPatch(self):
         art_model = AdversarialPatch(ARTParameters({}, {}))
@@ -240,7 +235,6 @@ class TestArtWithPytorchUsingFoolbox(unittest.TestCase):
 
 class TestArtWithKerasUsingArt(unittest.TestCase):
     # Working example
-    @timeout_decorator.timeout(120)
     def test_keras_fast_gradient(self):
         mod = keras_model_from_art()
 
@@ -253,8 +247,7 @@ class TestArtWithKerasUsingArt(unittest.TestCase):
 
         self.assertIsNotNone(attack.conduct(mod, Data(load_mnist()[0])))
 
-    @timeout_decorator.timeout(500)
-    @unittest.skip("I dont have that much time to spare.")
+    @unittest.skip("This takes forever")
     def test_art_ZeorthOrderOptimalization(self):
         model = pytorch_model_form_art()
         classifier_parameters = {"clip_values": (_min_pixel_value, _max_pixel_value),
@@ -270,7 +263,7 @@ class TestArtWithKerasUsingArt(unittest.TestCase):
 
         self.assertIsNotNone(art_model.conduct(keras_model_from_art(), Data(load_mnist()[0])))
 
-    @timeout_decorator.timeout(120)
+
     @unittest.skip("AdversarialPatch is not yet implemented.")
     def test_art_AdversarialPatch(self):
         art_model = AdversarialPatch(ARTParameters({}, {}))
@@ -278,14 +271,14 @@ class TestArtWithKerasUsingArt(unittest.TestCase):
 
     # With tf.compat.v1.disable_eager_execution() ValueError: TensorFlowModel requires TensorFlow Eager Mode
     # Without -"- ValueError: expected model to be callable
-    @timeout_decorator.timeout(120)
+
     def test_foolbox_ProjectedGradientDescentInf(self):
-        foolbox_model = LinfProjectedGradientDescent(ARTParameters({}, {}))
+        foolbox_model = LinfProjectedGradientDescent(FoolboxParameters({}, {}))
         self.assertIsNotNone(foolbox_model.conduct(keras_model_from_art(), Data(load_mnist()[0])))
 
     # With tf.compat.v1.disable_eager_execution() ValueError: TensorFlowModel requires TensorFlow Eager Mode
     # Without -"- ValueError: expected model to be callable
-    @timeout_decorator.timeout(120)
+
     def test_foolbox_L1BasicIterative(self):
         foolbox_model = L1BasicIterative(FoolboxParameters({}, {}))
         self.assertIsNotNone(foolbox_model.conduct(keras_model_from_art(), Data(load_mnist()[0])))

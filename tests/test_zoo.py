@@ -1,7 +1,6 @@
 import unittest
 
 import numpy as np
-import timeout_decorator
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -63,7 +62,6 @@ def art_sample_data():
 
 
 class ZooTestUsingPytorchArt(unittest.TestCase):
-    @timeout_decorator.timeout(900)
     def test_art_ZeorthOrderOptimalization(self):
         model = pytorch_model_form_art()
         # This is only for testing purpose as are the parameters
@@ -85,7 +83,6 @@ class ZooTestUsingPytorchArt(unittest.TestCase):
         self.assertIsNotNone(art_model.conduct(pytorch_model_form_art(), art_sample_data()))
 
 class ZooTestUsingPytorchArt__potential_failure(unittest.TestCase):
-    @timeout_decorator.timeout(900)
     def test_art_ZeorthOrderOptimalization(self):
         model = pytorch_model_form_art()
         # This is only for testing purpose as are the parameters

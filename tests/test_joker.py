@@ -14,6 +14,7 @@ from keras.layers import Dense, Flatten, Conv2D, MaxPooling2D
 from keras.models import Sequential
 
 from attacks.artattacks.joker import Joker
+from attacks.helpers.parameters import ARTParameters
 
 
 class Data:
@@ -39,14 +40,17 @@ class TestKeras(unittest.TestCase):
         model.add(Dense(100, activation="relu"))
         model.add(Dense(10, activation="softmax"))
 
-        art_attack = Joker(joker='FastGradientMethod', clip_values=(min_pixel_value, max_pixel_value), use_logits=False)
+        classifier_parameters = {"clip_values": (min_pixel_value, max_pixel_value)}
+        attack_parameters = {}
+        parameters = ARTParameters(classifier_parameters=classifier_parameters, attack_parameters=attack_parameters)
+
+        art_attack = Joker(joker='FastGradientMethod', parameters=parameters)
 
         self.assertIsNotNone(art_attack.conduct(model, data))
 
 
 class TestPytorch(unittest.TestCase):
     def test_pytorch(self):
-        print("a")
         # declaring pytorch model
         class Net(nn.Module):
             def __init__(self):
@@ -71,15 +75,16 @@ class TestPytorch(unittest.TestCase):
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.Adam(model.parameters(), lr=0.01)
 
-        art_model = Joker(joker='FastGradientMethod', clip_values=(min_pixel_value, max_pixel_value),
-                                 loss=criterion,
-                                 optimizer=optimizer,
-                                 input_shape=(1, 28, 28),
-                                 nb_classes=10,)
+        classifier_parameters = {"clip_values": (min_pixel_value, max_pixel_value),
+                                 "loss": criterion,
+                                 "optimizer": optimizer,
+                                 "input_shape": (1, 28, 28),
+                                 "nb_classes": 10}
+        attack_parameters = {}
+        parameters = ARTParameters(classifier_parameters=classifier_parameters, attack_parameters=attack_parameters)
+
+        art_model = Joker(joker='FastGradientMethod', parameters=parameters)
 
         # This attack does not need y/output
         data2 = Data((np.transpose(data.input, (0, 3, 1, 2)).astype(np.float32), None))
-
-        print("a")
-
         self.assertIsNotNone(art_model.conduct(model, data2))
