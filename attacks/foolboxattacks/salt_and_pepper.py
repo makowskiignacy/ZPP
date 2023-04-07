@@ -4,18 +4,19 @@ from foolbox.attacks.saltandpepper import SaltAndPepperNoiseAttack
 
 
 class SaltAndPepperNoise(SaltAndPepperNoiseAttack, FoolboxAttack):
-    def __init__(self, attack_specific_args, generic_args):
-
-        super().__init__(**attack_specific_args)
-        FoolboxAttack.__init__(self, generic_args)
+    def __init__(self, parameters):
+        super().__init__(**parameters.attack_specific_parameters)
+        FoolboxAttack.__init__(self, parameters.generic_parameters)
 
     def conduct(self, model, data):
 
+        output = super().flatten_output(data)
+        super().verify_bounds(data=data)
+        super().verify_epsilon()
         model_correct_format = super().reformat_model(model)
         if model_correct_format is None:
             model_correct_format = model
 
-        output = super().flatten_output(data)
         if self.criterion_type == "targeted_misclassification":
             self.criterion = TargetedMisclassification(output)
         if self.criterion_type == "misclassification":

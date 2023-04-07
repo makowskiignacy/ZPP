@@ -12,7 +12,6 @@ import eagerpy as ep
 import numpy as np
 import tensorflow
 import tensorflow.compat.v1 as tf
-import timeout_decorator
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -29,7 +28,8 @@ from attacks.artattacks.adversarial_patch import AdversarialPatch
 from attacks.artattacks.fast_gradient import FastGradient
 from attacks.artattacks.zeroth_order_optimization_bb_attack import ZeorthOrderOptimalization
 from attacks.foolboxattacks.basic_iterative import L1BasicIterative, L2BasicIterative, LinfBasicIterative
-from attacks.foolboxattacks.projected_gradient_descent import ProjectedGradientDescentInf
+from attacks.foolboxattacks.projected_gradient_descent import LinfProjectedGradientDescent
+from attacks.helpers.parameters import FoolboxParameters, ARTParameters
 
 tf.compat.v1.disable_eager_execution()
 
@@ -127,11 +127,11 @@ class TestFoolboxWithPytorchUsingFoolbox(unittest.TestCase):
     https://github.com/bethgelab/foolbox/blob/master/examples/single_attack_pytorch_resnet18.py
     '''
     def test_foolbox_ProjectedGradientDescentInf(self):
-        foolbox_model = ProjectedGradientDescentInf()
+        foolbox_model = LinfProjectedGradientDescent(FoolboxParameters({}, {}))
         self.assertIsNotNone(foolbox_model.conduct(pytorch_model_form_foolbox(), foolbox_sample_data()))
 
     def test_foolbox_L1BasicIterative(self):
-        foolbox_model = L1BasicIterative({})
+        foolbox_model = L1BasicIterative(FoolboxParameters({}, {}))
         self.assertIsNotNone(foolbox_model.conduct(pytorch_model_form_foolbox(), foolbox_sample_data()))
 
 
@@ -142,22 +142,22 @@ class TestFoolboxWithPytorchUsingArt(unittest.TestCase):
     https://github.com/Trusted-AI/adversarial-robustness-toolbox/blob/main/examples/get_started_pytorch.py
     '''
     def test_foolbox_ProjectedGradientDescentInf(self):
-        foolbox_model = ProjectedGradientDescentInf()
+        foolbox_model = LinfProjectedGradientDescent(FoolboxParameters({}, {}))
         self.assertIsNotNone(foolbox_model.conduct(pytorch_model_form_art(),
                                                    art_sample_data().foolbox_pytorch_preprocessing()))
 
     def test_foolbox_L1BasicIterative(self):
-        foolbox_model = L1BasicIterative({}, {})
+        foolbox_model = L1BasicIterative(FoolboxParameters({}, {}))
         self.assertIsNotNone(foolbox_model.conduct(pytorch_model_form_art(),
                                                    art_sample_data().foolbox_pytorch_preprocessing()))
 
     def test_foolbox_L2BasicIterative(self):
-        foolbox_model = L2BasicIterative({}, {})
+        foolbox_model = L2BasicIterative(FoolboxParameters({}, {}))
         self.assertIsNotNone(foolbox_model.conduct(pytorch_model_form_art(),
                                                    art_sample_data().foolbox_pytorch_preprocessing()))
 
     def test_foolbox_LinfBasicIterative(self):
-        foolbox_model = LinfBasicIterative({}, {})
+        foolbox_model = LinfBasicIterative(FoolboxParameters({}, {}))
         self.assertIsNotNone(foolbox_model.conduct(pytorch_model_form_art(),
                                                    art_sample_data().foolbox_pytorch_preprocessing()))
 
@@ -168,28 +168,30 @@ class TestArtWithPytorchUsingArt(unittest.TestCase):
     Checks attacks from artattacks package using example from:
     https://github.com/Trusted-AI/adversarial-robustness-toolbox/blob/main/examples/get_started_pytorch.py
     '''
-    # Zmodyfikowany czas oczekiwania, tak aby test mógł się zakończyć w 15min.
-    @timeout_decorator.timeout(900)
     def test_art_ZeorthOrderOptimalization(self):
         model = pytorch_model_form_art()
         # This is only for testing purpose as are the parameters
         model.cpu()
-        art_model = ZeorthOrderOptimalization(clip_values=(_min_pixel_value, _max_pixel_value),
-                                              loss=nn.CrossEntropyLoss(),
-                                              optimizer=optim.Adam(model.parameters(), lr=0.01),
-                                              input_shape=(1, 28, 28),
-                                              nb_classes=10,
-                                              nb_parallel=1,
-                                              binary_search_steps=1,
-                                              batch_size=500,
-                                              max_iter=2,
-                                            #   use_resize=False,
-                                              verbose=True)
+        classifier_parameters = {"clip_values": (_min_pixel_value, _max_pixel_value),
+                                 "loss": nn.CrossEntropyLoss(),
+                                 "optimizer": optim.Adam(model.parameters(), lr=0.01),
+                                 "input_shape": (1, 28, 28),
+                                 "nb_classes": 10}
+        attack_parameters = {"nb_parallel": 1,
+                             "binary_search_steps": 1,
+                             "batch_size": 500,
+                             "max_iter": 2,
+                             "verbose": True}
+
+        parameters = ARTParameters(classifier_parameters=classifier_parameters, attack_parameters=attack_parameters)
+
+        art_model = ZeorthOrderOptimalization(parameters=parameters)
+
         self.assertIsNotNone(art_model.conduct(pytorch_model_form_art(), art_sample_data()))
 
     @unittest.skip("AdversarialPatch is not yet implemented.")
     def test_art_AdversarialPatch(self):
-        art_model = AdversarialPatch()
+        art_model = AdversarialPatch(ARTParameters({}, {}))
         self.assertIsNotNone(art_model.conduct(pytorch_model_form_art(), art_sample_data()))
 
 
@@ -198,21 +200,22 @@ class TestArtWithPytorchUsingFoolbox(unittest.TestCase):
     Checks attacks from artattacks package using example from:
     https://github.com/bethgelab/foolbox/blob/master/examples/single_attack_pytorch_resnet18.py
     '''
-    @timeout_decorator.timeout(900)
-    @unittest.expectedFailure
     def test_art_ZeorthOrderOptimalization(self):
         model = pytorch_model_form_foolbox()
-        art_model = ZeorthOrderOptimalization(clip_values=(_min_pixel_value, _max_pixel_value),
-                                              loss=nn.CrossEntropyLoss(),
-                                              optimizer=optim.Adam(model.parameters(), lr=0.01),
-                                              input_shape=(1, 28, 28),
-                                              nb_classes=10,
-                                              nb_parallel=1,
-                                              binary_search_steps=1,
-                                              batch_size=500,
-                                              max_iter=2,
-                                            #   use_resize=False,
-                                              verbose=True)
+        classifier_parameters = {"clip_values": (_min_pixel_value, _max_pixel_value),
+                                 "loss": nn.CrossEntropyLoss(),
+                                 "optimizer": optim.Adam(model.parameters(), lr=0.01),
+                                 "input_shape": (1, 28, 28),
+                                 "nb_classes": 10}
+        attack_parameters = {"nb_parallel": 1,
+                             "binary_search_steps": 1,
+                             "batch_size": 500,
+                             "max_iter": 2,
+                             "verbose": True}
+
+        parameters = ARTParameters(classifier_parameters=classifier_parameters, attack_parameters=attack_parameters)
+
+        art_model = ZeorthOrderOptimalization(parameters=parameters)
 
         # FIXME :
         # Poniższa linijka wyrzuca błąd:
@@ -223,52 +226,61 @@ class TestArtWithPytorchUsingFoolbox(unittest.TestCase):
         # Czy Foolbox używa tablic? Czy kodowanie jest hot-one?
         self.assertIsNotNone(art_model.conduct(model, foolbox_sample_data()))
 
-    @timeout_decorator.timeout(120)
+
     @unittest.skip("AdversarialPatch is not yet implemented.")
     def test_art_AdversarialPatch(self):
-        art_model = AdversarialPatch()
+        art_model = AdversarialPatch(ARTParameters({}, {}))
         self.assertIsNotNone(art_model.conduct(pytorch_model_form_foolbox(), foolbox_sample_data()))
 
 
 class TestArtWithKerasUsingArt(unittest.TestCase):
     # Working example
-    @timeout_decorator.timeout(120)
     def test_keras_fast_gradient(self):
         mod = keras_model_from_art()
 
-        attack = FastGradient(clip_values=(_min_pixel_value, _max_pixel_value), use_logits=False)
+        classifier_parameters = {"clip_values": (_min_pixel_value, _max_pixel_value),
+                                 "use_logits": False}
+        attack_parameters = {}
+        parameters = ARTParameters(classifier_parameters=classifier_parameters, attack_parameters=attack_parameters)
+
+        attack = FastGradient(parameters=parameters)
 
         self.assertIsNotNone(attack.conduct(mod, Data(load_mnist()[0])))
 
-    @timeout_decorator.timeout(500)
-    @unittest.skip("I dont have that much time to spare.")
+    @unittest.skip("This takes forever")
     def test_art_ZeorthOrderOptimalization(self):
         model = pytorch_model_form_art()
-        art_model = ZeorthOrderOptimalization(clip_values=(_min_pixel_value, _max_pixel_value),
-                                              loss=nn.CrossEntropyLoss(),
-                                              optimizer=optim.Adam(model.parameters(), lr=0.01),
-                                              input_shape=(1, 28, 28),
-                                              nb_classes=10)
+        classifier_parameters = {"clip_values": (_min_pixel_value, _max_pixel_value),
+                                 "loss": nn.CrossEntropyLoss(),
+                                 "optimizer": optim.Adam(model.parameters(), lr=0.01),
+                                 "input_shape": (1, 28, 28),
+                                 "nb_classes": 10}
+        attack_parameters = {}
+
+        parameters = ARTParameters(classifier_parameters=classifier_parameters, attack_parameters=attack_parameters)
+
+        art_model = ZeorthOrderOptimalization(parameters=parameters)
+
         self.assertIsNotNone(art_model.conduct(keras_model_from_art(), Data(load_mnist()[0])))
 
-    @timeout_decorator.timeout(120)
+
     @unittest.skip("AdversarialPatch is not yet implemented.")
     def test_art_AdversarialPatch(self):
-        art_model = AdversarialPatch()
+        art_model = AdversarialPatch(ARTParameters({}, {}))
         self.assertIsNotNone(art_model.conduct(keras_model_from_art(), Data(load_mnist()[0])))
 
     # With tf.compat.v1.disable_eager_execution() ValueError: TensorFlowModel requires TensorFlow Eager Mode
     # Without -"- ValueError: expected model to be callable
-    @timeout_decorator.timeout(120)
+
     def test_foolbox_ProjectedGradientDescentInf(self):
-        foolbox_model = ProjectedGradientDescentInf()
+        foolbox_model = LinfProjectedGradientDescent(FoolboxParameters({}, {}))
         self.assertIsNotNone(foolbox_model.conduct(keras_model_from_art(), Data(load_mnist()[0])))
 
     # With tf.compat.v1.disable_eager_execution() ValueError: TensorFlowModel requires TensorFlow Eager Mode
     # Without -"- ValueError: expected model to be callable
-    @timeout_decorator.timeout(120)
+
     def test_foolbox_L1BasicIterative(self):
-        foolbox_model = L1BasicIterative({})
+        foolbox_model = L1BasicIterative(FoolboxParameters({}, {}))
         self.assertIsNotNone(foolbox_model.conduct(keras_model_from_art(), Data(load_mnist()[0])))
 
 

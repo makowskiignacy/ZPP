@@ -4,21 +4,16 @@ from attacks.art_attack import ARTAttack
 
 
 class DeepFool(ARTAttack):
-    def __init__(self, **params):
+    def __init__(self, parameters):
         # Initialization of the arguments needed for the classifier
-        super().__init__(**params)
+        super().__init__(parameters.classifier_parameters)
 
         self._attack_params = {
-            "max_iter": 100,
-            "epsilon": 1e-06,
-            "nb_grads": 10,
-            "verbose": True,
+            "max_iter": parameters.attack_parameters.get("max_iter", 100),
+            "epsilon": parameters.attack_parameters.get("epsilon", 1e-06),
+            "nb_grads": parameters.attack_parameters.get("nb_grads", 10),
+            "verbose": parameters.attack_parameters.get("verbose", True),
         }
-
-        # Assigning only relevant arguments
-        for key in self._attack_params.keys():
-            if key in params.keys():
-                self._attack_params[key] = params[key]
 
     def conduct(self, model, data):
         self._set_classifier(model)

@@ -5,16 +5,35 @@ from foolbox.models.tensorflow import TensorFlowModel
 from foolbox.models.jax import JAXModel
 import torch
 import keras
+from attacks.helpers.data import Data
+from eagerpy.astensor import astensor
 
 class FoolboxAttack(Attack):
 
     def __init__(self, args):
         super().__init__()
         self.criterion_type = args.get("criterion_type", "misclassification")
-        self.epsilon = args.get("epsilon", 0.01)
+        self.epsilon = args.get("epsilon")
+        self.epsilon_rate = args.get("epsilon_rate")
         self.min = args.get("min")
         self.max = args.get("max")
         self.criterion = None
+
+
+    def verify_bounds(self, data: Data):
+        if self.min is not None and self.max is not None:
+            return
+        input_values = astensor(data.input)
+        self.min = input_values.min().item()
+        self.max = input_values.max().item()
+
+    def verify_epsilon(self):
+        if self.epsilon is not None:
+            return
+        elif self.epsilon_rate is not None:
+            self.epsilon = (self.max - self.min)*self.epsilon_rate
+        else:
+            self.epsilon = (self.max-self.min)*0.001
 
     @staticmethod
     def to_unified_format(data_from_attack):

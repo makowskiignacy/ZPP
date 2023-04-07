@@ -8,6 +8,7 @@ from attacks.art_attack import ARTAttack
 
 from attacks.artattacks.zeroth_order_optimization_bb_attack\
     import ZeorthOrderOptimalization as ZOOAttack
+from attacks.helpers.parameters import ARTParameters
 
 class TestZOO(unittest.TestCase):
     def test_class_hierarchy(self):
@@ -27,7 +28,7 @@ class TestZOO(unittest.TestCase):
 
         print("Próba utowrzenia obiektu klasy ARTAttack:\n****")
         try:
-            AbsA = ARTAttack()
+            AbsA = ARTAttack({})
             assertion_var += 1
             print("Brak błędów.")
         except Exception as e:
@@ -39,7 +40,7 @@ class TestZOO(unittest.TestCase):
 
         print("Klasę konkretnego ataku można już zinstancjonować:\n****")
         try:
-            ZOO_attack = ZOOAttack()
+            ZOO_attack = ZOOAttack(ARTParameters({}, {}))
             assertion_var += 1
             print("Brak błędów.")
         except Exception as e:
@@ -51,10 +52,11 @@ class TestZOO(unittest.TestCase):
 
         default_params = ZOO_attack._attack_params
 
-        ZOO_attack = ZOOAttack(confidence=0.50, abort_early=False, max_iter=100, boi_o_boi="YES")
+        attack_parameters={"confidence": 0.5, "abort_early": False, "max_iter": 100}
+
+        ZOO_attack = ZOOAttack(ARTParameters(classifier_parameters={}, attack_parameters=attack_parameters))
         changed_params = ZOO_attack._attack_params
 
-        self.assertNotIn('boi_o_boi', changed_params.keys())
 
         for key, val in default_params.items():
             if changed_params[key] != val:
