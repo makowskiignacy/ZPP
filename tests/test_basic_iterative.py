@@ -92,51 +92,51 @@ class TestBasicIterative(unittest.TestCase):
 
     def test_bi_1_simple(self):
         result1s = conduct(self.attack_bi1, self.smodel, self.sdata)
-        #print(result1s)
+        self.assertIsNotNone(result1s)
 
     def test_bi_2_simple(self):
         result2s = conduct(self.attack_bi2, self.smodel, self.sdata)
-        #print(result2s)
+        self.assertIsNotNone(result2s)
 
     def test_bi_inf_simple(self):
         resultinfs = conduct(self.attack_biinf, self.smodel, self.sdata)
-        #print(resultinfs)
+        self.assertIsNotNone(resultinfs)
 
     def test_bi_1_a_simple(self):
         result1s = conduct(self.attack_bi1_a, self.smodel, self.sdata)
-        # print(result1s)
+        self.assertIsNotNone(result1s)
 
     def test_bi_2_a_simple(self):
         result2s = conduct(self.attack_bi2_a, self.smodel, self.sdata)
-        # print(result2s)
+        self.assertIsNotNone(result2s)
 
     def test_bi_inf_a_simple(self):
         resultinfs = conduct(self.attack_biinf_a, self.smodel, self.sdata)
-        # print(resultinfs)
+        self.assertIsNotNone(resultinfs)
 
     nn_model, nn_data = nn_test()
 
     def test_bi_1_nn(self):
         result1nn = conduct(self.attack_bi1, self.nn_model, self.nn_data)
-        # print(result1nn)
+        self.assertIsNotNone(result1nn)
 
     def test_bi_2_nn(self):
         result2nn = conduct(self.attack_bi2, self.nn_model, self.nn_data)
-        # print(result2nn)
+        self.assertIsNotNone(result2nn)
 
     def test_bi_inf_nn(self):
         resultinfnn = conduct(self.attack_biinf, self.nn_model, self.nn_data)
-        # print(resultinfnn)
+        self.assertIsNotNone(resultinfnn)
 
     def test_bi_1_a_nn(self):
         result1ann = conduct(self.attack_bi1_a, self.nn_model, self.nn_data)
-        # print(result1ann)
+        self.assertIsNotNone(result1ann)
 
     def test_bi_2_a_nn(self):
         result2ann = conduct(self.attack_bi2_a, self.nn_model, self.nn_data)
-        # print(result2ann)
+        self.assertIsNotNone(result2ann)
 
     def test_bi_inf_a_nn(self):
         resultinfann = conduct(self.attack_biinf_a, self.nn_model, self.nn_data)
-        # print(resultinfann)
+        self.assertIsNotNone(resultinfann)
 

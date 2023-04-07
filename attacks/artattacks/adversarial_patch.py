@@ -13,7 +13,7 @@ class AdversarialPatch(ARTAttack):
         super().__init__(parameters.classifier_parameters)
         self.attack = None
         self._attack_params = {
-            "classifier": parameters.attack_parameters.get("classifier", None),
+            "classifier": parameters.attack_parameters.get("classifier"),
             # rotation_max (float) – The maximum rotation applied to random patches.
             # The value is expected to be in the range [0, 180].
             "rotation_max": parameters.attack_parameters.get("rotation_max", 22.5),
@@ -30,7 +30,7 @@ class AdversarialPatch(ARTAttack):
             # patch_shape – The shape of the adversarial patch as a tuple of shape (width, height, nb_channels).
             # Currently only supported for TensorFlowV2Classifier. For classifiers of other frameworks the patch_shape
             # is set to the shape of the input samples.
-            "patch_shape": parameters.attack_parameters.get("patch_shape", None),
+            "patch_shape": parameters.attack_parameters.get("patch_shape"),
             "targeted": parameters.attack_parameters.get("targeted", True),
             "verbose": parameters.attack_parameters.get("verbose", True)
         }

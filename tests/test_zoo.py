@@ -96,7 +96,6 @@ class ZooTestUsingPytorchArt__potential_failure(unittest.TestCase):
                              "binary_search_steps": 1,
                              "batch_size": 500,
                              "max_iter": 1,
-                             "use_resize": False,
                              "verbose": True}
         parameters = ARTParameters(classifier_parameters=classifier_parameters, attack_parameters=attack_parameters)
 

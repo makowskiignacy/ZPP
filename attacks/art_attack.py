@@ -25,13 +25,13 @@ class ARTAttack(Attack):
 
         # Parameters required to initialize the classifier
         self._classifier_params = {
-            'mask': params.get('mask', None),
+            'mask': params.get('mask'),
             'reset_patch': params.get('reset_patch', False),
-            'input_shape': params.get('input_shape', None),
-            'loss': params.get('loss', None),
-            'nb_classes': params.get('nb_classes', None),
-            'optimizer': params.get('optimizer', None),
-            'clip_values': params.get('clip_values', None),
+            'input_shape': params.get('input_shape'),
+            'loss': params.get('loss'),
+            'nb_classes': params.get('nb_classes'),
+            'optimizer': params.get('optimizer'),
+            'clip_values': params.get('clip_values'),
             'use_logits': params.get('use_logits', False)
         }
 

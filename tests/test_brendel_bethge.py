@@ -100,35 +100,35 @@ class TestBrendelBethge(unittest.TestCase):
 
     def test_bb_0_simple(self):
         result0s = conduct(self.attack_bb0_simple, self.smodel, self.sdata)
-        #print(result0s)
+        self.assertIsNotNone(result0s)
 
     def test_bb_1_simple(self):
         result1s = conduct(self.attack_bb1_simple, self.smodel, self.sdata)
-        #print(result1s)
+        self.assertIsNotNone(result1s)
 
     def test_bb_2_simple(self):
         result2s = conduct(self.attack_bb2_simple, self.smodel, self.sdata)
-        #print(result2s)
+        self.assertIsNotNone(result2s)
 
     def test_bb_inf_simple(self):
         resultinfs = conduct(self.attack_bbinf_simple, self.smodel, self.sdata)
-        #print(resultinfs)
+        self.assertIsNotNone(resultinfs)
 
     nn_model, nn_data = nn_test()
 
     def test_bb_0_nn(self):
         result0nn = conduct(self.attack_bb0_nn, self.nn_model, self.nn_data)
-        #print(result0nn)
+        self.assertIsNotNone(result0nn)
 
     def test_bb_1_nn(self):
         result1nn = conduct(self.attack_bb1_nn, self.nn_model, self.nn_data)
-        #print(result1nn)
+        self.assertIsNotNone(result1nn)
 
     def test_bb_2_nn(self):
         result2nn = conduct(self.attack_bb2_nn, self.nn_model, self.nn_data)
-        #print(result2nn)
+        self.assertIsNotNone(result2nn)
 
     def test_bb_inf_nn(self):
         resultinfnn = conduct(self.attack_bbinf_nn, self.nn_model, self.nn_data)
-        #print(resultinfnn)
+        self.assertIsNotNone(resultinfnn)
 

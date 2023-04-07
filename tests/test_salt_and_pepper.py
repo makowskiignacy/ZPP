@@ -95,16 +95,16 @@ class TestSaltAndPepper(unittest.TestCase):
     def test_sap_simple_smaller(self):
         smodel, sdata = simple_test(batchsize=4)
         result1s = conduct(self.attack_sap_simple, smodel, sdata)
-        # print(result1s)
+        self.assertIsNotNone(result1s)
 
     def test_sap_simple_larger(self):
         smodel, sdata = simple_test(batchsize=20)
         result2s = conduct(self.attack_sap_simple, smodel, sdata)
-        # print(result2s)
+        self.assertIsNotNone(result2s)
 
     def test_sap_nn(self):
         nn_model, nn_data = nn_test()
         resultnn = conduct(self.attack_sap_nn, nn_model, nn_data)
-        # print(resultnn)
+        self.assertIsNotNone(resultnn)
 
 

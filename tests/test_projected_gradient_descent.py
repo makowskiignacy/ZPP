@@ -94,27 +94,27 @@ class TestProjectedGradientDescent(unittest.TestCase):
 
     def test_pgd_1_simple(self):
         result1s = conduct(self.attack_pgd1, self.smodel, self.sdata)
-        # print(result1s)
+        self.assertIsNotNone(result1s)
 
     def test_pgd_2_simple(self):
         result2s = conduct(self.attack_pgd2, self.smodel, self.sdata)
-        # print(result2s)
+        self.assertIsNotNone(result2s)
 
     def test_pgd_inf_simple(self):
         resultinfs = conduct(self.attack_pgdinf, self.smodel, self.sdata)
-        # print(resultinfs)
+        self.assertIsNotNone(resultinfs)
 
     def test_pgd_1_a_simple(self):
         result1s = conduct(self.attack_pgd1_a, self.smodel, self.sdata)
-        # print(result1s)
+        self.assertIsNotNone(result1s)
 
     def test_pgd_2_a_simple(self):
         result2s = conduct(self.attack_pgd2_a, self.smodel, self.sdata)
-        # print(result2s)
+        self.assertIsNotNone(result2s)
 
     def test_pgd_inf_a_simple(self):
         resultinfs = conduct(self.attack_pgdinf_a, self.smodel, self.sdata)
-        # print(resultinfs)
+        self.assertIsNotNone(resultinfs)
 
     nn_model, nn_data = nn_test()
 
@@ -127,26 +127,26 @@ class TestProjectedGradientDescent(unittest.TestCase):
 
     def test_pgd_1_nn(self):
         result1s = conduct(self.attack_pgd1_nn, self.nn_model, self.nn_data)
-        # print(result1s)
+        self.assertIsNotNone(result1s)
 
     def test_pgd_2_nn(self):
         result2s = conduct(self.attack_pgd2_nn, self.nn_model, self.nn_data)
-        # print(result2s)
+        self.assertIsNotNone(result2s)
 
     def test_pgd_inf_nn(self):
         resultinfs = conduct(self.attack_pgdinf_nn, self.nn_model, self.nn_data)
-        # print(resultinfs)
+        self.assertIsNotNone(resultinfs)
 
     def test_pgd_1_a_nn(self):
         result1s = conduct(self.attack_pgd1_a_nn, self.nn_model, self.nn_data)
-        # print(result1s)
+        self.assertIsNotNone(result1s)
 
     def test_pgd_2_a_nn(self):
         result2s = conduct(self.attack_pgd2_a_nn, self.nn_model, self.nn_data)
-        # print(result2s)
+        self.assertIsNotNone(result2s)
 
     def test_pgd_inf_a_nn(self):
         resultinfs = conduct(self.attack_pgdinf_a_nn, self.nn_model, self.nn_data)
-        # print(resultinfs)
+        self.assertIsNotNone(resultinfs)
 
 
