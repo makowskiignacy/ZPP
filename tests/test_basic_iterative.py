@@ -3,16 +3,18 @@ import mlflow
 import csv
 import numpy as np
 import torch
+import unittest
 
 import torchvision.models as tv_models
 import foolbox as fb
 from attacks.foolboxattacks.basic_iterative import L1BasicIterative, L2BasicIterative, LinfBasicIterative
 from attacks.foolboxattacks.basic_iterative import L1AdamBasicIterative, L2AdamBasicIterative, LinfAdamBasicIterative
+from attacks.helpers.parameters import FoolboxParameters
 from attacks.helpers.data import Data
 from attacks.foolbox_attack import FoolboxAttack
 from foolbox.utils import accuracy
-
 from foolbox.models.pytorch import PyTorchModel
+
 
 
 def simple_test(batchsize=4):
@@ -74,69 +76,67 @@ def conduct(attack: FoolboxAttack, model, data: Data):
     return adversarials
 
 
-def main():
-    attack_specific_args = {"steps": 10, "random_start": True}
-    generic_args = {"epsilon": 20}
+class TestBasicIterative(unittest.TestCase):
+    attack_specific_parameters = {"steps": 10, "random_start": True}
+    generic_parameters = {"epsilon_rate": 0.01}
+    parameters = FoolboxParameters(attack_specific_parameters, generic_parameters)
 
-    attack_bi1 = L1BasicIterative(attack_specific_args, generic_args)
-    attack_bi2 = L2BasicIterative(attack_specific_args, generic_args)
-    attack_biinf = LinfBasicIterative(attack_specific_args, generic_args)
-    attack_bi1_a = L1AdamBasicIterative(attack_specific_args, generic_args)
-    attack_bi2_a = L2AdamBasicIterative(attack_specific_args, generic_args)
-    attack_biinf_a = LinfAdamBasicIterative(attack_specific_args, generic_args)
+    attack_bi1 = L1BasicIterative(parameters)
+    attack_bi2 = L2BasicIterative(parameters)
+    attack_biinf = LinfBasicIterative(parameters)
+    attack_bi1_a = L1AdamBasicIterative(parameters)
+    attack_bi2_a = L2AdamBasicIterative(parameters)
+    attack_biinf_a = LinfAdamBasicIterative(parameters)
 
     smodel, sdata = simple_test(batchsize=20)
 
-    print("Attack bi1 simple")
-    result1s = conduct(attack_bi1, smodel, sdata)
-    print(result1s)
+    def test_bi_1_simple(self):
+        result1s = conduct(self.attack_bi1, self.smodel, self.sdata)
+        self.assertIsNotNone(result1s)
 
-    print("Attack bi2 simple")
-    result2s = conduct(attack_bi2, smodel, sdata)
-    print(result2s)
+    def test_bi_2_simple(self):
+        result2s = conduct(self.attack_bi2, self.smodel, self.sdata)
+        self.assertIsNotNone(result2s)
 
-    print("Attack biinf simple")
-    resultinfs = conduct(attack_biinf, smodel, sdata)
-    print(resultinfs)
+    def test_bi_inf_simple(self):
+        resultinfs = conduct(self.attack_biinf, self.smodel, self.sdata)
+        self.assertIsNotNone(resultinfs)
 
-    print("Attack bi1 with Adam simple")
-    result1s = conduct(attack_bi1_a, smodel, sdata)
-    print(result1s)
+    def test_bi_1_a_simple(self):
+        result1s = conduct(self.attack_bi1_a, self.smodel, self.sdata)
+        self.assertIsNotNone(result1s)
 
-    print("Attack bi2 with Adam simple")
-    result2s = conduct(attack_bi2_a, smodel, sdata)
-    print(result2s)
+    def test_bi_2_a_simple(self):
+        result2s = conduct(self.attack_bi2_a, self.smodel, self.sdata)
+        self.assertIsNotNone(result2s)
 
-    print("Attack biinf with Adam simple")
-    resultinfs = conduct(attack_biinf_a, smodel, sdata)
-    print(resultinfs)
+    def test_bi_inf_a_simple(self):
+        resultinfs = conduct(self.attack_biinf_a, self.smodel, self.sdata)
+        self.assertIsNotNone(resultinfs)
 
     nn_model, nn_data = nn_test()
-    if nn_model is not None and nn_data is not None:
-        print("Attack bi1 nn")
-        result1nn = conduct(attack_bi1, nn_model, nn_data)
-        print(result1nn)
 
-        print("Attack bi2 nn")
-        result2nn = conduct(attack_bi2, nn_model, nn_data)
-        print(result2nn)
+    def test_bi_1_nn(self):
+        result1nn = conduct(self.attack_bi1, self.nn_model, self.nn_data)
+        self.assertIsNotNone(result1nn)
 
-        print("Attack biinf nn")
-        resultinfnn = conduct(attack_biinf, nn_model, nn_data)
-        print(resultinfnn)
+    def test_bi_2_nn(self):
+        result2nn = conduct(self.attack_bi2, self.nn_model, self.nn_data)
+        self.assertIsNotNone(result2nn)
 
-        print("Attack bi1 with Adam nn")
-        result1nn = conduct(attack_bi1_a, nn_model, nn_data)
-        print(result1nn)
+    def test_bi_inf_nn(self):
+        resultinfnn = conduct(self.attack_biinf, self.nn_model, self.nn_data)
+        self.assertIsNotNone(resultinfnn)
 
-        print("Attack bi2 with Adam nn")
-        result2nn = conduct(attack_bi2_a, nn_model, nn_data)
-        print(result2nn)
+    def test_bi_1_a_nn(self):
+        result1ann = conduct(self.attack_bi1_a, self.nn_model, self.nn_data)
+        self.assertIsNotNone(result1ann)
 
-        print("Attack biinf with Adam nn")
-        resultinfnn = conduct(attack_biinf_a, nn_model, nn_data)
-        print(resultinfnn)
+    def test_bi_2_a_nn(self):
+        result2ann = conduct(self.attack_bi2_a, self.nn_model, self.nn_data)
+        self.assertIsNotNone(result2ann)
 
+    def test_bi_inf_a_nn(self):
+        resultinfann = conduct(self.attack_biinf_a, self.nn_model, self.nn_data)
+        self.assertIsNotNone(resultinfann)
 
-if __name__ == '__main__':
-    main()

@@ -9,38 +9,31 @@ import numpy as np
 
 
 class AdversarialPatch(ARTAttack):
-    def __init__(self, **params):
-        super().__init__(**params)
+    def __init__(self, parameters):
+        super().__init__(parameters.classifier_parameters)
         self.attack = None
-        self._attack_params.update({
-            'classifier': None,
+        self._attack_params = {
+            "classifier": parameters.attack_parameters.get("classifier"),
             # rotation_max (float) – The maximum rotation applied to random patches.
             # The value is expected to be in the range [0, 180].
-            'rotation_max': 22.5,
+            "rotation_max": parameters.attack_parameters.get("rotation_max", 22.5),
             # scale_min (float) – The minimum scaling applied to random patches.
             # The value should be in the range [0, 1], but less than scale_max.
-            'scale_min': 0.1,
-            'scale_max': 1.0,
+            "scale_min": parameters.attack_parameters.get("scale_min", 0.1),
+            "scale_max": parameters.attack_parameters.get("scale_max", 1.0),
             # learning_rate (float) – The learning rate of the optimization.
-            'learning_rate': 5.0,
+            "learning_rate": parameters.attack_parameters.get("learning_rate", 5.0),
             # max_iter (int) – The number of optimization steps.
-            'max_iter': 500,
+            "max_iter": parameters.attack_parameters.get("max_iter", 500),
             # batch_size (int) – The size of the training batch.
-            'batch_size': 16,
+            "batch_size": parameters.attack_parameters.get("batch_size", 16),
             # patch_shape – The shape of the adversarial patch as a tuple of shape (width, height, nb_channels).
             # Currently only supported for TensorFlowV2Classifier. For classifiers of other frameworks the patch_shape
             # is set to the shape of the input samples.
-            'patch_shape': None,
-            # targeted (bool) – Indicates whether the attack is targeted (True) or untargeted (False).
-            'targeted': True,
-            # verbose (bool) – Show progress bars.
-            'verbose': True,
-        })
-
-        # We do not include parameters outside the list!
-        for key in self._attack_params.keys():
-            if key in params.keys():
-                self._attack_params[key] = params[key]
+            "patch_shape": parameters.attack_parameters.get("patch_shape"),
+            "targeted": parameters.attack_parameters.get("targeted", True),
+            "verbose": parameters.attack_parameters.get("verbose", True)
+        }
 
         self._attack: Union[AdversarialPatchTensorFlowV2, AdversarialPatchPyTorch, AdversarialPatchNumpy]
         if isinstance(self._attack_params.get('classifier'), TensorFlowV2Classifier):

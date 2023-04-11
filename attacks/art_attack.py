@@ -20,28 +20,21 @@ class ARTAttack(Attack):
         return data_from_attack
 
     @abc.abstractmethod
-    def __init__(self, **params):
+    def __init__(self, params):
         super().__init__()
 
         # Parameters required to initialize the classifier
         self._classifier_params = {
-            'mask': None,
-            'reset_patch': False,
-            'input_shape': None,
-            'loss': None,
-            'nb_classes': None,
-            'optimizer': None,
-            'clip_values': None,
-            'use_logits': False
+            'mask': params.get('mask'),
+            'reset_patch': params.get('reset_patch', False),
+            'input_shape': params.get('input_shape'),
+            'loss': params.get('loss'),
+            'nb_classes': params.get('nb_classes'),
+            'optimizer': params.get('optimizer'),
+            'clip_values': params.get('clip_values'),
+            'use_logits': params.get('use_logits', False)
         }
 
-        # We separate known classifier parameters from potential attack params
-        for key in self._classifier_params.keys():
-            if key in params.keys():
-                self._classifier_params[key] = params[key]
-                params.pop(key)
-        # On lower levels we can separete further if needed
-        # There is no need to filter params on lower levels
 
     def _set_data(self, data):
         # TODO dorzucić tu lub wyżej sprawdzanie poprawności danych

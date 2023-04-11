@@ -6,86 +6,48 @@ from attacks.foolbox_attack import FoolboxAttack
 from foolbox.criteria import Misclassification, TargetedMisclassification
 from abc import ABC
 
-from attacks.helpers.data import Data
-from eagerpy.astensor import astensor
 
-class BrendelBethge(FoolboxAttack, ABC):
-    def __init__(self, args):
-        FoolboxAttack.__init__(self, args)
-        self.attack = None
+class GenericBrendelBethge(FoolboxAttack, ABC):
+    def __init__(self, parent, parameters):
+        self.Parent = parent
+        self.Parent.__init__(self, **parameters.attack_specific_parameters)
+        FoolboxAttack.__init__(self, parameters.generic_parameters)
 
-        if 'lr' in args:
-            self.lr = args['lr']
-        else:
-            self.lr = 1
-
-        if 'epsilons' in args:
-            self.epsilons = args['epsilons']
-        else:
-            self.epsilons = 1
-
-        if 'steps' in args:
-            self.steps = args['steps']
-        else:
-            self.steps = 100
-
-
-    def verify_bounds(self, data: Data):
-        if hasattr(self, 'min') and hasattr(self, 'max'):
-            return
-        
-        originals, _ = astensor(data.input)
-        self.min = originals.min().item()
-        self.max = originals.max().item()
-
-
-    def conduct(self, model, data: Data):
-        outputs = data.output
-        self.verify_bounds(data=data)
+    def conduct(self, model, data):
+        output = super().flatten_output(data)
+        super().verify_bounds(data=data)
+        super().verify_epsilon()
         model_correct_format = super().reformat_model(model)
 
         if model_correct_format is None:
             model_correct_format = model
-        else:
-            outputs = data.output[:, 0]
+
         if self.criterion_type == "targeted_misclassification":
-            self.criterion = TargetedMisclassification(outputs)
+            self.criterion = TargetedMisclassification(output)
         if self.criterion_type == "misclassification":
-            self.criterion = Misclassification(outputs)
+            self.criterion = Misclassification(output)
 
 
-        try:
-            assert(self.attack is not None)
+        result = self.Parent.run(self, model=model_correct_format, inputs=data.input, criterion=self.criterion)
+        return result
 
-            adversarials, _, _ = self.attack(model=model_correct_format, inputs=data.input, criterion=self.criterion, epsilons=self.epsilons)
-
-
-            return adversarials
-        except Exception as e:
-            delim = "\n" + "#" * 64 + "\n"
-            print(f"Exception raised:{delim}{e}{delim}{repr(e)}{delim}{traceback.print_exc()}{delim}")
-            return None
     
 
-class L0BrendelBethge(BrendelBethge):
-    def __init__(self, args):
-        BrendelBethge.__init__(self, args)
-        self.attack = L0BrendelBethgeAttack(lr=self.lr, steps=self.steps)
+class L0BrendelBethge(GenericBrendelBethge, L0BrendelBethgeAttack):
+    def __init__(self, parameters):
+        GenericBrendelBethge.__init__(self, L0BrendelBethgeAttack, parameters)
 
 
-class L1BrendelBethge(BrendelBethge, L1BrendelBethgeAttack):
-    def __init__(self, args):
-        BrendelBethge.__init__(self, args)
-        self.attack = L1BrendelBethgeAttack(lr=self.lr, steps=self.steps)
+class L1BrendelBethge(GenericBrendelBethge, L1BrendelBethgeAttack):
+    def __init__(self, parameters):
+        GenericBrendelBethge.__init__(self, L1BrendelBethgeAttack, parameters)
 
 
-class L2BrendelBethge(BrendelBethge):
-    def __init__(self, args):
-        BrendelBethge.__init__(self, args)
-        self.attack = L2BrendelBethgeAttack(lr=self.lr, steps=self.steps)
+class L2BrendelBethge(GenericBrendelBethge, L2BrendelBethgeAttack):
+    def __init__(self, parameters):
+        GenericBrendelBethge.__init__(self, L2BrendelBethgeAttack, parameters)
 
 
-class LinfinityBrendelBethge(BrendelBethge, LinfinityBrendelBethgeAttack):
-    def __init__(self, args):
-        BrendelBethge.__init__(self, args)
-        self.attack = LinfinityBrendelBethgeAttack(lr=self.lr, steps=self.steps)
+class LinfinityBrendelBethge(GenericBrendelBethge, LinfinityBrendelBethgeAttack):
+    def __init__(self, parameters):
+        GenericBrendelBethge.__init__(self, LinfinityBrendelBethgeAttack, parameters)

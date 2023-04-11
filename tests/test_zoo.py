@@ -1,7 +1,6 @@
 import unittest
 
 import numpy as np
-import timeout_decorator
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -9,7 +8,7 @@ import torch.optim as optim
 from art.utils import load_mnist
 
 
-
+from attacks.helpers.parameters import ARTParameters
 from attacks.artattacks.zeroth_order_optimization_bb_attack import ZeorthOrderOptimalization
 
 
@@ -63,39 +62,43 @@ def art_sample_data():
 
 
 class ZooTestUsingPytorchArt(unittest.TestCase):
-    @timeout_decorator.timeout(900)
     def test_art_ZeorthOrderOptimalization(self):
         model = pytorch_model_form_art()
         # This is only for testing purpose as are the parameters
         model.cpu()
-        art_model = ZeorthOrderOptimalization(clip_values=(_min_pixel_value, _max_pixel_value),
-                                              loss=nn.CrossEntropyLoss(),
-                                              optimizer=optim.Adam(model.parameters(), lr=0.01),
-                                              input_shape=(1, 28, 28),
-                                              nb_classes=10,
-                                              nb_parallel=1,
-                                              binary_search_steps=1,
-                                              batch_size=1000,
-                                              max_iter=1,
-                                            #   use_resize=False,
-                                              verbose=True)
+        classifier_parameters = {"clip_values": (_min_pixel_value, _max_pixel_value),
+                                 "loss": nn.CrossEntropyLoss(),
+                                 "optimizer": optim.Adam(model.parameters(), lr=0.01),
+                                 "input_shape": (1, 28, 28),
+                                 "nb_classes": 10}
+        attack_parameters = {"nb_parallel": 1,
+                             "binary_search_steps": 1,
+                             "batch_size": 1000,
+                             "max_iter": 1,
+                             "verbose": True}
+        parameters = ARTParameters(classifier_parameters=classifier_parameters, attack_parameters=attack_parameters)
+
+        art_model = ZeorthOrderOptimalization(parameters=parameters)
+
         self.assertIsNotNone(art_model.conduct(pytorch_model_form_art(), art_sample_data()))
 
 class ZooTestUsingPytorchArt__potential_failure(unittest.TestCase):
-    @timeout_decorator.timeout(900)
     def test_art_ZeorthOrderOptimalization(self):
         model = pytorch_model_form_art()
         # This is only for testing purpose as are the parameters
         model.cpu()
-        art_model = ZeorthOrderOptimalization(clip_values=(_min_pixel_value, _max_pixel_value),
-                                              loss=nn.CrossEntropyLoss(),
-                                              optimizer=optim.Adam(model.parameters(), lr=0.01),
-                                              input_shape=(1, 28, 28),
-                                              nb_classes=10,
-                                              nb_parallel=1,
-                                              binary_search_steps=1,
-                                              batch_size=500,
-                                              max_iter=1,
-                                              use_resize=False,
-                                              verbose=True)
+        classifier_parameters = {"clip_values": (_min_pixel_value, _max_pixel_value),
+                                 "loss": nn.CrossEntropyLoss(),
+                                 "optimizer": optim.Adam(model.parameters(), lr=0.01),
+                                 "input_shape": (1, 28, 28),
+                                 "nb_classes": 10}
+        attack_parameters = {"nb_parallel": 1,
+                             "binary_search_steps": 1,
+                             "batch_size": 500,
+                             "max_iter": 1,
+                             "verbose": True}
+        parameters = ARTParameters(classifier_parameters=classifier_parameters, attack_parameters=attack_parameters)
+
+        art_model = ZeorthOrderOptimalization(parameters=parameters)
+
         self.assertIsNotNone(art_model.conduct(pytorch_model_form_art(), art_sample_data()))

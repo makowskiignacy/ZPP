@@ -7,19 +7,10 @@ from attacks.art_attack import ARTAttack
 from art.attacks.evasion import *
 
 class Joker(ARTAttack):
-    def __init__(self, **params):
-        if 'joker' not in params:
-            raise Exception("The joker parameter is mandatory, set it to the name of the desired class from ART")
-
-        # Initialization of the arguments needed for the classifier
-        super().__init__(**params)
-
-        for key in self._classifier_params:
-            if key in params:
-                params.pop(key)
-
-        self.joker = params.pop('joker')
-        self._attack_params = params
+    def __init__(self, joker, parameters):
+        self.joker=joker
+        super().__init__(parameters.classifier_parameters)
+        self._attack_params = parameters.attack_parameters
 
     def conduct(self, model, data):
         self._set_classifier(model)

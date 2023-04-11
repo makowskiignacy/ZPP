@@ -3,12 +3,14 @@ import mlflow
 import csv
 import numpy as np
 import torch
+import unittest
 
 import torchvision.models as tv_models
 import foolbox as fb
 from attacks.foolboxattacks.projected_gradient_descent import L1ProjectedGradientDescent, L2ProjectedGradientDescent, LinfProjectedGradientDescent
 from attacks.foolboxattacks.projected_gradient_descent import L1AdamProjectedGradientDescent, L2AdamProjectedGradientDescent, LinfAdamProjectedGradientDescent
 from attacks.helpers.data import Data
+from attacks.helpers.parameters import FoolboxParameters
 from attacks.foolbox_attack import FoolboxAttack
 from foolbox.utils import accuracy
 
@@ -74,69 +76,77 @@ def conduct(attack: FoolboxAttack, model, data: Data):
     return adversarials
 
 
-def main():
-    attack_specific_args = {"steps": 10, "random_start": True}
-    generic_args = {"epsilon": 0.01}
+class TestProjectedGradientDescent(unittest.TestCase):
+    attack_specific_parameters = {"steps": 100, "random_start": True}
+    generic_parameters_simple = {"epsilon": 0.01}
+    generic_parameters_nn = {"epsilon": 30}
+    parameters_simple = FoolboxParameters(attack_specific_parameters,generic_parameters_simple)
+    parameters_nn = FoolboxParameters(attack_specific_parameters, generic_parameters_nn)
 
-    attack_pgd1 = L1ProjectedGradientDescent(attack_specific_args, generic_args)
-    attack_pgd2 = L2ProjectedGradientDescent(attack_specific_args, generic_args)
-    attack_pgdinf = LinfProjectedGradientDescent(attack_specific_args, generic_args)
-    attack_pgd1_a = L1AdamProjectedGradientDescent(attack_specific_args, generic_args)
-    attack_pgd2_a = L2AdamProjectedGradientDescent(attack_specific_args, generic_args)
-    attack_pgdinf_a = LinfAdamProjectedGradientDescent(attack_specific_args, generic_args)
+    attack_pgd1 = L1ProjectedGradientDescent(parameters_simple)
+    attack_pgd2 = L2ProjectedGradientDescent(parameters_simple)
+    attack_pgdinf = LinfProjectedGradientDescent(parameters_simple)
+    attack_pgd1_a = L1AdamProjectedGradientDescent(parameters_simple)
+    attack_pgd2_a = L2AdamProjectedGradientDescent(parameters_simple)
+    attack_pgdinf_a = LinfAdamProjectedGradientDescent(parameters_simple)
 
     smodel, sdata = simple_test(batchsize=20)
 
-    print("Attack pgd1 simple")
-    result1s = conduct(attack_pgd1, smodel, sdata)
-    print(result1s)
+    def test_pgd_1_simple(self):
+        result1s = conduct(self.attack_pgd1, self.smodel, self.sdata)
+        self.assertIsNotNone(result1s)
 
-    print("Attack pgd2 simple")
-    result2s = conduct(attack_pgd2, smodel, sdata)
-    print(result2s)
+    def test_pgd_2_simple(self):
+        result2s = conduct(self.attack_pgd2, self.smodel, self.sdata)
+        self.assertIsNotNone(result2s)
 
-    print("Attack pgdinf simple")
-    resultinfs = conduct(attack_pgdinf, smodel, sdata)
-    print(resultinfs)
+    def test_pgd_inf_simple(self):
+        resultinfs = conduct(self.attack_pgdinf, self.smodel, self.sdata)
+        self.assertIsNotNone(resultinfs)
 
-    print("Attack pgd1 with Adam simple")
-    result1s = conduct(attack_pgd1_a, smodel, sdata)
-    print(result1s)
+    def test_pgd_1_a_simple(self):
+        result1s = conduct(self.attack_pgd1_a, self.smodel, self.sdata)
+        self.assertIsNotNone(result1s)
 
-    print("Attack pgd2 with Adam simple")
-    result2s = conduct(attack_pgd2_a, smodel, sdata)
-    print(result2s)
+    def test_pgd_2_a_simple(self):
+        result2s = conduct(self.attack_pgd2_a, self.smodel, self.sdata)
+        self.assertIsNotNone(result2s)
 
-    print("Attack pgdinf with Adam simple")
-    resultinfs = conduct(attack_pgdinf_a, smodel, sdata)
-    print(resultinfs)
+    def test_pgd_inf_a_simple(self):
+        resultinfs = conduct(self.attack_pgdinf_a, self.smodel, self.sdata)
+        self.assertIsNotNone(resultinfs)
 
     nn_model, nn_data = nn_test()
-    if nn_model is not None and nn_data is not None:
-        print("Attack pgd1 nn")
-        result1nn = conduct(attack_pgd1, nn_model, nn_data)
-        print(result1nn)
 
-        print("Attack pgd2 nn")
-        result2nn = conduct(attack_pgd2, nn_model, nn_data)
-        print(result2nn)
+    attack_pgd1_nn = L1ProjectedGradientDescent(parameters_nn)
+    attack_pgd2_nn = L2ProjectedGradientDescent(parameters_nn)
+    attack_pgdinf_nn = LinfProjectedGradientDescent(parameters_nn)
+    attack_pgd1_a_nn = L1AdamProjectedGradientDescent(parameters_nn)
+    attack_pgd2_a_nn = L2AdamProjectedGradientDescent(parameters_nn)
+    attack_pgdinf_a_nn = LinfAdamProjectedGradientDescent(parameters_nn)
 
-        print("Attack pgdinf nn")
-        resultinfnn = conduct(attack_pgdinf, nn_model, nn_data)
-        print(resultinfnn)
+    def test_pgd_1_nn(self):
+        result1s = conduct(self.attack_pgd1_nn, self.nn_model, self.nn_data)
+        self.assertIsNotNone(result1s)
 
-        print("Attack pgd1 with Adam nn")
-        result1nn = conduct(attack_pgd1_a, nn_model, nn_data)
-        print(result1nn)
+    def test_pgd_2_nn(self):
+        result2s = conduct(self.attack_pgd2_nn, self.nn_model, self.nn_data)
+        self.assertIsNotNone(result2s)
 
-        print("Attack pgd2 with Adam nn")
-        result2nn = conduct(attack_pgd2_a, nn_model, nn_data)
-        print(result2nn)
+    def test_pgd_inf_nn(self):
+        resultinfs = conduct(self.attack_pgdinf_nn, self.nn_model, self.nn_data)
+        self.assertIsNotNone(resultinfs)
 
-        print("Attack pgdinf with Adam nn")
-        resultinfnn = conduct(attack_pgdinf_a, nn_model, nn_data)
-        print(resultinfnn)
+    def test_pgd_1_a_nn(self):
+        result1s = conduct(self.attack_pgd1_a_nn, self.nn_model, self.nn_data)
+        self.assertIsNotNone(result1s)
+
+    def test_pgd_2_a_nn(self):
+        result2s = conduct(self.attack_pgd2_a_nn, self.nn_model, self.nn_data)
+        self.assertIsNotNone(result2s)
+
+    def test_pgd_inf_a_nn(self):
+        resultinfs = conduct(self.attack_pgdinf_a_nn, self.nn_model, self.nn_data)
+        self.assertIsNotNone(resultinfs)
 
 
-if __name__ == '__main__':
-    main()
