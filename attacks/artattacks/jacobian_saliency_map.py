@@ -21,7 +21,9 @@ class JacobianSaliencyMap(ARTAttack):
             "verbose" : False
         }
         # Aktualizujemy, jeżeli nadpisano
-        self._attack_params.update(parameters.attack_parameters)
+        for key in self._attack_params.keys():
+            if key in parameters.attack_parameters.keys():
+                self._attack_params[key] = parameters.attack_parameters[key]
 
     def conduct(self, model, data):
         self._set_classifier(model)

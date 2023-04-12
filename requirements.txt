@@ -9,7 +9,12 @@ scikit_learn==1.1.3
 tensorflow==2.11.0
 torch==1.13.1
 Pillow==9.4.0
-torchvision==0.14.0
+
+# The conflict is caused by:
+#     The user requested torch==1.13.1
+#     torchvision 0.14.0 depends on torch==1.13.0
+
+torchvision==0.14.1
 numba==0.56.4
 
 # Do testów
