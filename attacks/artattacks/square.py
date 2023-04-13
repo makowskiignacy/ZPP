@@ -2,22 +2,32 @@
 from attacks.art_attack import ARTAttack
 from attacks.helpers.parameters import ARTParameters
 
-from art.attacks.evasion import SaliencyMapMethod
+from art.attacks.evasion import SquareAttack
 
 
-class JacobianSaliencyMap(ARTAttack):
+class Square(ARTAttack):
     def __init__(self,parameters : ARTParameters) :
         super().__init__(parameters.classifier_parameters)
 
         # Wartości domyślne
         self._attack_params = {
-            # Wartość perturbacji każdej zmodyfikowanej cechy na jeden krok
-            "theta" : 0.1,
-            # Maksymalny ułamek cech jakie będą poddane perturbacji
-            "gamma" : 1.0,
+            # Norma L_, możliwe wartości to 1,2,"inf"
+            "norm" : 2,
+            # Funkcja jakiej atak ma użyć aby określić 'kontradyktoryjność'
+            "adv_criterion" : None,
+            # Funkcja, jaką atak ma optymalizować
+            "loss" : None,
+            # Maksymalna liczba iteracji
+            "max_iter" : 100,
+            # Maksymalna perturbacja
+            "eps" : 0.3,
+            # Wstępna część elementów
+            "p_init": 0.8,
+            # Liczba ponownych uruchomień
+            "nb_restarts" : 1,
             # Liczba przykładów treningowych wykorzystywanych w jednej iteracji
             # uczenia
-            "batch_size" : 1,
+            "batch_size" : 128,
             # Czy pokazywać pasek progresu
             "verbose" : False
         }
@@ -33,8 +43,8 @@ class JacobianSaliencyMap(ARTAttack):
         self._set_classifier(model)
         self._set_data(data)
 
-        return JacobianSaliencyMap.to_unified_format(
-            SaliencyMapMethod(
+        return Square.to_unified_format(
+            SquareAttack(
                 self._classifier,
                 **self._attack_params
             ).generate(
