@@ -11,6 +11,12 @@ from attacks.artattacks.zeroth_order_optimization_bb_attack\
 from attacks.artattacks.adversarial_patch\
     import AdversarialPatch
 
+from attacks.artattacks.geometric_decision_based import GeometricDecisionBased
+from attacks.artattacks.jacobian_saliency_map import JacobianSaliencyMap
+from attacks.artattacks.square import Square
+from attacks.artattacks.sign_opt import SignOPT
+from attacks.artattacks.threshold import Threshold
+
 # Ataki pochodzące z FoolBoxa
 from attacks.foolboxattacks.brendel_bethge import BrendelBethge 
 from attacks.foolboxattacks.basic_iterative import L1BasicIterative, L2BasicIterative, LinfBasicIterative
@@ -47,7 +53,12 @@ class AttackManager():
             "L1 Adam Projected Gradient Descent": L1AdamProjectedGradientDescent,
             "L2 Adam Projected Gradient Descent": L2AdamProjectedGradientDescent,
             "Linf Adam Projected Gradient Descent": LinfAdamProjectedGradientDescent,
-            "Salt And Pepper" : SaltAndPepperNoise
+            "Salt And Pepper" : SaltAndPepperNoise,
+            "Geometric Decision Based" : GeometricDecisionBased,
+            "Jacobian Saliency Map" : JacobianSaliencyMap,
+            "Square" : Square,
+            "Sign-OPT" : SignOPT,
+            "Threshold" : Threshold
         }
     
     @staticmethod
