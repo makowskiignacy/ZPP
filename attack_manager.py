@@ -5,7 +5,7 @@ from attacks.artattacks.deep_fool import DeepFool
 from attacks.artattacks.fast_gradient import FastGradient
 from attacks.artattacks.joker import Joker
 
-from attacks.artattacks.zeroth_order_optimization_bb_attack\
+from attacks.artattacks.zeroeth_order_optimization_bb_attack\
     import ZeorthOrderOptimalization as ZOOAttack
 
 from attacks.artattacks.adversarial_patch\

@@ -3,7 +3,7 @@ from art.attacks.evasion import ZooAttack as orig_art_zoo_attack
 
 
 
-class ZeorthOrderOptimalization(ARTAttack):
+class ZeroethOrderOptimalization(ARTAttack):
     def __init__(self, parameters):
         # inicjalizacja argumentów potrzebnych dla klasyfikatora, będą one wspólne dla wszystkich ataków
         super().__init__(parameters.classifier_parameters)
@@ -48,7 +48,7 @@ class ZeorthOrderOptimalization(ARTAttack):
         # for i in ['mask', 'reset_patch', 'input_shape', 'loss', 'nb_classes', 'optimizer', 'clip_values']:
         #     del self._attack_params[i]
 
-        return ZeorthOrderOptimalization.to_unified_format(
+        return ZeroethOrderOptimalization.to_unified_format(
             # Ważne, aby dodać model do listy parametrów podczas tworzenia
             # obiektu z biblioteki ART
             orig_art_zoo_attack(

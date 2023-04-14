@@ -6,15 +6,16 @@ from attacks.attack import Attack
 
 from attacks.art_attack import ARTAttack
 
-from attacks.artattacks.zeroth_order_optimization_bb_attack\
-    import ZeorthOrderOptimalization as ZOOAttack
+from attacks.artattacks.zeroeth_order_optimization_bb_attack\
+    import ZeroethOrderOptimalization as ZOOAttack
 from attacks.helpers.parameters import ARTParameters
 
-class TestZOO(unittest.TestCase):
+class TestClassHierarchyArt:
     def test_class_hierarchy(self):
         # # Nie powinno być możliwości utworzenia obiektu klasy abstrakcyjnej
+        assertion_vars = []
         assertion_var = 0
-        print("Próba utowrzenia obiektu klasy Attack:\n****")
+        print("Próba utworzenia obiektu klasy Attack:\n****")
         try:
             AbsA = Attack()
             assertion_var += 1
@@ -24,9 +25,9 @@ class TestZOO(unittest.TestCase):
         finally:
             print("****\n")
 
-        self.assertEqual(assertion_var, 0)
+        assertion_vars.append(assertion_var == 0)
 
-        print("Próba utowrzenia obiektu klasy ARTAttack:\n****")
+        print("Próba utworzenia obiektu klasy ARTAttack:\n****")
         try:
             AbsA = ARTAttack({})
             assertion_var += 1
@@ -36,7 +37,7 @@ class TestZOO(unittest.TestCase):
         finally:
             print("****\n")
 
-        self.assertEqual(assertion_var, 0)
+        assertion_vars.append(assertion_var == 0)
 
         print("Klasę konkretnego ataku można już zinstancjonować:\n****")
         try:
@@ -48,7 +49,7 @@ class TestZOO(unittest.TestCase):
         finally:
             print("****\n")
 
-        self.assertEqual(assertion_var, 1)
+        assertion_vars.append(assertion_var == 1)
 
         default_params = ZOO_attack._attack_params
 
@@ -65,4 +66,5 @@ class TestZOO(unittest.TestCase):
                 print("same:", key, "=", val)
 
         print("Zakończono pomyślnie.")
+        return assertion_vars
 
