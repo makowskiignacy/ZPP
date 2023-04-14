@@ -61,7 +61,6 @@ class ArtTests(unittest.TestCase):
         test = TestClassHierarchyArt()
         self.assertEqual(test.test_class_hierarchy(), [True, True, True])
 
-    @unittest.SkipTest
     def test_DeepFool(self):
         parameters = art_parameters.get("deep_fool")
         self.assertIsNotNone(parameters, msg="Input given for running tests does not contain parameters for the Deep Fool attack test.")
