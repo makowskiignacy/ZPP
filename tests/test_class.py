@@ -44,7 +44,6 @@ class Test():
     def _prep_nn_test(self):
         if os.path.exists(SS_NN_ABSOLUTE_PATH):
             ss_nn_pipeline = mlflow.sklearn.load_model(SS_NN_ABSOLUTE_PATH)
-            print(f"Path {SS_NN_ABSOLUTE_PATH} found.")
         else:
             print(f"The directory '{SS_NN_ABSOLUTE_PATH}' does not exist.")
             return None,  None
@@ -58,10 +57,8 @@ class Test():
             fmodel = fb.models.pytorch.PyTorchModel(nn_model, bounds=(-2., 30000.))
 
             if os.path.exists(DATA_ABSOLUTE_PATH):
-                print(f"Path {DATA_ABSOLUTE_PATH} found.")
                 csv_filename = DATA_ABSOLUTE_PATH
             else:
-                print(f"Path '{DATA_ABSOLUTE_PATH}' does not exist.")
                 return None,  None
 
             data_df = pd.read_csv(csv_filename, skiprows=[0], nrows=10000)
@@ -71,24 +68,6 @@ class Test():
             result = torch.tensor(result, requires_grad=False, dtype=torch.long)
             data = Data(data, result)
 
-            # with open(csv_filename) as f:
-            #     reader = csv.reader(f)
-                # data = list(list(line) for line in reader)
-                # data.pop(0)
-                # data2 = []
-                # i = 0
-                # for row in data:
-                #     if i < 10000:
-                #         i = i+1
-                #         row2 = []
-                #         for place in range(len(row)):
-                #             row2.append(float(row[place]))
-                #         data2.append(row2)
-                # data = data2
-                # data = torch.tensor(data, requires_grad=False, dtype=torch.float)
-                # data, result = torch.hsplit(data, [91, ])
-                # result = torch.tensor(result, requires_grad=False, dtype=torch.float)
-                # data = Data(data, result)
 
         return fmodel, data
 
@@ -96,14 +75,11 @@ class Test():
     def _conduct(self, attack: FoolboxAttack, model, data: Data):
         time_start = time.time()
 
-        # print(type(model))
         if isinstance(model, PyTorchModel):
             print(f"Model accuracy before attack: {fb.utils.accuracy(model, data.input, data.output)}")
-            # pred = model(data[:, :-1])
-            # print(f"Model accuracy before attack: {fb.utils.accuracy(pred.argmax(dim=1), data[:, -1])}")
         print(f"Starting attack. ({time.asctime(time.localtime(time_start))})")
         adversarials = None
-        
+
         try:
             adversarials = attack.conduct(model, data)
         except Exception as e:
