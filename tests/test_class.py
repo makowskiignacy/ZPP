@@ -68,7 +68,7 @@ class Test():
             data_arr = data_df.values
             data = torch.tensor(data_arr, requires_grad=False, dtype=torch.float)
             data, result = torch.hsplit(data, [91, ])
-            result = torch.tensor(result, requires_grad=False, dtype=torch.float)
+            result = torch.tensor(result, requires_grad=False, dtype=torch.long)
             data = Data(data, result)
 
             # with open(csv_filename) as f:
@@ -102,8 +102,12 @@ class Test():
             # pred = model(data[:, :-1])
             # print(f"Model accuracy before attack: {fb.utils.accuracy(pred.argmax(dim=1), data[:, -1])}")
         print(f"Starting attack. ({time.asctime(time.localtime(time_start))})")
-
-        adversarials = attack.conduct(model, data)
+        adversarials = None
+        
+        try:
+            adversarials = attack.conduct(model, data)
+        except Exception as e:
+            print(f"Error: {e}")
 
         time_end = time.time()
         print(f"Attack done. ({time.asctime(time.localtime(time_end))})")
