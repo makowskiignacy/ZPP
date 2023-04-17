@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from attacks.attack import Attack
 
 from foolbox.models.pytorch import PyTorchModel
@@ -14,12 +15,22 @@ import numpy as np
 from attacks.foolbox_attack import FoolboxAttack
 from foolbox.utils import accuracy
 
-class Test:
-    def __init__(self, attack_simple: Attack, attack_nn: Attack) -> None:
+import pandas as pd
+import os
+
+CWD = os.getcwd()
+SS_NN_RELATIVE_PATH = 'ss_nn/'
+DATA_RELATIVE_PATH = 'data_test.csv'
+SS_NN_ABSOLUTE_PATH = os.path.join(CWD, SS_NN_RELATIVE_PATH)
+DATA_ABSOLUTE_PATH = os.path.join(CWD, DATA_RELATIVE_PATH)
+
+class Test():
+    def __init__(self, attack_simple: Attack, attack_nn: Attack, batchsize=40) -> None:
         self.attack_simple = attack_simple
         self.attack_nn = attack_nn
+        
 
-    def prep_simple_test(self, batchsize=40):
+    def _prep_simple_test(self, batchsize=40):
         model = tv_models.resnet18(weights=tv_models.ResNet18_Weights.DEFAULT).eval()
         preprocessing = dict(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], axis=-3)
         fmodel = fb.models.pytorch.PyTorchModel(model, bounds=(0, 1), preprocessing=preprocessing)
@@ -27,59 +38,90 @@ class Test:
         images, labels = fb.utils.samples(fmodel, dataset='imagenet', batchsize=batchsize)
         data = Data(images, labels)
 
-        self.fmodel = fmodel
-        self.data = data
+        return fmodel, data
 
 
-    def prep_nn_test(self):
-        ss_nn_pipeline = mlflow.sklearn.load_model('../ss_nn/')
+    def _prep_nn_test(self):
+        if os.path.exists(SS_NN_ABSOLUTE_PATH):
+            ss_nn_pipeline = mlflow.sklearn.load_model(SS_NN_ABSOLUTE_PATH)
+            print(f"Path {SS_NN_ABSOLUTE_PATH} found.")
+        else:
+            print(f"The directory '{SS_NN_ABSOLUTE_PATH}' does not exist.")
+            return None,  None
+        
+        fmodel = None
+        data = None
+
         if ss_nn_pipeline is not None:
             standard_scaler_from_nn_pipeline = ss_nn_pipeline.steps[0][1]
             nn_model = ss_nn_pipeline.steps[1][1].module_
             fmodel = fb.models.pytorch.PyTorchModel(nn_model, bounds=(-2., 30000.))
 
-            csv_filename = '../data_test.csv'
+            if os.path.exists(DATA_ABSOLUTE_PATH):
+                print(f"Path {DATA_ABSOLUTE_PATH} found.")
+                csv_filename = DATA_ABSOLUTE_PATH
+            else:
+                print(f"Path '{DATA_ABSOLUTE_PATH}' does not exist.")
+                return None,  None
 
-            with open(csv_filename) as f:
-                reader = csv.reader(f)
-                data = list(list(line) for line in reader)
-                data.pop(0)
-                data2 = []
-                i = 0
-                for row in data:
-                    if i < 10000:
-                        i = i+1
-                        row2 = []
-                        for place in range(len(row)):
-                            row2.append(float(row[place]))
-                        data2.append(row2)
-                data = data2
-                data = torch.tensor(data, requires_grad=False, dtype=torch.float)
-                data, result = torch.hsplit(data, [91, ])
-                result = torch.tensor(result, requires_grad=False, dtype=torch.float)
-                data = Data(data, result)
+            data_df = pd.read_csv(csv_filename, skiprows=[0], nrows=10000)
+            data_arr = data_df.values
+            data = torch.tensor(data_arr, requires_grad=False, dtype=torch.float)
+            data, result = torch.hsplit(data, [91, ])
+            result = torch.tensor(result, requires_grad=False, dtype=torch.float)
+            data = Data(data, result)
 
-            self.fmodel = fmodel
-            self.data = data
-        self.fmodel = None
-        self.data = None
+            # with open(csv_filename) as f:
+            #     reader = csv.reader(f)
+                # data = list(list(line) for line in reader)
+                # data.pop(0)
+                # data2 = []
+                # i = 0
+                # for row in data:
+                #     if i < 10000:
+                #         i = i+1
+                #         row2 = []
+                #         for place in range(len(row)):
+                #             row2.append(float(row[place]))
+                #         data2.append(row2)
+                # data = data2
+                # data = torch.tensor(data, requires_grad=False, dtype=torch.float)
+                # data, result = torch.hsplit(data, [91, ])
+                # result = torch.tensor(result, requires_grad=False, dtype=torch.float)
+                # data = Data(data, result)
+
+        return fmodel, data
 
 
-    def conduct(self):
+    def _conduct(self, attack: FoolboxAttack, model, data: Data):
         time_start = time.time()
 
         # print(type(model))
-        if isinstance(self.fmodel, PyTorchModel):
-            print(f"Model accuracy before attack: {fb.utils.accuracy(self.fmodel, self.data.input, self.data.output)}")
+        if isinstance(model, PyTorchModel):
+            print(f"Model accuracy before attack: {fb.utils.accuracy(model, data.input, data.output)}")
+            # pred = model(data[:, :-1])
+            # print(f"Model accuracy before attack: {fb.utils.accuracy(pred.argmax(dim=1), data[:, -1])}")
         print(f"Starting attack. ({time.asctime(time.localtime(time_start))})")
 
-        adversarials = self.attack_simple.conduct(self.fmodel, self.data)
+        adversarials = attack.conduct(model, data)
 
         time_end = time.time()
         print(f"Attack done. ({time.asctime(time.localtime(time_end))})")
         print(f"Took {time_end - time_start}\n")
 
-        if adversarials is not None and isinstance(self.fmodel, PyTorchModel):
-            print(f"Model accuracy after attack: {accuracy(self.fmodel, adversarials, self.data.output)}")
+        if adversarials is not None and isinstance(model, PyTorchModel):
+            print(f"Model accuracy after attack: {accuracy(model, adversarials, data.output)}")
 
         return adversarials
+
+    def test_simple(self):
+        model, data = self._prep_simple_test()
+        return self._conduct(self.attack_simple, model, data)
+        
+
+    def test_nn(self):
+        model, data = self._prep_nn_test()
+        if data is None or model is None:
+            return None
+        return self._conduct(self.attack_nn, model, data)
+    
