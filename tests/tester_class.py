@@ -80,10 +80,11 @@ class Test():
         print(f"Starting attack. ({time.asctime(time.localtime(time_start))})")
         adversarials = None
 
-        try:
-            adversarials = attack.conduct(model, data)
-        except Exception as e:
-            print(f"Error: {e}")
+        adversarials = attack.conduct(model, data)
+        # try:
+        #     adversarials = attack.conduct(model, data)
+        # except Exception as e:
+        #     print(f"Error: {e}")
 
         time_end = time.time()
         print(f"Attack done. ({time.asctime(time.localtime(time_end))})")

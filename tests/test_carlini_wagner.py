@@ -1,20 +1,20 @@
-from attacks.foolboxattacks.newton_fool import NewtonFool
+from attacks.foolboxattacks.carlini_wagner import L2CarliniWagner
 from attacks.helpers.parameters import FoolboxParameters
 from tests.tester_class import Test
 import unittest
 
 def test_msg(test_name):
-    print(f"\n### {test_name} NewtonFool test: ###")
+    print(f"\n### {test_name} L2CarliniWagner test: ###")
 
-class TestNewtonFool(unittest.TestCase):
+class TestL2CarliniWagner(unittest.TestCase):
     generic_args = {}
-    attack_specific_args = {'steps': 100}
+    attack_specific_args = {}
 
     parameters_simple = FoolboxParameters(attack_specific_args, generic_args)
     parameters_nn = FoolboxParameters(attack_specific_args, generic_args)
 
-    attack_simple = NewtonFool(parameters_simple)
-    attack_nn = NewtonFool(parameters_nn)
+    attack_simple = L2CarliniWagner(parameters_simple)
+    attack_nn = L2CarliniWagner(parameters_nn)
 
     tester = Test(attack_simple=attack_simple, attack_nn=attack_nn, batchsize=4)
 

@@ -1,12 +1,12 @@
 from attacks.foolbox_attack import FoolboxAttack
 from foolbox.criteria import Misclassification, TargetedMisclassification
-from foolbox.attacks.newtonfool import NewtonFoolAttack
+from foolbox.attacks.carlini_wagner import L2CarliniWagnerAttack
 
 from attacks.helpers.data import Data
 from eagerpy.astensor import astensor
 
 
-class NewtonFool(NewtonFoolAttack, FoolboxAttack):
+class L2CarliniWagner(L2CarliniWagnerAttack, FoolboxAttack):
     def __init__(self, parameters):
         super().__init__(**parameters.attack_specific_parameters)
         FoolboxAttack.__init__(self, parameters.generic_parameters)
