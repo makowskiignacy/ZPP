@@ -1,6 +1,8 @@
+import numpy
 
 from attacks.art_attack import ARTAttack
 from attacks.helpers.parameters import ARTParameters
+from attacks.helpers.data import Data
 
 from art.attacks.evasion import ShadowAttack
 
@@ -41,6 +43,16 @@ class Shadow(ARTAttack):
     def conduct(self, model, data):
         self._set_classifier(model)
         self._set_data(data)
+
+        if self._data.input.shape[0] > 1 or self._data.output.shape[0] > 1:
+            if self._data.input.shape[0] > 1 and self._data.output.shape[0] > 1:
+                print("This attack only accepts a single sample as input. Using the first sample in the given data as input.")
+                new_input = numpy.expand_dims(self._data.input[0], 0)
+                new_output = numpy.expand_dims(numpy.asarray([self._data.output[0]]), 0)
+                new_data = Data (new_input, new_output)
+                self._set_data(new_data)
+            else:
+                raise ValueError("This attack only accepts a single sample as input. Can not automatically use the first sample, due to the shape of the data.")
 
         return Shadow.to_unified_format(
             ShadowAttack(

@@ -36,9 +36,9 @@ tf.compat.v1.disable_eager_execution()
 
 # Wrapper class providing .input and .output for some of the attacks
 class Data:
-    def __init__(self, data):
-        self.input = data[0]
-        self.output = data[1]
+    def __init__(self, x, y):
+        self.input = x
+        self.output = y
 
     def foolbox_pytorch_preprocessing(self):
         # Labels are expected to be 1D, match the length of logits (not checked) and type Long
@@ -80,11 +80,11 @@ _keras_foolbox_model = tensorflow.keras.applications.ResNet50(weights="imagenet"
 
 
 def foolbox_sample_data():
-    return Data(_foolbox_data)
+    return Data(_foolbox_data[0], _foolbox_data[1])
 
 
 def art_sample_data():
-    return Data((np.transpose(_mnist_data[0], (0, 3, 1, 2)).astype(np.float32), _mnist_data[1]))
+    return Data(np.transpose(_mnist_data[0], (0, 3, 1, 2)).astype(np.float32), _mnist_data[1])
 
 
 
@@ -194,7 +194,7 @@ class TestArtWithPytorchUsingArt:
         attack_parameters = {}
         parameters = ARTParameters(classifier_parameters=classifier_parameters, attack_parameters=attack_parameters)
         art_model = FastGradient(parameters=parameters)
-        return art_model.conduct(model, Data(load_mnist()[0]))
+        return art_model.conduct(model, Data(load_mnist()[0][0], load_mnist()[0][1]))
 
 
 class TestArtWithPytorchUsingFoolbox:
@@ -234,7 +234,7 @@ class TestArtWithPytorchUsingFoolbox:
         attack_parameters = {}
         parameters = ARTParameters(classifier_parameters=classifier_parameters, attack_parameters=attack_parameters)
         art_model = FastGradient(parameters=parameters)
-        return art_model.conduct(model, Data(load_mnist()[0]))
+        return art_model.conduct(model, Data(load_mnist()[0][0], load_mnist()[0][1]))
 
 
     def test_art_AdversarialPatch(self):
@@ -251,7 +251,7 @@ class TestArtWithKerasUsingArt:
         attack_parameters = {}
         parameters = ARTParameters(classifier_parameters=classifier_parameters, attack_parameters=attack_parameters)
         art_model = FastGradient(parameters=parameters)
-        return art_model.conduct(mod, Data(load_mnist()[0]))
+        return art_model.conduct(mod, Data(load_mnist()[0][0], load_mnist()[0][1]))
 
     def test_art_ZeroethOrderOptimalization(self):
         model = pytorch_model_from_art()
@@ -266,11 +266,11 @@ class TestArtWithKerasUsingArt:
 
         art_model = ZeroethOrderOptimalization(parameters=parameters)
 
-        return art_model.conduct(keras_model_from_art(), Data(load_mnist()[0]))
+        return art_model.conduct(keras_model_from_art(), Data(load_mnist()[0][0], load_mnist()[0][1]))
 
     def test_art_AdversarialPatch(self):
         art_model = AdversarialPatch(ARTParameters({}, {}))
-        return art_model.conduct(keras_model_from_art(), Data(load_mnist()[0]))
+        return art_model.conduct(keras_model_from_art(), Data(load_mnist()[0][0], load_mnist()[0][1]))
 
 
 class TestFoolboxWithKerasUsingArt:
@@ -280,12 +280,12 @@ class TestFoolboxWithKerasUsingArt:
 
     def test_foolbox_ProjectedGradientDescentInf(self):
         foolbox_model = LinfProjectedGradientDescent(FoolboxParameters({}, {}))
-        return foolbox_model.conduct(keras_model_from_art(), Data(load_mnist()[0]))
+        return foolbox_model.conduct(keras_model_from_art(), Data(load_mnist()[0][0], load_mnist()[0][1]))
 
     # With tf.compat.v1.disable_eager_execution() ValueError: TensorFlowModel requires TensorFlow Eager Mode
     # Without -"- ValueError: expected model to be callable
 
     def test_foolbox_L1BasicIterative(self):
         foolbox_model = L1BasicIterative(FoolboxParameters({}, {}))
-        return foolbox_model.conduct(keras_model_from_art(), Data(load_mnist()[0]))
+        return foolbox_model.conduct(keras_model_from_art(), Data(load_mnist()[0][0], load_mnist()[0][1]))
 

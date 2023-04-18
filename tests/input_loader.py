@@ -20,7 +20,6 @@ def simple_input(batchsize=4):
     images, labels = fb.utils.samples(foolbox_model, dataset='imagenet', batchsize=batchsize)
     foolbox_data = Data(images, labels)
     art_data = Data(images.numpy(), labels.numpy())
-    print(art_data.input.shape)
     art_model = art.estimators.classification.pytorch.PyTorchClassifier(model=model, input_shape=(3, 224, 224),
                                                                         loss=nn.CrossEntropyLoss(),
                                                                         nb_classes=(art_data.output.max() - min(0,
@@ -28,11 +27,14 @@ def simple_input(batchsize=4):
     art_criterion = nn.CrossEntropyLoss()
     art_optimizer = optim.Adam(art_model._model.parameters(), lr=0.01)
 
-    classifier_parameters = {"clip_values": (0, 1), "loss": art_criterion, "optimizer": art_optimizer,
+    classifier_parameters_default = {"clip_values": (0, 1), "loss": art_criterion, "optimizer": art_optimizer,
                              "input_shape": (3, 224, 224),
                              "nb_classes": (art_data.output.max() - min(0, art_data.output.min()) + 1)}
-    attack_parameters = {"verbose": True}
-    art_parameters_default = ARTParameters(classifier_parameters, attack_parameters)
+    attack_parameters_default = {"verbose": True}
+    art_parameters_default = ARTParameters(classifier_parameters_default, attack_parameters_default)
+
+    attack_parameters_joker = {}
+    art_parameters_joker = ARTParameters(classifier_parameters_default, attack_parameters_joker)
 
     generic_parameters_bb = {"epsilon_rate": 0.01}
     attack_specific_parameters_bb = {"lr": 10, 'steps': 100}
@@ -59,7 +61,7 @@ def simple_input(batchsize=4):
                       "fast_gradient": art_parameters_default,
                       "geometric_decision_based": art_parameters_default,
                       "jacobian_saliency_map": art_parameters_default,
-                      "joker": art_parameters_default,
+                      "joker": art_parameters_joker,
                       "shadow": art_parameters_default,
                       "sign_opt": art_parameters_default,
                       "square": art_parameters_default,
