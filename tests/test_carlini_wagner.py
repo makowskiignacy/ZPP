@@ -19,10 +19,10 @@ class TestL2CarliniWagner(unittest.TestCase):
     tester = Test(attack_simple=attack_simple, attack_nn=attack_nn, batchsize=4)
 
 
-    # def test_nf_simple(self):
-    #     test_msg("simple")
-    #     results = self.tester.test_simple()
-    #     self.assertIsNotNone(results)
+    def test_nf_simple(self):
+        test_msg("simple")
+        results = self.tester.test_simple()
+        self.assertIsNotNone(results)
 
 
     def test_nf_nn(self):

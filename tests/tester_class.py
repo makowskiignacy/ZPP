@@ -17,6 +17,7 @@ from foolbox.utils import accuracy
 
 import pandas as pd
 import os
+import traceback
 
 CWD = os.getcwd()
 SS_NN_RELATIVE_PATH = 'ss_nn/'
@@ -80,11 +81,11 @@ class Test():
         print(f"Starting attack. ({time.asctime(time.localtime(time_start))})")
         adversarials = None
 
-        adversarials = attack.conduct(model, data)
-        # try:
-        #     adversarials = attack.conduct(model, data)
-        # except Exception as e:
-        #     print(f"Error: {e}")
+        try:
+            adversarials = attack.conduct(model, data)
+        except Exception as e:
+            print(f"Error: {e}")
+            traceback.print_exc()
 
         time_end = time.time()
         print(f"Attack done. ({time.asctime(time.localtime(time_end))})")
