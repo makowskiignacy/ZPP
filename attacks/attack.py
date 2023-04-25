@@ -1,8 +1,14 @@
+from foolbox.models.pytorch import PyTorchModel
+import time
+from attacks.helpers.data import Data
+from foolbox.utils import accuracy
+
 # Chcemy mieć możliwość określenia metody jako abstrakcyjnej
 import abc
 
 # Chcemy mieć możliwość określenia klasy jako abstrakcyjnej
 from abc import ABC
+
 
 # *Abstrakcyjna* klasa będąca uogólnionym atakiem, którym można zaatakować
 # wybrany model o określonym zbiorze danych wejściowych
@@ -23,3 +29,23 @@ class Attack(ABC):
     @abc.abstractmethod
     def conduct(self, model, data):
         raise NotImplementedError
+
+
+def run_attack(attack: Attack, model, data: Data):
+    time_start = time.time()
+
+    # print(type(model))
+    if isinstance(model, PyTorchModel):
+        print(f"Model accuracy before attack: {accuracy(model, data.input, data.output)}")
+    print(f"Starting attack. ({time.asctime(time.localtime(time_start))})")
+
+    adversarials = attack.conduct(model, data)
+
+    time_end = time.time()
+    print(f"Attack done. ({time.asctime(time.localtime(time_end))})")
+    print(f"Took {time_end - time_start}\n")
+
+    if adversarials is not None and isinstance(model, PyTorchModel):
+        print(f"Model accuracy after attack: {accuracy(model, adversarials, data.output)}")
+
+    return adversarials

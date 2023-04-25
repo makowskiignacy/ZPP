@@ -1,6 +1,8 @@
+import numpy
 
 from attacks.art_attack import ARTAttack
 from attacks.helpers.parameters import ARTParameters
+from attacks.helpers.data import Data
 
 from art.attacks.evasion import ShadowAttack
 
@@ -38,9 +40,28 @@ class Shadow(ARTAttack):
             if key in parameters.attack_parameters.keys():
                 self._attack_params[key] = parameters.attack_parameters[key]
 
+        self.data_samples = []
+
     def conduct(self, model, data):
         self._set_classifier(model)
         self._set_data(data)
+
+        if self._data.input.shape[0] > 1 or self._data.output.shape[0] > 1:
+            if self._data.input.shape[0] == self._data.output.shape[0]:
+                print("This attack only accepts a single sample as input. Running it for every sample in the input given; this might take a long time.")
+
+                new_input = numpy.expand_dims(self._data.input[0], 0)
+                new_output = numpy.expand_dims(numpy.asarray([self._data.output[0]]), 0)
+                result = ShadowAttack(self._classifier, **self._attack_params).generate(x=new_input, y=new_output)
+                for i in range(1, self._data.input.shape[0]):
+                    new_input = numpy.expand_dims(self._data.input[i], 0)
+                    new_output = numpy.expand_dims(numpy.asarray([self._data.output[i]]), 0)
+                    single_result = ShadowAttack(self._classifier, **self._attack_params).generate(x=new_input, y=new_output)
+                    result = numpy.concatenate((result, single_result))
+                    print(result.shape)
+                return Shadow.to_unified_format(result)
+            else:
+                raise ValueError("This attack only accepts a single sample as input. Can not automatically separate input into samples, due to the shape of the data.")
 
         return Shadow.to_unified_format(
             ShadowAttack(
