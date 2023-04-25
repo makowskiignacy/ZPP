@@ -6,8 +6,8 @@ from attacks.attack import Attack
 
 from attacks.art_attack import ARTAttack
 
-from attacks.artattacks.zeroeth_order_optimization_bb_attack\
-    import ZeroethOrderOptimalization as ZOOAttack
+from attacks.artattacks.zeroth_order_optimization_bb_attack\
+    import ZerothOrderOptimalization as ZOOAttack
 from attacks.helpers.parameters import ARTParameters
 
 class TestClassHierarchyArt:

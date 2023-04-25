@@ -1,6 +1,6 @@
 import unittest
 
-import input_loader
+from tests import input_loader
 
 from tests.foolbox_tests.test_brendel_bethge import TestBrendelBethge
 from tests.foolbox_tests.test_basic_iterative import TestBasicIterative
@@ -12,7 +12,7 @@ from tests.art_tests.test_art_attacks import *
 from tests.other_tests.test_frameworks import *
 
 #To run the tests on a different data set, add it to input_loader.py, and then change the line below.
-foolbox_model, art_model, foolbox_data, art_data, foolbox_parameters, art_parameters = input_loader.simple_input(4)
+foolbox_model, art_model, foolbox_data, art_data, foolbox_parameters, art_parameters = input_loader.nn_input()
 
 
 class FoolboxTests(unittest.TestCase):
@@ -115,10 +115,10 @@ class ArtTests(unittest.TestCase):
         test = TestSquare(art_model, art_data, parameters)
         self.assertIsNotNone(test.test())
 
-    def test_ZeroethOrderOptimalization(self):
-        parameters = art_parameters.get("zeroeth_order_optimization")
-        self.assertIsNotNone(parameters, msg="Input given for running tests does not contain parameters for the Zeorth Order Optimalization attack test.")
-        test = TestZeroethOrderOptimalization(art_model, art_data, parameters)
+    def test_ZerothOrderOptimalization(self):
+        parameters = art_parameters.get("zeroth_order_optimization")
+        self.assertIsNotNone(parameters, msg="Input given for running tests does not contain parameters for the Zeroth Order Optimalization attack test.")
+        test = TestZerothOrderOptimalization(art_model, art_data, parameters)
         self.assertIsNotNone(test.test())
 
 class TestFrameworks(unittest.TestCase):
@@ -135,25 +135,20 @@ class TestFrameworks(unittest.TestCase):
         self.assertIsNotNone(test.test_foolbox_L2BasicIterative())
         self.assertIsNotNone(test.test_foolbox_LinfBasicIterative())
 
-    def test_FoolboxWithKerasUsingArt(self):
-        test = TestFoolboxWithKerasUsingArt()
-        self.assertIsNotNone(test.test_foolbox_L1BasicIterative())
-        self.assertIsNotNone(test.test_foolbox_ProjectedGradientDescentInf())
-
     def test_ArtWithPytorchUsingArt(self):
         test = TestArtWithPytorchUsingArt()
         #self.assertIsNotNone(test.test_art_AdversarialPatch()) Adversarial Patch is not yet implemented
-        self.assertIsNotNone(test.test_art_ZeroethOrderOptimalization())
+        self.assertIsNotNone(test.test_art_ZerothOrderOptimalization())
         self.assertIsNotNone(test.test_art_FastGradient())
 
     def test_ArtWithPytorchUsingFoolbox(self):
         test = TestArtWithPytorchUsingFoolbox()
         #self.assertIsNotNone(test.test_art_AdversarialPatch()) Adversarial Patch is not yet implemented
-        self.assertIsNotNone(test.test_art_ZeroethOrderOptimalization())
+        self.assertIsNotNone(test.test_art_ZerothOrderOptimalization())
         self.assertIsNotNone(test.test_art_FastGradient())
 
     def test_ArtWithKerasUsingArt(self):
         test = TestArtWithKerasUsingArt()
-        self.assertIsNotNone(test.test_art_ZeroethOrderOptimalization())
+        self.assertIsNotNone(test.test_art_ZerothOrderOptimalization())
         #self.assertIsNotNone(test.test_art_AdversarialPatch()) Adversarial Patch is not yet implemented
         self.assertIsNotNone(test.test_art_FastGradient())

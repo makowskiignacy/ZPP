@@ -6,7 +6,7 @@ from attacks.artattacks.shadow import Shadow
 from attacks.artattacks.threshold import Threshold
 from attacks.artattacks.sign_opt import SignOPT
 from attacks.artattacks.square import Square
-from attacks.artattacks.zeroeth_order_optimization_bb_attack import ZeroethOrderOptimalization
+from attacks.artattacks.zeroth_order_optimization_bb_attack import ZerothOrderOptimalization
 from attacks.artattacks.deep_fool import DeepFool
 
 from attacks.attack import run_attack
@@ -75,10 +75,10 @@ class TestSquare(ARTTest):
         return run_attack(art_model, self.model, self.data)
 
 
-class TestZeroethOrderOptimalization(ARTTest):
+class TestZerothOrderOptimalization(ARTTest):
     def test(self):
-        print("Zeroeth Order Optimalization test running")
-        art_model = ZeroethOrderOptimalization(self.parameters)
+        print("Zeroth Order Optimalization test running")
+        art_model = ZerothOrderOptimalization(self.parameters)
         return run_attack(art_model, self.model, self.data)
 
 class TestDeepFool(ARTTest):

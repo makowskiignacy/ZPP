@@ -27,7 +27,6 @@ class GenericBrendelBethge(FoolboxAttack, ABC):
         if self.criterion_type == "misclassification":
             self.criterion = Misclassification(output)
 
-
         result = self.Parent.run(self, model=model_correct_format, inputs=data.input, criterion=self.criterion)
         return result
 
@@ -48,6 +47,6 @@ class L2BrendelBethge(GenericBrendelBethge, L2BrendelBethgeAttack):
         GenericBrendelBethge.__init__(self, L2BrendelBethgeAttack, parameters)
 
 
-class LinfinityBrendelBethge(GenericBrendelBethge, LinfinityBrendelBethgeAttack):
+class LinfBrendelBethge(GenericBrendelBethge, LinfinityBrendelBethgeAttack):
     def __init__(self, parameters):
         GenericBrendelBethge.__init__(self, LinfinityBrendelBethgeAttack, parameters)

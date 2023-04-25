@@ -66,7 +66,7 @@ def simple_input(batchsize=4):
                       "sign_opt": art_parameters_default,
                       "square": art_parameters_default,
                       "threshold": art_parameters_default,
-                      "zeroeth_order_optimization": art_parameters_default}
+                      "zeroth_order_optimization": art_parameters_default}
 
     return foolbox_model, model, foolbox_data, art_data, foolbox_parameters, art_parameters
 
@@ -142,7 +142,7 @@ def nn_input():
                           "sign_opt": art_parameters_default,
                           "square": art_parameters_default,
                           "threshold": art_parameters_default,
-                          "zeroeth_order_optimization": art_parameters_default}
+                          "zeroth_order_optimization": art_parameters_default}
 
         return fmodel, nn_model, foolbox_data, art_data, foolbox_parameters, art_parameters
     return None, None

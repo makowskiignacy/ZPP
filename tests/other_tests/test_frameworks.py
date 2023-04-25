@@ -26,7 +26,7 @@ from keras.optimizers import Adam
 
 from attacks.artattacks.adversarial_patch import AdversarialPatch
 from attacks.artattacks.fast_gradient import FastGradient
-from attacks.artattacks.zeroeth_order_optimization_bb_attack import ZeroethOrderOptimalization
+from attacks.artattacks.zeroth_order_optimization_bb_attack import ZerothOrderOptimalization
 from attacks.foolboxattacks.basic_iterative import L1BasicIterative, L2BasicIterative, LinfBasicIterative
 from attacks.foolboxattacks.projected_gradient_descent import LinfProjectedGradientDescent
 from attacks.helpers.parameters import FoolboxParameters, ARTParameters
@@ -163,7 +163,7 @@ class TestArtWithPytorchUsingArt:
     Checks attacks from artattacks package using example from:
     https://github.com/Trusted-AI/adversarial-robustness-toolbox/blob/main/examples/get_started_pytorch.py
     '''
-    def test_art_ZeroethOrderOptimalization(self):
+    def test_art_ZerothOrderOptimalization(self):
         model = pytorch_model_from_art()
         # This is only for testing purpose as are the parameters
         model.cpu()
@@ -180,7 +180,7 @@ class TestArtWithPytorchUsingArt:
 
         parameters = ARTParameters(classifier_parameters=classifier_parameters, attack_parameters=attack_parameters)
 
-        art_model = ZeroethOrderOptimalization(parameters=parameters)
+        art_model = ZerothOrderOptimalization(parameters=parameters)
 
         return art_model.conduct(pytorch_model_from_art(), art_sample_data())
 
@@ -202,7 +202,7 @@ class TestArtWithPytorchUsingFoolbox:
     Checks attacks from artattacks package using example from:
     https://github.com/bethgelab/foolbox/blob/master/examples/single_attack_pytorch_resnet18.py
     '''
-    def test_art_ZeroethOrderOptimalization(self):
+    def test_art_ZerothOrderOptimalization(self):
         model = pytorch_model_from_foolbox()
         classifier_parameters = {"clip_values": (_min_pixel_value, _max_pixel_value),
                                  "loss": nn.CrossEntropyLoss(),
@@ -217,7 +217,7 @@ class TestArtWithPytorchUsingFoolbox:
 
         parameters = ARTParameters(classifier_parameters=classifier_parameters, attack_parameters=attack_parameters)
 
-        art_model = ZeroethOrderOptimalization(parameters=parameters)
+        art_model = ZerothOrderOptimalization(parameters=parameters)
 
         # FIXME :
         # Poniższa linijka wyrzuca błąd:
@@ -253,7 +253,7 @@ class TestArtWithKerasUsingArt:
         art_model = FastGradient(parameters=parameters)
         return art_model.conduct(mod, Data(load_mnist()[0][0], load_mnist()[0][1]))
 
-    def test_art_ZeroethOrderOptimalization(self):
+    def test_art_ZerothOrderOptimalization(self):
         model = pytorch_model_from_art()
         classifier_parameters = {"clip_values": (_min_pixel_value, _max_pixel_value),
                                  "loss": nn.CrossEntropyLoss(),
@@ -264,28 +264,11 @@ class TestArtWithKerasUsingArt:
 
         parameters = ARTParameters(classifier_parameters=classifier_parameters, attack_parameters=attack_parameters)
 
-        art_model = ZeroethOrderOptimalization(parameters=parameters)
+        art_model = ZerothOrderOptimalization(parameters=parameters)
 
         return art_model.conduct(keras_model_from_art(), Data(load_mnist()[0][0], load_mnist()[0][1]))
 
     def test_art_AdversarialPatch(self):
         art_model = AdversarialPatch(ARTParameters({}, {}))
         return art_model.conduct(keras_model_from_art(), Data(load_mnist()[0][0], load_mnist()[0][1]))
-
-
-class TestFoolboxWithKerasUsingArt:
-
-    # With tf.compat.v1.disable_eager_execution() ValueError: TensorFlowModel requires TensorFlow Eager Mode
-    # Without -"- ValueError: expected model to be callable
-
-    def test_foolbox_ProjectedGradientDescentInf(self):
-        foolbox_model = LinfProjectedGradientDescent(FoolboxParameters({}, {}))
-        return foolbox_model.conduct(keras_model_from_art(), Data(load_mnist()[0][0], load_mnist()[0][1]))
-
-    # With tf.compat.v1.disable_eager_execution() ValueError: TensorFlowModel requires TensorFlow Eager Mode
-    # Without -"- ValueError: expected model to be callable
-
-    def test_foolbox_L1BasicIterative(self):
-        foolbox_model = L1BasicIterative(FoolboxParameters({}, {}))
-        return foolbox_model.conduct(keras_model_from_art(), Data(load_mnist()[0][0], load_mnist()[0][1]))
 

@@ -1,4 +1,4 @@
-from attacks.foolboxattacks.brendel_bethge import L0BrendelBethge, L1BrendelBethge, L2BrendelBethge, LinfinityBrendelBethge
+from attacks.foolboxattacks.brendel_bethge import L0BrendelBethge, L1BrendelBethge, L2BrendelBethge, LinfBrendelBethge
 
 from attacks.attack import run_attack
 
@@ -29,7 +29,7 @@ class TestBrendelBethge:
 
     def test_bb_inf(self):
         print("L infinity Brendel-Bethge attack test running")
-        attack_bbinf = LinfinityBrendelBethge(self.parameters)
+        attack_bbinf = LinfBrendelBethge(self.parameters)
         resultinfs = run_attack(attack_bbinf, self.model, self.data)
         return resultinfs
 
