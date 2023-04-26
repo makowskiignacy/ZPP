@@ -46,8 +46,6 @@ class ARTAttack(Attack):
             self._classifier = KerasClassifier(
                 model=model, **{key: self._classifier_params.get(key) for key in
                                 ['clip_values', 'use_logits']})
-        elif isinstance(model, BinaryNeuralNetworkClassifier):
-            self._classifier = model.get_sklearn_object()
         elif isinstance(model, torch.nn.Module):
             # Pytorch model
             if self._classifier_params.get('input_shape')\
@@ -58,6 +56,8 @@ class ARTAttack(Attack):
                                     ['loss', 'optimizer', 'input_shape', 'nb_classes', 'clip_values']})
             else:
                 raise Exception("PyTorch model needs input_shape, loss and nb_classes to conduct attack")
+        elif isinstance(model, BinaryNeuralNetworkClassifier):
+            self._classifier = model.get_sklearn_object()
         elif isinstance(model, sklearn.base.BaseEstimator):
             # todo adding optional parameters for sklearn model classifier
             self._classifier = SklearnClassifier(model=model)

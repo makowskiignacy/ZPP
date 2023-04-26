@@ -6,13 +6,19 @@ from attacks.artattacks.fast_gradient import FastGradient
 from attacks.artattacks.joker import Joker
 
 from attacks.artattacks.zeroth_order_optimization_bb_attack\
-    import ZeorthOrderOptimalization as ZOOAttack
+    import ZerothOrderOptimalization as ZOOAttack
 
 from attacks.artattacks.adversarial_patch\
     import AdversarialPatch
 
+from attacks.artattacks.geometric_decision_based import GeometricDecisionBased
+from attacks.artattacks.jacobian_saliency_map import JacobianSaliencyMap
+from attacks.artattacks.square import Square
+from attacks.artattacks.sign_opt import SignOPT
+from attacks.artattacks.threshold import Threshold
+
 # Ataki pochodzące z FoolBoxa
-from attacks.foolboxattacks.brendel_bethge import BrendelBethge 
+from attacks.foolboxattacks.brendel_bethge import L0BrendelBethge, L1BrendelBethge, L2BrendelBethge, LinfBrendelBethge
 from attacks.foolboxattacks.basic_iterative import L1BasicIterative, L2BasicIterative, LinfBasicIterative
 from attacks.foolboxattacks.basic_iterative import L1AdamBasicIterative, L2AdamBasicIterative, LinfAdamBasicIterative
 from attacks.foolboxattacks.projected_gradient_descent import L1ProjectedGradientDescent, L2ProjectedGradientDescent, LinfProjectedGradientDescent
@@ -29,12 +35,15 @@ class AttackManager():
     def get_possible_attacks():
         return {
             # możliwe, że elementami będą pary (klasa, procedura sprawdzająca)
-            "Zeorth Order Optimalization" : ZOOAttack,
+            "Zeroth Order Optimalization" : ZOOAttack,
             "Adversarial Patch" : AdversarialPatch,
             "DeepFool" : DeepFool,
             "FastGradient" : FastGradient,
             "Joker" : Joker,
-            "Brendel Bethge" : BrendelBethge,
+            "L0 Brendel Bethge" : L0BrendelBethge,
+            "L1 Brendel Bethge": L1BrendelBethge,
+            "L2 Brendel Bethge": L2BrendelBethge,
+            "Linf Brendel Bethge": LinfBrendelBethge,
             "L1 Basic Iterative": L1BasicIterative,
             "L2 Basic Iterative": L2BasicIterative,
             "Linf Basic Iterative": LinfBasicIterative,
@@ -47,7 +56,12 @@ class AttackManager():
             "L1 Adam Projected Gradient Descent": L1AdamProjectedGradientDescent,
             "L2 Adam Projected Gradient Descent": L2AdamProjectedGradientDescent,
             "Linf Adam Projected Gradient Descent": LinfAdamProjectedGradientDescent,
-            "Salt And Pepper" : SaltAndPepperNoise
+            "Salt And Pepper" : SaltAndPepperNoise,
+            "Geometric Decision Based" : GeometricDecisionBased,
+            "Jacobian Saliency Map" : JacobianSaliencyMap,
+            "Square" : Square,
+            "Sign-OPT" : SignOPT,
+            "Threshold" : Threshold
         }
     
     @staticmethod
