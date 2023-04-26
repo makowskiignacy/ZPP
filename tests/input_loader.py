@@ -36,6 +36,10 @@ def simple_input(batchsize=4):
     attack_parameters_joker = {}
     art_parameters_joker = ARTParameters(classifier_parameters_default, attack_parameters_joker)
 
+    generic_parameters_an = {"epsilon_rate": 0.01}
+    attack_specific_parameters_an = {"lr": 10, 'steps': 100}
+    foolbox_parameters_an = FoolboxParameters(attack_specific_parameters_an, generic_parameters_an)
+
     generic_parameters_bb = {"epsilon_rate": 0.01}
     attack_specific_parameters_bb = {"lr": 10, 'steps': 100}
     foolbox_parameters_bb = FoolboxParameters(attack_specific_parameters_bb, generic_parameters_bb)
@@ -43,6 +47,14 @@ def simple_input(batchsize=4):
     generic_parameters_bi = {"epsilon_rate": 0.05}
     attack_specific_parameters_bi = {"steps": 10, "random_start": True}
     foolbox_parameters_bi = FoolboxParameters(attack_specific_parameters_bi, generic_parameters_bi)
+
+    generic_parameters_cw = {"epsilon_rate": 0.01}
+    attack_specific_parameters_cw = {"steps": 100, "random_start": True}
+    foolbox_parameters_cw = FoolboxParameters(attack_specific_parameters_cw, generic_parameters_cw)
+
+    generic_parameters_nf = {"epsilon_rate": 0.01}
+    attack_specific_parameters_nf = {"steps": 100, "random_start": True}
+    foolbox_parameters_nf = FoolboxParameters(attack_specific_parameters_nf, generic_parameters_nf)
 
     generic_parameters_pgd = {"epsilon_rate": 0.01}
     attack_specific_parameters_pgd = {"steps": 100, "random_start": True}
@@ -52,8 +64,11 @@ def simple_input(batchsize=4):
     attack_specific_parameters_sap = {"steps": 10, "across_channels": True}
     foolbox_parameters_sap = FoolboxParameters(attack_specific_parameters_sap, generic_parameters_sap)
 
-    foolbox_parameters = {"brendel_bethge": foolbox_parameters_bb,
+    foolbox_parameters = {"additive_noise": foolbox_parameters_an,
+                          "brendel_bethge": foolbox_parameters_bb,
                           "basic_iterative": foolbox_parameters_bi,
+                          "carlini_wagner": foolbox_parameters_cw,
+                          "newton_Fool": foolbox_parameters_nf,
                           "projected_gradient_descent": foolbox_parameters_pgd,
                           "salt_and_pepper": foolbox_parameters_sap}
 
@@ -112,6 +127,10 @@ def nn_input():
         attack_parameters_default = {}
         art_parameters_default = ARTParameters(classifier_parameters_default, attack_parameters_default)
 
+        generic_parameters_an = {"epsilon_rate": 0.01}
+        attack_specific_parameters_an = {"lr": 10, 'steps': 100}
+        foolbox_parameters_an = FoolboxParameters(attack_specific_parameters_an, generic_parameters_an)
+        
         generic_parameters_bb = {"epsilon_rate": 0.01}
         attack_specific_parameters_bb = {"lr": 10, 'steps': 100}
         foolbox_parameters_bb = FoolboxParameters(attack_specific_parameters_bb, generic_parameters_bb)
@@ -119,6 +138,14 @@ def nn_input():
         generic_parameters_bi = {"epsilon_rate": 0.05}
         attack_specific_parameters_bi = {"steps": 100, "random_start": True}
         foolbox_parameters_bi = FoolboxParameters(attack_specific_parameters_bi, generic_parameters_bi)
+
+        generic_parameters_cw = {"epsilon_rate": 0.01}
+        attack_specific_parameters_cw = {"steps": 100, "random_start": True}
+        foolbox_parameters_cw = FoolboxParameters(attack_specific_parameters_cw, generic_parameters_cw)
+
+        generic_parameters_nf = {"epsilon_rate": 0.01}
+        attack_specific_parameters_nf = {"steps": 100, "random_start": True}
+        foolbox_parameters_nf = FoolboxParameters(attack_specific_parameters_nf, generic_parameters_nf)
 
         generic_parameters_pgd = {"epsilon_rate": 0.01}
         attack_specific_parameters_pgd = {"steps": 100, "random_start": True}
@@ -128,8 +155,11 @@ def nn_input():
         attack_specific_parameters_sap = {"steps": 100, "across_channels": True}
         foolbox_parameters_sap = FoolboxParameters(attack_specific_parameters_sap, generic_parameters_sap)
 
-        foolbox_parameters = {"brendel_bethge": foolbox_parameters_bb,
+        foolbox_parameters = {"additive_noise": foolbox_parameters_an,
+                              "brendel_bethge": foolbox_parameters_bb,
                               "basic_iterative": foolbox_parameters_bi,
+                              "carlini_wagner": foolbox_parameters_cw,
+                              "newton_Fool": foolbox_parameters_nf,
                               "projected_gradient_descent": foolbox_parameters_pgd,
                               "salt_and_pepper": foolbox_parameters_sap}
 

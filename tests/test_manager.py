@@ -2,8 +2,11 @@ import unittest
 
 from tests import input_loader
 
+from tests.foolbox_tests.test_additive_noise import TestAdditiveNoise
 from tests.foolbox_tests.test_brendel_bethge import TestBrendelBethge
 from tests.foolbox_tests.test_basic_iterative import TestBasicIterative
+from tests.foolbox_tests.test_carlini_wagner import TestCarliniWagner
+from tests.foolbox_tests.test_newton_fool import TestNewtonFool
 from tests.foolbox_tests.test_projected_gradient_descent import TestProjectedGradientDescent
 from tests.foolbox_tests.test_salt_and_pepper import TestSaltAndPepper
 
@@ -16,6 +19,21 @@ foolbox_model, art_model, foolbox_data, art_data, foolbox_parameters, art_parame
 
 
 class FoolboxTests(unittest.TestCase):
+
+    def test_AdditiveNoise(self):
+        parameters = foolbox_parameters.get("additive_noise")
+        self.assertIsNotNone(parameters, msg="Input given for running tests does not contain parameters for the Additive Noise attack test.")
+        test = TestAdditiveNoise(foolbox_model, foolbox_data, parameters)
+        self.assertIsNotNone(test.test_an_l2_g())
+        self.assertIsNotNone(test.test_an_l2_u())
+        self.assertIsNotNone(test.test_an_l2_cag())
+        self.assertIsNotNone(test.test_an_l2_cau())
+        self.assertIsNotNone(test.test_an_l2_carg())
+        self.assertIsNotNone(test.test_an_l2_caru())
+        self.assertIsNotNone(test.test_an_l2_rg())
+        self.assertIsNotNone(test.test_an_l2_ru())
+        self.assertIsNotNone(test.test_an_inf_u())
+        self.assertIsNotNone(test.test_an_inf_ru())
 
     def test_BrendelBethge(self):
         parameters = foolbox_parameters.get("brendel_bethge")
@@ -36,6 +54,18 @@ class FoolboxTests(unittest.TestCase):
         self.assertIsNotNone(test.test_bi_2_a())
         self.assertIsNotNone(test.test_bi_inf())
         self.assertIsNotNone(test.test_bi_inf_a())
+
+    def test_CarliniWagner(self):
+        parameters = foolbox_parameters.get("carlini_wagner")
+        self.assertIsNotNone(parameters, msg="Input given for running tests does not contain parameters for the Carlini Wagner attack test.")
+        test = TestCarliniWagner(foolbox_model, foolbox_data, parameters)
+        self.assertIsNotNone(test.test_cw_l2())
+
+    def test_NewtonFool(self):
+        parameters = foolbox_parameters.get("newton_fool")
+        self.assertIsNotNone(parameters, msg="Input given for running tests does not contain parameters for the Newton Fool attack test.")
+        test = TestNewtonFool(foolbox_model, foolbox_data, parameters)
+        self.assertIsNotNone(test.test_nf())
 
     def test_ProjectedGradientDescent(self):
         parameters = foolbox_parameters.get("projected_gradient_descent")
