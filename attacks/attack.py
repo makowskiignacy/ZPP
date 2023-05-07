@@ -43,9 +43,14 @@ def run_attack(attack: Attack, model, data: Data):
 
     time_end = time.time()
     print(f"Attack done. ({time.asctime(time.localtime(time_end))})")
-    print(f"Took {time_end - time_start}\n")
+    print(f"Took {time_end - time_start}")
 
     if adversarials is not None and isinstance(model, PyTorchModel):
         print(f"Model accuracy after attack: {accuracy(model, adversarials, data.output)}")
+    elif not isinstance(model, PyTorchModel):
+        print(f"No accuracy measure for non-PyTorch models?")
+    else:
+        print(f"Attack not successfull, adversarials:\n{adversarials}")
+    print()
 
     return adversarials

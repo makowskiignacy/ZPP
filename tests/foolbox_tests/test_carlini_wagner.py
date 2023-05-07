@@ -3,7 +3,7 @@ from attacks.foolboxattacks.carlini_wagner import L2CarliniWagner
 from attacks.attack import run_attack
 
 
-class TestL2CarliniWagner():
+class TestCarliniWagner():
 
     def __init__(self, model, data, parameters):
         self.model = model

@@ -11,23 +11,11 @@ class L2CarliniWagner(L2CarliniWagnerAttack, FoolboxAttack):
         super().__init__(**parameters.attack_specific_parameters)
         FoolboxAttack.__init__(self, parameters.generic_parameters)
 
-    def verify_bounds(self, data: Data):
-        if hasattr(self, 'min') and hasattr(self, 'max'):
-            return
-        
-        originals, _ = astensor(data.input)
-        self.min = originals.min().item()
-        self.max = originals.max().item()
-
-        return
-
 
     def conduct(self, model, data):
-        self.verify_bounds(data=data)
+        super.verify_bounds(data=data)
         output = super().flatten_output(data)
         model_correct_format = super().reformat_model(model)
-        if model_correct_format is None:
-            model_correct_format = model
 
         if self.criterion_type == "targeted_misclassification":
             self.criterion = TargetedMisclassification(output)

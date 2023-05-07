@@ -19,9 +19,6 @@ class GenericBrendelBethge(FoolboxAttack, ABC):
         super().verify_epsilon()
         model_correct_format = super().reformat_model(model)
 
-        if model_correct_format is None:
-            model_correct_format = model
-
         if self.criterion_type == "targeted_misclassification":
             self.criterion = TargetedMisclassification(output)
         if self.criterion_type == "misclassification":
@@ -30,7 +27,7 @@ class GenericBrendelBethge(FoolboxAttack, ABC):
         result = self.Parent.run(self, model=model_correct_format, inputs=data.input, criterion=self.criterion)
         return result
 
-    
+
 
 class L0BrendelBethge(GenericBrendelBethge, L0BrendelBethgeAttack):
     def __init__(self, parameters):

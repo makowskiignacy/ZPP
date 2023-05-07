@@ -26,8 +26,6 @@ class NewtonFool(NewtonFoolAttack, FoolboxAttack):
         self.verify_bounds(data=data)
         output = super().flatten_output(data)
         model_correct_format = super().reformat_model(model)
-        if model_correct_format is None:
-            model_correct_format = model
 
         if self.criterion_type == "targeted_misclassification":
             self.criterion = TargetedMisclassification(output)

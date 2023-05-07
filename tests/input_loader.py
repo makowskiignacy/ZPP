@@ -11,6 +11,13 @@ from torch import nn, optim
 from attacks.helpers.data import Data
 from attacks.helpers.parameters import FoolboxParameters, ARTParameters
 
+import os
+
+CWD = os.getcwd()
+SS_NN_RELATIVE_PATH = 'ss_nn/'
+SS_NN_ABSOLUTE_PATH = os.path.join(CWD, SS_NN_RELATIVE_PATH)
+DATA_RELATIVE_PATH = 'data_test.csv'
+DATA_ABSOLUTE_PATH = os.path.join(CWD, DATA_RELATIVE_PATH)
 
 def simple_input(batchsize=4):
     model = tv_models.resnet18(pretrained=True).eval()
@@ -36,8 +43,8 @@ def simple_input(batchsize=4):
     attack_parameters_joker = {}
     art_parameters_joker = ARTParameters(classifier_parameters_default, attack_parameters_joker)
 
-    generic_parameters_an = {"epsilon_rate": 0.01}
-    attack_specific_parameters_an = {"lr": 10, 'steps': 100}
+    generic_parameters_an = {"epsilon": 0.01}
+    attack_specific_parameters_an = {}
     foolbox_parameters_an = FoolboxParameters(attack_specific_parameters_an, generic_parameters_an)
 
     generic_parameters_bb = {"epsilon_rate": 0.01}
@@ -49,11 +56,11 @@ def simple_input(batchsize=4):
     foolbox_parameters_bi = FoolboxParameters(attack_specific_parameters_bi, generic_parameters_bi)
 
     generic_parameters_cw = {"epsilon_rate": 0.01}
-    attack_specific_parameters_cw = {"steps": 100, "random_start": True}
+    attack_specific_parameters_cw = {"steps": 100}
     foolbox_parameters_cw = FoolboxParameters(attack_specific_parameters_cw, generic_parameters_cw)
 
     generic_parameters_nf = {"epsilon_rate": 0.01}
-    attack_specific_parameters_nf = {"steps": 100, "random_start": True}
+    attack_specific_parameters_nf = {"steps": 100, "stepsize": 100}
     foolbox_parameters_nf = FoolboxParameters(attack_specific_parameters_nf, generic_parameters_nf)
 
     generic_parameters_pgd = {"epsilon_rate": 0.01}
@@ -68,7 +75,7 @@ def simple_input(batchsize=4):
                           "brendel_bethge": foolbox_parameters_bb,
                           "basic_iterative": foolbox_parameters_bi,
                           "carlini_wagner": foolbox_parameters_cw,
-                          "newton_Fool": foolbox_parameters_nf,
+                          "newton_fool": foolbox_parameters_nf,
                           "projected_gradient_descent": foolbox_parameters_pgd,
                           "salt_and_pepper": foolbox_parameters_sap}
 
@@ -87,12 +94,21 @@ def simple_input(batchsize=4):
 
 
 def nn_input():
-    ss_nn_pipeline = mlflow.sklearn.load_model('../ss_nn/')
+    if os.path.exists(SS_NN_ABSOLUTE_PATH):
+        ss_nn_pipeline = mlflow.sklearn.load_model(SS_NN_ABSOLUTE_PATH)
+    else:
+        print("Can't find model directory.")
+        return None, None
+
+    if os.path.exists(DATA_ABSOLUTE_PATH):
+        csv_filename = DATA_ABSOLUTE_PATH
+    else:
+        print("Can't find data file.")
+        return None, None
+
     if ss_nn_pipeline is not None:
         nn_model = ss_nn_pipeline.steps[1][1].module_
         fmodel = fb.models.pytorch.PyTorchModel(nn_model, bounds=(-2., 30000.))
-
-        csv_filename = '../data_test.csv'
 
         with open(csv_filename) as f:
             reader = csv.reader(f)
@@ -127,8 +143,8 @@ def nn_input():
         attack_parameters_default = {}
         art_parameters_default = ARTParameters(classifier_parameters_default, attack_parameters_default)
 
-        generic_parameters_an = {"epsilon_rate": 0.01}
-        attack_specific_parameters_an = {"lr": 10, 'steps': 100}
+        generic_parameters_an = {"epsilon": 0.01}
+        attack_specific_parameters_an = {}
         foolbox_parameters_an = FoolboxParameters(attack_specific_parameters_an, generic_parameters_an)
         
         generic_parameters_bb = {"epsilon_rate": 0.01}
@@ -140,11 +156,11 @@ def nn_input():
         foolbox_parameters_bi = FoolboxParameters(attack_specific_parameters_bi, generic_parameters_bi)
 
         generic_parameters_cw = {"epsilon_rate": 0.01}
-        attack_specific_parameters_cw = {"steps": 100, "random_start": True}
+        attack_specific_parameters_cw = {"steps": 100}
         foolbox_parameters_cw = FoolboxParameters(attack_specific_parameters_cw, generic_parameters_cw)
 
         generic_parameters_nf = {"epsilon_rate": 0.01}
-        attack_specific_parameters_nf = {"steps": 100, "random_start": True}
+        attack_specific_parameters_nf = {"steps": 100, "stepsize": 100}
         foolbox_parameters_nf = FoolboxParameters(attack_specific_parameters_nf, generic_parameters_nf)
 
         generic_parameters_pgd = {"epsilon_rate": 0.01}
@@ -159,7 +175,7 @@ def nn_input():
                               "brendel_bethge": foolbox_parameters_bb,
                               "basic_iterative": foolbox_parameters_bi,
                               "carlini_wagner": foolbox_parameters_cw,
-                              "newton_Fool": foolbox_parameters_nf,
+                              "newton_fool": foolbox_parameters_nf,
                               "projected_gradient_descent": foolbox_parameters_pgd,
                               "salt_and_pepper": foolbox_parameters_sap}
 

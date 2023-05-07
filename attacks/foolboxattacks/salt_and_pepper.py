@@ -14,8 +14,6 @@ class SaltAndPepperNoise(SaltAndPepperNoiseAttack, FoolboxAttack):
         super().verify_bounds(data=data)
         super().verify_epsilon()
         model_correct_format = super().reformat_model(model)
-        if model_correct_format is None:
-            model_correct_format = model
 
         if self.criterion_type == "targeted_misclassification":
             self.criterion = TargetedMisclassification(output)
