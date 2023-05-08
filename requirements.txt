@@ -3,7 +3,7 @@ eagerpy==0.30.0
 foolbox==3.3.3
 adversarial-robustness-toolbox==1.14.0
 mlflow==1.29.0
-./mlplatformlib-0.0.6-py3-none-any.whl
+./packages/mlplatformlib-1.0.0-py3-none-any.whl
 numpy==1.23.5
 scikit_learn==1.1.3
 tensorflow==2.11.0
@@ -21,5 +21,5 @@ numba==0.56.4
 timeout-decorator==0.5.0
 
 # To handle cloud databases:
-./mlplatformclient-0.0.10-py3-none-any.whl
-./naskrdsecurity-0.0.4-py3-none-any.whl
+./packages/mlplatformclient-0.0.10-py3-none-any.whl
+./packages/naskrdsecurity-0.0.4-py3-none-any.whl
