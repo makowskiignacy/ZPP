@@ -1,3 +1,13 @@
+"""
+Be sure to add the certificate before connecting:
+$ sudo -iu root
+$ mv Internal_CBiTT_CA_.crt /usr/local/share/ca-certificates/
+$ update-ca-certificates
+
+Remember to import the variable before running the script:
+$ export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+"""
+
 import os.path
 import time
 import traceback
@@ -47,5 +57,7 @@ def get_model(experiment_name, run_name, download_dir):
 
     pipeline = mlflow.sklearn.load_model(download_dir)
     standard_scaler = pipeline.steps[0][1]
+
     shutil.rmtree(download_dir)
+
     return pipeline.steps[1][1]
