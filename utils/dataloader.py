@@ -1,5 +1,6 @@
 
 
+import itertools
 import os
 import csv
 import torch
@@ -9,10 +10,11 @@ from mlplatformclient import MLPlatformClient, NextCloud
 from attacks.helpers.data import Data
 
 
-class SupportedLibrary(Enum):
-    ART = 1
-    Foolbox = 2
+
 class DataLoader:
+    class SupportedLibrary(Enum):
+        ART = 1
+        Foolbox = 2
     UPLOAD_DIRECTORY = "/uw_demo"
     DOWNLOAD_DIRECTORY = "downloads/"
     downloaded_files = []
@@ -113,7 +115,7 @@ class DataLoader:
         """
         if local_download_path is None:
             local_download_path = self.DOWNLOAD_DIRECTORY
-
+        
         if self.__next_cloud.download_file(remote_path, local_download_path):
             downloaded_file_path = os.path.join(os.path.abspath(local_download_path),
                                                 os.path.basename(remote_path))
@@ -127,43 +129,60 @@ class DataLoader:
                 self.downloaded_files.append(downloaded_file_path)
             return True
         return False
+            
         
-    def load_to_variable(lib : SupportedLibrary, local_file_path : str, number_of_samples : int | None = None, column_names_row : int = 0, labels_column_number : int | None = None):
+    def load_to_variable(libs : list[SupportedLibrary], local_file_path : str, number_of_samples : int | None = None, column_names_row : int = 0, labels_column_number : int | None = None):
         with open(local_file_path) as f:
             reader = csv.reader(f)
+        with open(local_file_path) as f:
+            reader = csv.reader(f)
+            
+        if number_of_samples is not None:
+            data = list(list(line) for line in itertools.islice(reader, number_of_samples))
+        else:
             data = list(list(line) for line in reader)
             # NOTE czy tutaj chcemy robić ten preprocessing?
             # Niebrałem udziału w 'ładowniu danych' stąd nie do
             # końca wiem czy coś tu jeszcze by się przydało
 
             # Zakładamy domyślnie że pierwszy wiersz to etykiety
-            data.pop(column_names_row)
+        data.pop(column_names_row)
 
-            if number_of_samples is not None:
-                number_of_samples = len(data)
-            i = 0
-            data2 = []
-            while i < number_of_samples:
-                row = [float(data[i][j]) for j in range(len(data[i]))]
-                data2.append(row)
-            data = data2
-            data = torch.tensor(data, requires_grad=False, dtype=torch.float)
-            number_of_columns = len(data[0])
-            if labels_column_number is None:
+        i = 0
+        data2 = []
+        while i < len(data):
+            row = [float(data[i][j]) for j in range(len(data[i]))]
+            data2.append(row)
+        data = data2
+        data = torch.tensor(data, requires_grad=False, dtype=torch.float)
+        number_of_columns = len(data[0])
+        if labels_column_number is None:
             # Zakładamy domyślnie, że wynik są ostatnią kolumną
-                data, labels = torch.hsplit(data, [number_of_columns - 1, ])
-            else:
-                raise NotImplementedError("There is no implementation for extracting other than last column, for now.")
+            data, labels = torch.hsplit(data, [number_of_columns - 1, ])
+        else:
+            data1, data2 = torch.hsplit(data, [0, labels_column_number])
+            labels, data2 = torch.hsplit(data2, [1,])
+            data = torch.hstack(data1, data2)
             
-            if lib == SupportedLibrary.ART:
-                data = Data(data.numpy(), labels.numpy())
-            elif lib == SupportedLibrary.Foolbox:
-                data = Data(data, labels)
+        retlist = []
+        for lib in libs:
+            if lib == DataLoader.SupportedLibrary.ART:
+                outdata = Data(data.numpy(), labels.numpy())
+            elif lib == DataLoader.SupportedLibrary.Foolbox:
+                outdata = Data(data, labels)
             else:
                 raise NotImplementedError(f"{lib.name} is not yet supported.")
+            retlist.append(outdata)
             
-        return data
+        return retlist
     
     def delete_downloaded(self):
         for path in self.downloaded_files:
             os.remove(path)
+
+
+    def make_remote_path(self, remote_file : str):
+        return os.path.join(self.UPLOAD_DIRECTORY, remote_file)
+    
+    def make_local_path(self, local_file : str):
+        return os.path.join(self.DOWNLOAD_DIRECTORY, local_file)

@@ -66,6 +66,6 @@ class LoaderTest(unittest.TestCase):
 
         loader.delete_downloaded()
         
-        os.remove(os.path.abspath(loader.DOWNLOAD_DIRECTORY))
+        os.rmdir(os.path.abspath(loader.DOWNLOAD_DIRECTORY))
         
     
