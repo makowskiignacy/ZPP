@@ -13,7 +13,7 @@ class L2CarliniWagner(L2CarliniWagnerAttack, FoolboxAttack):
 
 
     def conduct(self, model, data):
-        super.verify_bounds(data=data)
+        super().verify_bounds(data=data)
         output = super().flatten_output(data)
         model_correct_format = super().reformat_model(model)
 

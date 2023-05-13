@@ -1,6 +1,7 @@
 import csv
 import mlflow
 import numpy
+import pandas as pd
 import torch
 
 import torchvision.models as tv_models
@@ -10,7 +11,8 @@ from torch import nn, optim
 
 from attacks.helpers.data import Data
 from attacks.helpers.parameters import FoolboxParameters, ARTParameters
-from utils.logger import logger
+from utils.logger import test_logger
+from utils.config import SS_INPUT_ROWS
 
 import os
 
@@ -98,38 +100,26 @@ def nn_input():
     if os.path.exists(SS_NN_ABSOLUTE_PATH):
         ss_nn_pipeline = mlflow.sklearn.load_model(SS_NN_ABSOLUTE_PATH)
     else:
-        logger.error("Can't find model directory.")
+        test_logger.error("Can't find model directory.")
         return None, None
 
     if os.path.exists(DATA_ABSOLUTE_PATH):
         csv_filename = DATA_ABSOLUTE_PATH
     else:
-        logger.error("Can't find data file.")
+        test_logger.error("Can't find data file.")
         return None, None
 
     if ss_nn_pipeline is not None:
         nn_model = ss_nn_pipeline.steps[1][1].module_
         fmodel = fb.models.pytorch.PyTorchModel(nn_model, bounds=(-2., 30000.))
 
-        with open(csv_filename) as f:
-            reader = csv.reader(f)
-            data = list(list(line) for line in reader)
-            data.pop(0)
-            data2 = []
-            i = 0
-            for row in data:
-                if i < 100:
-                    i = i + 1
-                    row2 = []
-                    for place in range(len(row)):
-                        row2.append(float(row[place]))
-                    data2.append(row2)
-            data = data2
-            data = torch.tensor(data, requires_grad=False, dtype=torch.float)
-            data, result = torch.hsplit(data, [91, ])
-            result = torch.tensor(result, requires_grad=False, dtype=torch.float)
-            foolbox_data = Data(data, result)
-            art_data = Data(data.numpy(), result.numpy())
+        data_df = pd.read_csv(csv_filename, skiprows=[0], nrows=SS_INPUT_ROWS)
+        data = data_df.values
+        data = torch.tensor(data, requires_grad=False, dtype=torch.float)
+        data, result = torch.hsplit(data, [91, ])
+        result = torch.tensor(result, requires_grad=False, dtype=torch.float)
+        foolbox_data = Data(data, result)
+        art_data = Data(data.numpy(), result.numpy())
 
         art_model = art.estimators.classification.pytorch.PyTorchClassifier(model=nn_model,
                                                                             input_shape=art_data.input.shape,

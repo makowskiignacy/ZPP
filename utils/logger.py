@@ -1,16 +1,18 @@
 import logging
 
-log_format = logging.Formatter('%(levelname)s - %(message)s')
+from utils.config import LOGGING_LVL, LOGGING_FORMAT
 
+log_format = logging.Formatter(LOGGING_FORMAT)
 handler = logging.StreamHandler()
-handler.setFormatter(log_format)
+test_logger = logging.getLogger('test')
+test_logger.propagate = False
 
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
-logger.addHandler(handler)
+handler.setFormatter(log_format)
+test_logger.setLevel(LOGGING_LVL)
+test_logger.addHandler(handler)
 
 def input_err_msg(attack: str):
     return f"Input given for running tests does not contain parameters for the {attack} attack test."
 
 def log_attack_start_msg(attack: str):
-    logger.info(f"\nPerforming {attack} attack test:")
+    test_logger.info(f"Performing {attack} attack test:")

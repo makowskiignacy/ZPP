@@ -10,7 +10,7 @@ import torch
 import keras
 from attacks.helpers.data import Data
 from eagerpy.astensor import astensor
-from utils.logger import logger
+from utils.logger import test_logger
 
 class FoolboxAttack(Attack):
 
@@ -30,6 +30,7 @@ class FoolboxAttack(Attack):
         input_values = astensor(data.input)
         self.min = input_values.min().item()
         self.max = input_values.max().item()
+
 
     def verify_epsilon(self):
         if self.epsilon is not None:
@@ -64,7 +65,7 @@ class FoolboxAttack(Attack):
         elif len(data.output.shape) == 1:
             output = data.output
         else:
-            logger.error("ERROR")
+            test_logger.error("ERROR")
             return 0
 
         return output

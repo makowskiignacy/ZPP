@@ -27,4 +27,4 @@ python3 -m unittest.tests.\<nazwa-odpowiedniej-klasy>
 python3 -m unittest discover
 
 ### Cloud config
-W pliku `config.py` należy podać swój login oraz hasło, by umożliwić połączenie z zasobami NASK
+W pliku `/utils/cloud_config.py` należy podać swój login oraz hasło, by umożliwić połączenie z zasobami NASK

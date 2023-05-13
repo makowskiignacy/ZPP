@@ -6,7 +6,7 @@ from art.attacks.evasion.adversarial_patch.adversarial_patch_tensorflow import A
 from art.attacks.evasion.adversarial_patch.adversarial_patch_pytorch import AdversarialPatchPyTorch
 from typing import Optional, Tuple, Union, TYPE_CHECKING
 import numpy as np
-from utils.logger import logger
+from utils.logger import test_logger
 
 class AdversarialPatch(ARTAttack):
     def __init__(self, parameters):
@@ -96,7 +96,7 @@ class AdversarialPatch(ARTAttack):
         :type reset_patch: bool
         :return: An array with adversarial patch and an array of the patch mask.
         """
-        logger.debug("Creating adversarial patch.")
+        test_logger.debug("Creating adversarial patch.")
 
         if len(x.shape) == 2:  # pragma: no cover
             raise ValueError(

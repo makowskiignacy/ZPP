@@ -1,7 +1,7 @@
 from attacks.foolboxattacks.carlini_wagner import L2CarliniWagner
 
 from attacks.attack import run_attack
-from utils.logger import logger
+from utils.logger import test_logger
 
 
 class TestCarliniWagner():
@@ -12,7 +12,7 @@ class TestCarliniWagner():
         self.parameters = parameters
 
     def test_cw_l2(self):
-        logger.info("L2 Carlini Wagner attack test running")
+        test_logger.info("L2 Carlini Wagner attack test running")
         attack_an_l2_g = L2CarliniWagner(self.parameters)
         result_an_l2_g = run_attack(attack_an_l2_g, self.model, self.data)
         return result_an_l2_g
