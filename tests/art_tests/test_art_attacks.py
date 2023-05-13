@@ -10,6 +10,7 @@ from attacks.artattacks.zeroth_order_optimization_bb_attack import ZerothOrderOp
 from attacks.artattacks.deep_fool import DeepFool
 
 from attacks.attack import run_attack
+from utils.logger import logger
 
 
 class ARTTest:
@@ -21,68 +22,68 @@ class ARTTest:
 
 class TestFastGradient(ARTTest):
     def test(self):
-        print("Fast Gradient Attack test running")
+        logger.info("Fast Gradient Attack test running")
         art_model = FastGradient(self.parameters)
         return run_attack(art_model, self.model, self.data)
 
 
 class TestJoker(ARTTest):
     def test(self):
-        print("Joker Attack test running")
+        logger.info("Joker Attack test running")
         art_model = Joker(joker='FastGradientMethod', parameters=self.parameters)
         return run_attack(art_model, self.model, self.data)
 
 
 class TestJacobianSaliencyMap(ARTTest):
     def test(self):
-        print("Jacobian Saliency Map Attack test running")
+        logger.info("Jacobian Saliency Map Attack test running")
         art_model = JacobianSaliencyMap(self.parameters)
         return run_attack(art_model, self.model, self.data)
 
 
 class TestGeometricDecisionBased(ARTTest):
     def test(self):
-        print("Geometric Decision Based Attack test running")
+        logger.info("Geometric Decision Based Attack test running")
         art_model = GeometricDecisionBased(self.parameters)
         return run_attack(art_model, self.model, self.data)
 
 
 class TestShadow(ARTTest):
     def test(self):
-        print("Shadow Attack test running")
+        logger.info("Shadow Attack test running")
         art_model = Shadow(self.parameters)
         return run_attack(art_model, self.model, self.data)
 
 
 class TestThreshold(ARTTest):
     def test(self):
-        print("Threshold Attack test running")
+        logger.info("Threshold Attack test running")
         art_model = Threshold(self.parameters)
         return run_attack(art_model, self.model, self.data)
 
 
 class TestSignOPT(ARTTest):
     def test(self):
-        print("SignOPT Attack test running")
+        logger.info("SignOPT Attack test running")
         art_model = SignOPT(self.parameters)
         return run_attack(art_model, self.model, self.data)
 
 
 class TestSquare(ARTTest):
     def test(self):
-        print("Square Attack test running")
+        logger.info("Square Attack test running")
         art_model = Square(self.parameters)
         return run_attack(art_model, self.model, self.data)
 
 
 class TestZerothOrderOptimalization(ARTTest):
     def test(self):
-        print("Zeroth Order Optimalization test running")
+        logger.info("Zeroth Order Optimalization test running")
         art_model = ZerothOrderOptimalization(self.parameters)
         return run_attack(art_model, self.model, self.data)
 
 class TestDeepFool(ARTTest):
     def test(self):
-        print("Deep Fool test running")
+        logger.info("Deep Fool test running")
         art_model = DeepFool(self.parameters)
         return run_attack(art_model, self.model, self.data)

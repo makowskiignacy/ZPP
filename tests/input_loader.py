@@ -10,6 +10,7 @@ from torch import nn, optim
 
 from attacks.helpers.data import Data
 from attacks.helpers.parameters import FoolboxParameters, ARTParameters
+from utils.logger import logger
 
 import os
 
@@ -97,13 +98,13 @@ def nn_input():
     if os.path.exists(SS_NN_ABSOLUTE_PATH):
         ss_nn_pipeline = mlflow.sklearn.load_model(SS_NN_ABSOLUTE_PATH)
     else:
-        print("Can't find model directory.")
+        logger.error("Can't find model directory.")
         return None, None
 
     if os.path.exists(DATA_ABSOLUTE_PATH):
         csv_filename = DATA_ABSOLUTE_PATH
     else:
-        print("Can't find data file.")
+        logger.error("Can't find data file.")
         return None, None
 
     if ss_nn_pipeline is not None:

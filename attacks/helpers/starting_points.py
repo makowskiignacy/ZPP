@@ -5,6 +5,7 @@ from foolbox.distances import LpDistance
 import eagerpy as ep
 
 from eagerpy.astensor import astensor
+from utils.logger import logger
 
 import time
 
@@ -16,9 +17,9 @@ def generate_starting_points(self, data, model, distance, directions=1000, steps
     starting_points = init_attack.run(model, originals, self.criterion)
 
     if starting_points is None:
-        print(f'Wrong starting points ({starting_points}) for params: distance={distance}, directions={directions}, steps={steps}')
+        logger.debug(f'Wrong starting points ({starting_points}) for params: distance={distance}, directions={directions}, steps={steps}')
     else:
-        print(f'Successful starting points ({starting_points}) for params: distance={distance}, directions={directions}, steps={steps}')
+        logger.debug(f'Successful starting points ({starting_points}) for params: distance={distance}, directions={directions}, steps={steps}')
         # sys.exit(f'Wrong starting points ({starting_points}) for params: distance={dist}, directions={dirs}, steps={stps}')
 
     return starting_points
@@ -43,13 +44,13 @@ def generate_starting_points_set(self, data, model):
                 time_end = time.time()
 
                 if starting_points is None:
-                    print(f'Wrong starting points ({starting_points})')
+                    logger.debug(f'Wrong starting points ({starting_points})')
                 else:
-                    print(f'Successful starting points ({starting_points})')
+                    logger.debug(f'Successful starting points ({starting_points})')
                     # sys.exit(f'Wrong starting points ({starting_points}) for params: distance={dist}, directions={dirs}, steps={stps}')
                     ptsSet.append(starting_points)
                 
-                print(f"Checked for params: distance={dist}, directions={dir}, steps={steps}")
-                print(f"Took {time_end - time_start}\n")
+                logger.debug(f"Checked for params: distance={dist}, directions={dir}, steps={steps}")
+                logger.debug(f"Took {time_end - time_start}\n")
 
     return ptsSet

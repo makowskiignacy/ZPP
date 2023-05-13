@@ -10,6 +10,7 @@ import torch
 import keras
 from attacks.helpers.data import Data
 from eagerpy.astensor import astensor
+from utils.logger import logger
 
 class FoolboxAttack(Attack):
 
@@ -63,7 +64,7 @@ class FoolboxAttack(Attack):
         elif len(data.output.shape) == 1:
             output = data.output
         else:
-            print("ERROR")
+            logger.error("ERROR")
             return 0
 
         return output

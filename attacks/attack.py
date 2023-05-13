@@ -8,7 +8,7 @@ import abc
 
 # Chcemy mieć możliwość określenia klasy jako abstrakcyjnej
 from abc import ABC
-
+from utils.logger import logger
 
 # *Abstrakcyjna* klasa będąca uogólnionym atakiem, którym można zaatakować
 # wybrany model o określonym zbiorze danych wejściowych
@@ -34,23 +34,23 @@ class Attack(ABC):
 def run_attack(attack: Attack, model, data: Data):
     time_start = time.time()
 
-    # print(type(model))
+    # logger.info(type(model))
     if isinstance(model, PyTorchModel):
-        print(f"Model accuracy before attack: {accuracy(model, data.input, data.output)}")
-    print(f"Starting attack. ({time.asctime(time.localtime(time_start))})")
+        logger.info(f"Model accuracy before attack: {accuracy(model, data.input, data.output)}")
+    logger.info(f"Starting attack. ({time.asctime(time.localtime(time_start))})")
 
     adversarials = attack.conduct(model, data)
 
     time_end = time.time()
-    print(f"Attack done. ({time.asctime(time.localtime(time_end))})")
-    print(f"Took {time_end - time_start}")
+    logger.info(f"Attack done. ({time.asctime(time.localtime(time_end))})")
+    logger.info(f"Took {time_end - time_start}")
 
     if adversarials is not None and isinstance(model, PyTorchModel):
-        print(f"Model accuracy after attack: {accuracy(model, adversarials, data.output)}")
+        logger.info(f"Model accuracy after attack: {accuracy(model, adversarials, data.output)}")
     elif not isinstance(model, PyTorchModel):
-        print(f"No accuracy measure for non-PyTorch models?")
+        logger.info(f"No accuracy measure for non-PyTorch models?")
     else:
-        print(f"Attack not successfull, adversarials:\n{adversarials}")
-    print()
+        logger.info(f"Attack not successfull, adversarials:\n{adversarials}")
+    logger.info()
 
     return adversarials
