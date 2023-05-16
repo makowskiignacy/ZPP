@@ -1,6 +1,6 @@
 import unittest
 
-from tests import input_loader
+from tests import input_loader_cloud, input_loader
 
 from tests.foolbox_tests.test_brendel_bethge import TestBrendelBethge
 from tests.foolbox_tests.test_basic_iterative import TestBasicIterative
@@ -12,8 +12,8 @@ from tests.art_tests.test_art_attacks import *
 from tests.other_tests.test_frameworks import *
 
 #To run the tests on a different data set, add it to input_loader.py, and then change the line below.
-foolbox_model, art_model, foolbox_data, art_data, foolbox_parameters, art_parameters = input_loader.nn_input()
-
+foolbox_model, art_model, foolbox_data, art_data, foolbox_parameters, art_parameters = input_loader_cloud.nn_input()
+# foolbox_model, art_model, foolbox_data, art_data, foolbox_parameters, art_parameters = input_loader.nn_input()
 
 class FoolboxTests(unittest.TestCase):
 
