@@ -1,5 +1,6 @@
 import getpass
 import mlflow
+import os
 
 import torchvision.models as tv_models
 import foolbox as fb
@@ -71,13 +72,16 @@ def simple_input(batchsize=4):
 
 
 def nn_input():
-    ss_nn_pipeline = mlflow.sklearn.load_model('../ss_nn/')
+    CWD = os.getcwd()
+    SS_NN_RELATIVE_PATH = '../ss_nn/'
+    SS_NN_ABSOLUTE_PATH = os.path.join(CWD, SS_NN_RELATIVE_PATH)
+    ss_nn_pipeline = mlflow.sklearn.load_model(SS_NN_ABSOLUTE_PATH)
     if ss_nn_pipeline is not None:
         nn_model = ss_nn_pipeline.steps[1][1].module_
         fmodel = fb.models.pytorch.PyTorchModel(nn_model, bounds=(-2., 30000.))
 
         nc_user = input("NextCloud username:")
-        nc_pass = getpass("NextCloud password:")
+        nc_pass = getpass.getpass("NextCloud password:")
         dataloader = DataLoader(
                     ml_user='test', ml_pass='test',
                     nc_user=nc_user, nc_pass=nc_pass,
@@ -92,20 +96,16 @@ def nn_input():
         except Exception as e:
             print(f"Pobieranie niepowiodło się z błędem:\n{e}\nMoże nie ma takiego pliku?")
             quit(1)
-        
         data_list = dataloader.load_to_variable(
-                [DataLoader.SupportedLibrary.ART, DataLoader.SupportedLibrary.Foolbox],
-                dataloader.make_local_path('data_test.csv'),
-                number_of_samples=100,
-            )
-
+                libs=[DataLoader.SupportedLibrary.ART, DataLoader.SupportedLibrary.Foolbox],
+                local_file_path=dataloader.make_local_path('data_test.csv'),
+                number_of_samples=100)
         art_data = data_list[0]
         foolbox_data = data_list[1]
-
         art_model = art.estimators.classification.pytorch.PyTorchClassifier(model=nn_model,
                                                                             input_shape=art_data.input.shape,
-                                                                            loss=nn.CrossEntropyLoss(), nb_classes=int(
-                art_data.output.max() - min(0, art_data.output.min()) + 1))
+                                                                            loss=nn.CrossEntropyLoss(),
+                                                                            nb_classes=int(art_data.output.max() - min(0, art_data.output.min()) + 1))
         art_criterion = nn.CrossEntropyLoss()
         art_optimizer = optim.Adam(art_model._model.parameters(), lr=0.01)
 
