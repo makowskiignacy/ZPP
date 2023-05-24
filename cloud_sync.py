@@ -9,9 +9,6 @@ $ export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 """
 
 import os.path
-import time
-import traceback
-import sys
 import shutil
 from mlplatformclient import MLPlatformClient
 from zipfile import ZipFile
@@ -29,7 +26,17 @@ class MLPlatformClientConfig:
     password: str = 'test'
 
 def download_compressed_model(experiment_name, run_name, download_dir):
+    """
+    Downloads a compressed model from the ML Platform.
 
+    Parameters:
+        - experiment_name (str): The name of the MLflow experiment containing the model.
+        - run_name (str): The name of the MLflow run containing the model.
+        - download_dir (str): The directory where the downloaded artifact will be saved.
+
+    Returns:
+        Dictionary containing model decription.
+    """
     ml_p_conf = MLPlatformClientConfig()
 
     # Tworzenie instancji klienta Ml-platform:
@@ -47,6 +54,17 @@ def download_compressed_model(experiment_name, run_name, download_dir):
 
 
 def get_model(experiment_name, run_name, download_dir):
+    """
+    Downloads a compressed model artifact from the ML Platform, extracts it, and loads the model.
+
+    Parameters:
+        - experiment_name (str): The name of the MLflow experiment containing the model.
+        - run_name (str): The name of the MLflow run containing the model.
+        - download_dir (str): Temporary working directory
+
+    Returns:
+        The loaded model.
+    """
     if os.path.isdir(download_dir):
         raise NameError("Download directory already exist")
     
