@@ -6,6 +6,9 @@ from foolbox.attacks.basic_iterative_method import L1AdamBasicIterativeAttack, L
 
 
 class GenericBasicIterative(FoolboxAttack):
+    """
+    :param parent - attack specific class from foolbox.attacks.basic_iterative_method module
+    """
     def __init__(self, parent, parameters):
         self.Parent = parent
         self.Parent.__init__(self, **parameters.attack_specific_parameters)

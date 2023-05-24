@@ -8,6 +8,9 @@ from abc import ABC
 
 
 class GenericBrendelBethge(FoolboxAttack, ABC):
+    """
+    :param parent - attack specific class from foolbox.attacks.brendel_bethge module
+    """
     def __init__(self, parent, parameters):
         self.Parent = parent
         self.Parent.__init__(self, **parameters.attack_specific_parameters)

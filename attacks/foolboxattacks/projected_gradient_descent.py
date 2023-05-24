@@ -6,6 +6,9 @@ from eagerpy.astensor import astensor
 
 
 class GenericProjectedGradientDescent(FoolboxAttack):
+    """
+    :param parent - attack specific class from foolbox.attacks module
+    """
     def __init__(self, parent, parameters):
         self.Parent = parent
         self.Parent.__init__(self, **parameters.attack_specific_parameters)

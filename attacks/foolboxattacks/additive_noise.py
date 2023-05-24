@@ -9,7 +9,10 @@ from attacks.helpers.data import Data
 from eagerpy.astensor import astensor
 
 
-class BaseAdditiveNoise(FoolboxAttack, ABC):
+class GenericAdditiveNoise(FoolboxAttack, ABC):
+    """
+    :param parent - attack specific class from foolbox.attacks.additive_noise module
+    """
     def __init__(self, parent, parameters):
         self.parent = parent
         self.parent.__init__(self, **parameters.attack_specific_parameters)
@@ -38,57 +41,56 @@ class BaseAdditiveNoise(FoolboxAttack, ABC):
             self.criterion = Misclassification(output)
 
         result = self.parent.run(self, model=model_correct_format, inputs=data.input, criterion=self.criterion, epsilon=self.epsilon)
-        # result = super().run(model=model_correct_format, inputs=data.input, criterion=self.criterion, epsilon=self.epsilon)
 
         return result
 
 
-class L2AdditiveGaussianNoise(L2AdditiveGaussianNoiseAttack, BaseAdditiveNoise):
+class L2AdditiveGaussianNoise(L2AdditiveGaussianNoiseAttack, GenericAdditiveNoise):
     def __init__(self, parameters):
-        BaseAdditiveNoise.__init__(self, L2AdditiveGaussianNoiseAttack, parameters)
+        GenericAdditiveNoise.__init__(self, L2AdditiveGaussianNoiseAttack, parameters)
 
 
-class L2AdditiveUniformNoise(L2AdditiveUniformNoiseAttack, BaseAdditiveNoise):
+class L2AdditiveUniformNoise(L2AdditiveUniformNoiseAttack, GenericAdditiveNoise):
     def __init__(self, parameters):
-        BaseAdditiveNoise.__init__(self, L2AdditiveUniformNoiseAttack, parameters)
+        GenericAdditiveNoise.__init__(self, L2AdditiveUniformNoiseAttack, parameters)
 
 
-class L2ClippingAwareAdditiveGaussianNoise(L2ClippingAwareAdditiveGaussianNoiseAttack, BaseAdditiveNoise):
+class L2ClippingAwareAdditiveGaussianNoise(L2ClippingAwareAdditiveGaussianNoiseAttack, GenericAdditiveNoise):
     def __init__(self, parameters):
-        BaseAdditiveNoise.__init__(self, L2ClippingAwareAdditiveGaussianNoiseAttack, parameters)
+        GenericAdditiveNoise.__init__(self, L2ClippingAwareAdditiveGaussianNoiseAttack, parameters)
 
 
-class L2ClippingAwareAdditiveUniformNoise(L2ClippingAwareAdditiveUniformNoiseAttack, BaseAdditiveNoise):
+class L2ClippingAwareAdditiveUniformNoise(L2ClippingAwareAdditiveUniformNoiseAttack, GenericAdditiveNoise):
     def __init__(self, parameters):
-        BaseAdditiveNoise.__init__(self, L2ClippingAwareAdditiveUniformNoiseAttack, parameters)
+        GenericAdditiveNoise.__init__(self, L2ClippingAwareAdditiveUniformNoiseAttack, parameters)
 
 
-class LinfAdditiveUniformNoise(LinfAdditiveUniformNoiseAttack, BaseAdditiveNoise):
+class LinfAdditiveUniformNoise(LinfAdditiveUniformNoiseAttack, GenericAdditiveNoise):
     def __init__(self, parameters):
-        BaseAdditiveNoise.__init__(self, LinfAdditiveUniformNoiseAttack, parameters)
+        GenericAdditiveNoise.__init__(self, LinfAdditiveUniformNoiseAttack, parameters)
 
 
-class L2RepeatedAdditiveGaussianNoise(L2RepeatedAdditiveGaussianNoiseAttack, BaseAdditiveNoise):
+class L2RepeatedAdditiveGaussianNoise(L2RepeatedAdditiveGaussianNoiseAttack, GenericAdditiveNoise):
     def __init__(self, parameters):
-        BaseAdditiveNoise.__init__(self, L2RepeatedAdditiveGaussianNoiseAttack, parameters)
+        GenericAdditiveNoise.__init__(self, L2RepeatedAdditiveGaussianNoiseAttack, parameters)
 
 
-class L2RepeatedAdditiveUniformNoise(L2RepeatedAdditiveUniformNoiseAttack, BaseAdditiveNoise):
+class L2RepeatedAdditiveUniformNoise(L2RepeatedAdditiveUniformNoiseAttack, GenericAdditiveNoise):
     def __init__(self, parameters):
-        BaseAdditiveNoise.__init__(self, L2RepeatedAdditiveUniformNoiseAttack, parameters)
+        GenericAdditiveNoise.__init__(self, L2RepeatedAdditiveUniformNoiseAttack, parameters)
 
 
-class L2ClippingAwareRepeatedAdditiveGaussianNoise(L2ClippingAwareRepeatedAdditiveGaussianNoiseAttack, BaseAdditiveNoise):
+class L2ClippingAwareRepeatedAdditiveGaussianNoise(L2ClippingAwareRepeatedAdditiveGaussianNoiseAttack, GenericAdditiveNoise):
     def __init__(self, parameters):
-        BaseAdditiveNoise.__init__(self, L2ClippingAwareRepeatedAdditiveGaussianNoiseAttack, parameters)
+        GenericAdditiveNoise.__init__(self, L2ClippingAwareRepeatedAdditiveGaussianNoiseAttack, parameters)
 
 
-class L2ClippingAwareRepeatedAdditiveUniformNoise(L2ClippingAwareRepeatedAdditiveUniformNoiseAttack, BaseAdditiveNoise):
+class L2ClippingAwareRepeatedAdditiveUniformNoise(L2ClippingAwareRepeatedAdditiveUniformNoiseAttack, GenericAdditiveNoise):
     def __init__(self, parameters):
-        BaseAdditiveNoise.__init__(self, L2ClippingAwareRepeatedAdditiveUniformNoiseAttack, parameters)
+        GenericAdditiveNoise.__init__(self, L2ClippingAwareRepeatedAdditiveUniformNoiseAttack, parameters)
 
 
-class LinfRepeatedAdditiveUniformNoise(LinfRepeatedAdditiveUniformNoiseAttack, BaseAdditiveNoise):
+class LinfRepeatedAdditiveUniformNoise(LinfRepeatedAdditiveUniformNoiseAttack, GenericAdditiveNoise):
     def __init__(self, parameters):
-        BaseAdditiveNoise.__init__(self, LinfRepeatedAdditiveUniformNoiseAttack, parameters)
+        GenericAdditiveNoise.__init__(self, LinfRepeatedAdditiveUniformNoiseAttack, parameters)
 
