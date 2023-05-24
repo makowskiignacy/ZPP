@@ -1,18 +1,30 @@
 from attacks.foolbox_attack import FoolboxAttack
 from foolbox.criteria import Misclassification, TargetedMisclassification
-from foolbox.attacks.saltandpepper import SaltAndPepperNoiseAttack
+from foolbox.attacks.newtonfool import NewtonFoolAttack
+
+from attacks.helpers.data import Data
+from eagerpy.astensor import astensor
 
 
-class SaltAndPepperNoise(SaltAndPepperNoiseAttack, FoolboxAttack):
+class NewtonFool(NewtonFoolAttack, FoolboxAttack):
     def __init__(self, parameters):
         super().__init__(**parameters.attack_specific_parameters)
         FoolboxAttack.__init__(self, parameters.generic_parameters)
 
-    def conduct(self, model, data):
+    def verify_bounds(self, data: Data):
+        if hasattr(self, 'min') and hasattr(self, 'max'):
+            return
+        
+        originals, _ = astensor(data.input)
+        self.min = originals.min().item()
+        self.max = originals.max().item()
 
+        return
+
+
+    def conduct(self, model, data):
+        self.verify_bounds(data=data)
         output = super().flatten_output(data)
-        super().verify_bounds(data=data)
-        super().verify_epsilon()
         model_correct_format = super().reformat_model(model)
 
         if self.criterion_type == "targeted_misclassification":
@@ -21,4 +33,5 @@ class SaltAndPepperNoise(SaltAndPepperNoiseAttack, FoolboxAttack):
             self.criterion = Misclassification(output)
 
         result = super().run(model=model_correct_format, inputs=data.input, criterion=self.criterion)
+
         return result

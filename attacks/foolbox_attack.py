@@ -10,6 +10,7 @@ import torch
 import keras
 from attacks.helpers.data import Data
 from eagerpy.astensor import astensor
+from utils.logger import test_logger
 
 class FoolboxAttack(Attack):
 
@@ -30,6 +31,7 @@ class FoolboxAttack(Attack):
         self.min = input_values.min().item()
         self.max = input_values.max().item()
 
+
     def verify_epsilon(self):
         if self.epsilon is not None:
             return
@@ -44,14 +46,14 @@ class FoolboxAttack(Attack):
         return data_from_attack
 
     def reformat_model(self, model):
-        model2 = None
+        reformatted_model = model
         bounds = (self.min, self.max)
         if isinstance(model, torch.nn.Module):
-            model2 = PyTorchModel(model, bounds)
+            reformatted_model = PyTorchModel(model, bounds)
         elif isinstance(model, keras.Model):
-            model2 = TensorFlowModel(model2, bounds)
+            reformatted_model = TensorFlowModel(reformatted_model, bounds)
 
-        return model2
+        return reformatted_model
 
     # This makes sure that the output of experiments used for training has a 1D format,
     # instead of a faux-2D format, where one of the dimensions has a length of 1.
@@ -63,7 +65,7 @@ class FoolboxAttack(Attack):
         elif len(data.output.shape) == 1:
             output = data.output
         else:
-            print("ERROR")
+            test_logger.error("ERROR")
             return 0
 
         return output
