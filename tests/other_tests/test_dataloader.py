@@ -4,7 +4,6 @@ from utils.dataloader import DataLoader
 
 from getpass import getpass
 import os
-from turtle import down
 import unittest
 
 
@@ -50,6 +49,7 @@ class LoaderTest(unittest.TestCase):
 
         print("Uploading the same file and registering")
         upload_result = loader.upload_and_register(os.path.abspath(local_test_file_path))
+        print(upload_result)
         self.assertIsNotNone(upload_result)
         downloaded_file_path = "download_testdir/registered_filename.csv"
         print("Downloading registered file")

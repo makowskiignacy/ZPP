@@ -1,3 +1,4 @@
+from copyreg import constructor
 from attacks.attack import Attack
 
 # Ataki pochodzące z ARTa
@@ -24,44 +25,80 @@ from attacks.foolboxattacks.basic_iterative import L1AdamBasicIterative, L2AdamB
 from attacks.foolboxattacks.projected_gradient_descent import L1ProjectedGradientDescent, L2ProjectedGradientDescent, LinfProjectedGradientDescent
 from attacks.foolboxattacks.projected_gradient_descent import L1AdamProjectedGradientDescent, L2AdamProjectedGradientDescent, LinfAdamProjectedGradientDescent
 from attacks.foolboxattacks.salt_and_pepper import SaltAndPepperNoise
+from attacks.helpers.parameters import ARTParameters, FoolboxParameters
 
 
+class AttackNameNotRecognized(Exception):
+    def __init__(self, name):
+        super().__init__(f"Attack name \"{name}\" not recognized.")
+
+class AttackListEntry():
+    def __init__(self, constructor, default_params):
+        self.constructor = constructor,
+        self.default_params = default_params
+
+class AttackManager:
+    
+    classifier_parameters_default = { "clip_values": (-2., 30000.) }
+    attack_parameters_default = {}
+    art_parameters_default = ARTParameters(classifier_parameters_default, attack_parameters_default)
+    
+    generic_parameters_bb = {"epsilon_rate": 0.01}
+    attack_specific_parameters_bb = {"lr": 10, 'steps': 100}
+    foolbox_parameters_bb = FoolboxParameters(attack_specific_parameters_bb, generic_parameters_bb)
+
+    generic_parameters_bi = {"epsilon_rate": 0.05}
+    attack_specific_parameters_bi = {"steps": 100, "random_start": True}
+    foolbox_parameters_bi = FoolboxParameters(attack_specific_parameters_bi, generic_parameters_bi)
+
+    generic_parameters_pgd = {"epsilon_rate": 0.01}
+    attack_specific_parameters_pgd = {"steps": 100, "random_start": True}
+    foolbox_parameters_pgd = FoolboxParameters(attack_specific_parameters_pgd, generic_parameters_pgd)
+
+    generic_parameters_sap = {"epsilon_rate": 0.01}
+    attack_specific_parameters_sap = {"steps": 100, "across_channels": True}
+    foolbox_parameters_sap = FoolboxParameters(attack_specific_parameters_sap, generic_parameters_sap)
 
 
-
-class AttackManager():
     # Takie użycie zapewnia niezmienniczość listy w trakcie pracy programu
     @staticmethod
     def get_possible_attacks():
         return {
             # możliwe, że elementami będą pary (klasa, procedura sprawdzająca)
-            "Zeroth Order Optimalization" : ZOOAttack,
-            "Adversarial Patch" : AdversarialPatch,
-            "DeepFool" : DeepFool,
-            "FastGradient" : FastGradient,
-            "Joker" : Joker,
-            "L0 Brendel Bethge" : L0BrendelBethge,
-            "L1 Brendel Bethge": L1BrendelBethge,
-            "L2 Brendel Bethge": L2BrendelBethge,
-            "Linf Brendel Bethge": LinfBrendelBethge,
-            "L1 Basic Iterative": L1BasicIterative,
-            "L2 Basic Iterative": L2BasicIterative,
-            "Linf Basic Iterative": LinfBasicIterative,
-            "L1 Adam Basic Iterative": L1AdamBasicIterative,
-            "L2 Adam Basic Iterative": L2AdamBasicIterative,
-            "Linf Adam Basic Iterative": LinfAdamBasicIterative,
-            "L1 Projected Gradient Descent": L1ProjectedGradientDescent,
-            "L2 Projected Gradient Descent": L2ProjectedGradientDescent,
-            "Linf Projected Gradient Descent" : LinfProjectedGradientDescent,
-            "L1 Adam Projected Gradient Descent": L1AdamProjectedGradientDescent,
-            "L2 Adam Projected Gradient Descent": L2AdamProjectedGradientDescent,
-            "Linf Adam Projected Gradient Descent": LinfAdamProjectedGradientDescent,
-            "Salt And Pepper" : SaltAndPepperNoise,
-            "Geometric Decision Based" : GeometricDecisionBased,
-            "Jacobian Saliency Map" : JacobianSaliencyMap,
-            "Square" : Square,
-            "Sign-OPT" : SignOPT,
-            "Threshold" : Threshold
+            "Adversarial Patch"        : AttackListEntry(AdversarialPatch, AttackManager.art_parameters_default),
+            "DeepFool"                 : AttackListEntry(DeepFool, AttackManager.art_parameters_default),
+            "FastGradient"             : AttackListEntry(FastGradient, AttackManager.art_parameters_default),
+            "Geometric Decision Based" : AttackListEntry(GeometricDecisionBased, AttackManager.art_parameters_default),
+            "Jacobian Saliency Map"    : AttackListEntry(JacobianSaliencyMap, AttackManager.art_parameters_default),
+            "Joker"                    : AttackListEntry(Joker, AttackManager.art_parameters_default),
+            "L0 Brendel Bethge"        : AttackListEntry(L0BrendelBethge, AttackManager.foolbox_parameters_bb),
+            "L1 Brendel Bethge"        : AttackListEntry(L1BrendelBethge, AttackManager.foolbox_parameters_bb),
+            "L2 Brendel Bethge"        : AttackListEntry(L2BrendelBethge, AttackManager.foolbox_parameters_bb),
+            "Linf Brendel Bethge"      : AttackListEntry(LinfBrendelBethge, AttackManager.foolbox_parameters_bb),
+            "L1 Basic Iterative"       : AttackListEntry(L1BasicIterative, AttackManager.foolbox_parameters_bi),
+            "L1 Adam Basic Iterative"  : AttackListEntry(L1AdamBasicIterative, AttackManager.foolbox_parameters_bi),
+            "L2 Adam Basic Iterative"  : AttackListEntry(L2AdamBasicIterative, AttackManager.foolbox_parameters_bi),
+            "Linf Adam Basic Iterative": AttackListEntry(LinfAdamBasicIterative, AttackManager.foolbox_parameters_bi),
+            "Linf Basic Iterative"     : AttackListEntry(LinfBasicIterative, AttackManager.foolbox_parameters_bi),
+            "L2 Basic Iterative"       : AttackListEntry(L2BasicIterative, AttackManager.foolbox_parameters_bi),
+            "L1 Adam Projected Gradient Descent"
+                                       : AttackListEntry(L1AdamProjectedGradientDescent, AttackManager.foolbox_parameters_pgd),
+            "L1 Projected Gradient Descent"
+                                       : AttackListEntry(L1ProjectedGradientDescent, AttackManager.foolbox_parameters_pgd),
+            "L2 Adam Projected Gradient Descent"
+                                       : AttackListEntry(L2AdamProjectedGradientDescent, AttackManager.foolbox_parameters_pgd),
+            "L2 Projected Gradient Descent"
+                                       : AttackListEntry(L2ProjectedGradientDescent, AttackManager.foolbox_parameters_pgd),
+            "Linf Adam Projected Gradient Descent"
+                                       : AttackListEntry(LinfAdamProjectedGradientDescent, AttackManager.foolbox_parameters_pgd),
+            "Linf Projected Gradient Descent"
+                                       : AttackListEntry(LinfProjectedGradientDescent, AttackManager.foolbox_parameters_pgd),
+            "Salt And Pepper"          : AttackListEntry(SaltAndPepperNoise, AttackManager.foolbox_parameters_sap),
+            "Sign-OPT"                 : AttackListEntry(SignOPT, AttackManager.art_parameters_default),
+            "Square"                   : AttackListEntry(Square, AttackManager.art_parameters_default),
+            "Threshold"                : AttackListEntry(Threshold, AttackManager.art_parameters_default),
+            "Zeroth Order Optimalization"
+                                       : AttackListEntry(ZOOAttack, AttackManager.art_parameters_default)
         }
     
     @staticmethod
@@ -72,14 +109,24 @@ class AttackManager():
 
     # Tworzy i TODO sprawdza poprawność parametrów podanych ataków
     @staticmethod
-    def create_attacks(attack_names_params_list: list) -> list:
+    def create_attacks(attack_names_params_list: list[tuple[str, dict[str, ]]]) -> list:
+
+        for name, _ in attack_names_params_list:
+            if name not in AttackManager.get_possible_attacks():
+                raise AttackNameNotRecognized(name)
+
         attacks = []
         for name, params in attack_names_params_list:
             if name in AttackManager.get_possible_attacks():
                 # TODO sprawdzenie parametrów ataku
+                entry = AttackManager.get_possible_attacks()[name]
+                final_params = entry.default_params
+                if params is not None:
+                    final_params.update(params)
+                    
                 attacks.append(
                     # Wywołanie konstruktora ataku pod nazwą "name"
-                    AttackManager.get_possible_attacks()[name](params)
+                    entry.constructor[0](params)
                 )
         return attacks
     
@@ -93,11 +140,11 @@ class AttackManager():
     def conduct_attacks(self, attacks: list[Attack], model, data):
         # TODO Zrobić to w zoptymalizowany sposób
         results = []
-
         # zakładam kolejność wywoływania pozostaje niezmieniona
         # inaczej trzeba dodać id ataku do pozycji w wynikach
         for attack in attacks:
-            results.append(attack.conduct(model, data))\
+            results.append(attack.conduct(model, data))
         
         return results
-        
+    
+    
