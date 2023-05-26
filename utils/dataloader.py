@@ -152,6 +152,7 @@ class DataLoader:
             data2.append(row2)
         data = data2
         data = torch.tensor(data, requires_grad=False, dtype=torch.float)
+        
         number_of_columns = len(data[0])
         if labels_column_number is None:
             # Zakładamy domyślnie, że wynik są ostatnią kolumną
@@ -175,7 +176,7 @@ class DataLoader:
             retlist.append(outdata)
             
         return retlist
-    
+
     def delete_downloaded(self):
         for path in self.downloaded_files:
             os.remove(path)

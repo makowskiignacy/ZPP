@@ -1,6 +1,7 @@
 import abc
 
 import sklearn
+from skorch import NeuralNetBinaryClassifier
 import torch
 from art.estimators.classification \
     import KerasClassifier, PyTorchClassifier, SklearnClassifier
@@ -10,7 +11,7 @@ from tensorflow import keras
 
 from attacks.attack import Attack
 
-
+import art
 class ARTAttack(Attack):
     # Metoda statyczna służąca do unifikowania formatu danych wyjściowych
     # NOTE aktualnie nie zmienia nic, w przyszłości może znaleźc większe użycie
@@ -58,6 +59,12 @@ class ARTAttack(Attack):
                 raise Exception("PyTorch model needs input_shape, loss and nb_classes to conduct attack")
         elif isinstance(model, BinaryNeuralNetworkClassifier):
             self._classifier = model.get_sklearn_object()
+        elif isinstance(model, NeuralNetBinaryClassifier):
+            self._classifier = PyTorchClassifier(
+                model=model.module_,
+                **{key: self._classifier_params.get(key) for key in
+                                    ['loss', 'optimizer', 'input_shape', 'nb_classes', 'clip_values']}
+            )
         elif isinstance(model, sklearn.base.BaseEstimator):
             # todo adding optional parameters for sklearn model classifier
             self._classifier = SklearnClassifier(model=model)
