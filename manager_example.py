@@ -1,4 +1,5 @@
 import getpass
+import os
 
 from attack_manager import AttackManager
 
@@ -19,8 +20,12 @@ RUN_NAME = 'skam_search'
 DATA_ID = None #'997e79b1919a46fbb8d71bdafaf4a8ad'
 DATA_FILE_NAME = 'demo_dataset.csv'
 
-nc_user = input("NextCloud username:")
-nc_pass = getpass.getpass("NextCloud password:")
+# nc_user = input("NextCloud username:")
+# nc_pass = getpass.getpass("NextCloud password:")
+
+nc_user = os.environ['CLOUD_USERNAME']
+nc_pass = os.environ['CLOUD_PASSWORD']
+
 
 dl = DataLoader(
     ml_user='test', ml_pass='test',

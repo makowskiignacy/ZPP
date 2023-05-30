@@ -73,7 +73,7 @@ def simple_input(batchsize=4):
 
 def nn_input():
     CWD = os.getcwd()
-    SS_NN_RELATIVE_PATH = '../ss_nn/'
+    SS_NN_RELATIVE_PATH = 'ss_nn/'
     SS_NN_ABSOLUTE_PATH = os.path.join(CWD, SS_NN_RELATIVE_PATH)
     ss_nn_pipeline = mlflow.sklearn.load_model(SS_NN_ABSOLUTE_PATH)
     if ss_nn_pipeline is not None:

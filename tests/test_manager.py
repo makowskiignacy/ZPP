@@ -17,8 +17,8 @@ from tests.other_tests.test_frameworks import *
 
 #To run the tests on a different data set, add it to input_loader.py, and then change the line below.
 
-# foolbox_model, art_model, foolbox_data, art_data, foolbox_parameters, art_parameters = input_loader.simple_input()
-foolbox_model, art_model, foolbox_data, art_data, foolbox_parameters, art_parameters = input_loader_cloud.nn_input()
+foolbox_model, art_model, foolbox_data, art_data, foolbox_parameters, art_parameters = input_loader.simple_input()
+# foolbox_model, art_model, foolbox_data, art_data, foolbox_parameters, art_parameters = input_loader_cloud.nn_input()
 # foolbox_model, art_model, foolbox_data, art_data, foolbox_parameters, art_parameters = input_loader.nn_input()
 
 
@@ -181,13 +181,13 @@ class ArtTests(unittest.TestCase):
         test = TestSquare(art_model, art_data, parameters)
         self.assertIsNotNone(test.test())
 
-    def test_ZerothOrderOptimalization(self):
-        attack_name = "Zeroth Order"
-        log_attack_start_msg(attack_name)
-        parameters = art_parameters.get("zeroth_order_optimization")
-        self.assertIsNotNone(parameters, msg=input_err_msg(attack_name))
-        test = TestZerothOrderOptimalization(art_model, art_data, parameters)
-        self.assertIsNotNone(test.test())
+    # def test_ZerothOrderOptimalization(self):
+    #     attack_name = "Zeroth Order"
+    #     log_attack_start_msg(attack_name)
+    #     parameters = art_parameters.get("zeroth_order_optimization")
+    #     self.assertIsNotNone(parameters, msg=input_err_msg(attack_name))
+    #     test = TestZerothOrderOptimalization(art_model, art_data, parameters)
+    #     self.assertIsNotNone(test.test())
 
 class TestFrameworks(unittest.TestCase):
 

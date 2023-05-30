@@ -1,5 +1,5 @@
 ML_PLATFORM_USERNAME: str = 'test'
 ML_PLATFORM_PASSWORD: str = 'test'
 
-CLOUD_USERNAME: str = 
-CLOUD_PASSWORD: str = 
+# CLOUD_USERNAME: str = 
+# CLOUD_PASSWORD: str = 
