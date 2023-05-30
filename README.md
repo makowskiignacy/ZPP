@@ -30,12 +30,12 @@ python3 -m unittest discover
 W pliku `/utils/cloud_config.py` należy podać swój login oraz hasło, by umożliwić połączenie z zasobami NASK.
 
 ### Docker POC:
-Umieśccić plik `Internal_CBiTT_CA_.crt` w głównym katalogu.
-W pliku `.env` należy podać swój login oraz hasło w zmiennych 'CLOUD_USERNAME' i 'CLOUD_PASSWORD', by umożliwić połączenie z zasobami NASK oraz dodoać zmienną: `GIT_PYTHON_REFRESH=quiet`
+Umieścić plik `Internal_CBiTT_CA_.crt` w głównym katalogu.\
+W pliku `.env` należy podać swój login oraz hasło w zmiennych `CLOUD_USERNAME` i `CLOUD_PASSWORD`, by umożliwić połączenie z zasobami NASK oraz dodoać zmienną: `GIT_PYTHON_REFRESH=quiet`\
 
-Uruchomienie:
-`docker build -t <img_name>`
-`docker run --env-file=<env_file> <img_name>`
-to stop:
-`docker ps`
-`docker stop <container_id>
+Uruchomienie:\
+`docker build -t <img_name>`\
+`docker run --env-file=<env_file> <img_name>`\
+By zatrzymać:\
+`docker ps`\
+`docker stop <container_id>\
