@@ -1,5 +1,8 @@
 # ZPP
 
+### Licencjat - oglądanie
+https://www.overleaf.com/read/rjggzwdntjgm
+
 ### Trello
 https://trello.com/w/zpp58
 
