@@ -19,19 +19,10 @@ class GenericAdditiveNoise(FoolboxAttack, ABC):
         FoolboxAttack.__init__(self, parameters.generic_parameters)
 
 
-    def verify_bounds(self, data: Data):
-        if hasattr(self, 'min') and hasattr(self, 'max'):
-            return
-        
-        originals, _ = astensor(data.input)
-        self.min = originals.min().item()
-        self.max = originals.max().item()
-
-        return
-
 
     def conduct(self, model, data):
-        self.verify_bounds(data=data)
+        super().verify_bounds(data=data)
+        super().verify_epsilon()
         output = super().flatten_output(data)
         model_correct_format = super().reformat_model(model)
 

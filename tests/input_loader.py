@@ -3,6 +3,9 @@ import mlflow
 import numpy
 import pandas as pd
 import torch
+import timm
+import detectors
+import pickle
 
 import torchvision.models as tv_models
 import foolbox as fb
@@ -21,6 +24,80 @@ SS_NN_RELATIVE_PATH = 'ss_nn/'
 SS_NN_ABSOLUTE_PATH = os.path.join(CWD, SS_NN_RELATIVE_PATH)
 DATA_RELATIVE_PATH = 'data_test.csv'
 DATA_ABSOLUTE_PATH = os.path.join(CWD, DATA_RELATIVE_PATH)
+
+
+def resnet18_cifar100_input(batchsize = 100):
+    model = timm.create_model("resnet18_cifar100", pretrained=True)
+    foolbox_model = fb.models.pytorch.PyTorchModel(model, bounds=(-1, 256))
+    art_model = art.estimators.classification.pytorch.PyTorchClassifier(model=model, input_shape=(3, 32, 32), loss=nn.CrossEntropyLoss(), nb_classes=100)
+    art_criterion = nn.CrossEntropyLoss()
+    art_optimizer = optim.Adam(art_model._model.parameters(), lr=0.01)
+
+    cifar100_data_path = 'test_files/cifar100_testing_data'
+    with open(cifar100_data_path, 'rb') as file:
+        whole_data = pickle.load(file, encoding='latin1')
+    input_data = whole_data['data']
+    input_data = input_data.reshape(len(input_data), 3, 32, 32)
+    input_data = input_data[:batchsize, :, :, :]
+    output_data = numpy.array(whole_data['fine_labels'])
+    output_data = output_data[:batchsize]
+    foolbox_data = Data(torch.from_numpy(input_data).float(), torch.from_numpy(output_data).long())
+    art_data = Data(input_data, output_data)
+
+    classifier_parameters_default = {"clip_values": (-1, 256), "loss": art_criterion, "optimizer": art_optimizer, "input_shape": (3, 32, 32), "nb_classes": 100}
+    attack_parameters_default = {"verbose": True}
+    art_parameters_default = ARTParameters(classifier_parameters_default, attack_parameters_default)
+    attack_parameters_joker = {}
+    art_parameters_joker = ARTParameters(classifier_parameters_default, attack_parameters_joker)
+
+    art_parameters = {"deep_fool": art_parameters_default,
+                      "fast_gradient": art_parameters_default,
+                      "geometric_decision_based": art_parameters_default,
+                      "jacobian_saliency_map": art_parameters_default,
+                      "joker": art_parameters_joker,
+                      "shadow": art_parameters_default,
+                      "sign_opt": art_parameters_default,
+                      "square": art_parameters_default,
+                      "threshold": art_parameters_default,
+                      "zeroth_order_optimization": art_parameters_default}
+
+    generic_parameters_an = {"epsilon_rate": 0.01}
+    attack_specific_parameters_an = {}
+    foolbox_parameters_an = FoolboxParameters(attack_specific_parameters_an, generic_parameters_an)
+
+    generic_parameters_bb = {"epsilon_rate": 0.01}
+    attack_specific_parameters_bb = {"lr": 10, 'steps': 100}
+    foolbox_parameters_bb = FoolboxParameters(attack_specific_parameters_bb, generic_parameters_bb)
+
+    generic_parameters_bi = {"epsilon_rate": 0.05}
+    attack_specific_parameters_bi = {"steps": 10, "random_start": True}
+    foolbox_parameters_bi = FoolboxParameters(attack_specific_parameters_bi, generic_parameters_bi)
+
+    generic_parameters_cw = {"epsilon_rate": 0.01}
+    attack_specific_parameters_cw = {"steps": 100}
+    foolbox_parameters_cw = FoolboxParameters(attack_specific_parameters_cw, generic_parameters_cw)
+
+    generic_parameters_nf = {"epsilon_rate": 0.01}
+    attack_specific_parameters_nf = {"steps": 100, "stepsize": 100}
+    foolbox_parameters_nf = FoolboxParameters(attack_specific_parameters_nf, generic_parameters_nf)
+
+    generic_parameters_pgd = {"epsilon_rate": 0.01}
+    attack_specific_parameters_pgd = {"steps": 100, "random_start": True}
+    foolbox_parameters_pgd = FoolboxParameters(attack_specific_parameters_pgd, generic_parameters_pgd)
+
+    generic_parameters_sap = {"epsilon_rate": 0.01}
+    attack_specific_parameters_sap = {"steps": 10, "across_channels": True}
+    foolbox_parameters_sap = FoolboxParameters(attack_specific_parameters_sap, generic_parameters_sap)
+
+    foolbox_parameters = {"additive_noise": foolbox_parameters_an,
+                          "brendel_bethge": foolbox_parameters_bb,
+                          "basic_iterative": foolbox_parameters_bi,
+                          "carlini_wagner": foolbox_parameters_cw,
+                          "newton_fool": foolbox_parameters_nf,
+                          "projected_gradient_descent": foolbox_parameters_pgd,
+                          "salt_and_pepper": foolbox_parameters_sap}
+
+    return foolbox_model, model, foolbox_data, art_data, foolbox_parameters, art_parameters
 
 def simple_input(batchsize=4):
     model = tv_models.resnet18(pretrained=True).eval()

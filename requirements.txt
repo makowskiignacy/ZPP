@@ -19,6 +19,8 @@ numba==0.56.4
 
 # For tests:
 timeout-decorator==0.5.0
+timm
+detectors
 
 # To handle cloud databases:
 ./packages/mlplatformclient-0.0.10-py3-none-any.whl
