@@ -19,7 +19,7 @@ from tests.other_tests.test_frameworks import *
 
 # foolbox_model, art_model, foolbox_data, art_data, foolbox_parameters, art_parameters = input_loader.simple_input()
 # foolbox_model, art_model, foolbox_data, art_data, foolbox_parameters, art_parameters = input_loader.nn_input()
-foolbox_model, art_model, foolbox_data, art_data, foolbox_parameters, art_parameters = input_loader.resnet18_cifar100_input()
+foolbox_model, art_model, foolbox_data, art_data, foolbox_parameters, art_parameters = input_loader.resnet18_cifar100_input(batchsize = 32)
 
 class AFoolboxTests(unittest.TestCase):
 
