@@ -16,7 +16,7 @@ class DeepFool(ARTAttack):
         }
 
     def conduct(self, model, data):
-        self._set_classifier(model)
+        self._set_classifier(model, data)
         self._set_data(data)
 
         # __init__(classifier: CLASSIFIER_CLASS_LOSS_GRADIENTS_TYPE, max_iter: int = 100, epsilon: float = 1e-06,

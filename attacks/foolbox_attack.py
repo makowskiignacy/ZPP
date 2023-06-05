@@ -23,7 +23,6 @@ class FoolboxAttack(Attack):
         self.max = args.get("max")
         self.criterion = None
 
-
     def verify_bounds(self, data: Data):
         if self.min is not None and self.max is not None:
             return

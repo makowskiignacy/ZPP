@@ -1,6 +1,7 @@
 import abc
 
 import sklearn
+from eagerpy.astensor import astensor
 from skorch import NeuralNetBinaryClassifier
 import torch
 from art.estimators.classification \
@@ -36,12 +37,12 @@ class ARTAttack(Attack):
             'use_logits': params.get('use_logits', False)
         }
 
-
     def _set_data(self, data):
         # TODO dorzucić tu lub wyżej sprawdzanie poprawności danych
         self._data = data
 
-    def _set_classifier(self, model):
+    def _set_classifier(self, model, data):
+        self.verify_clip_values(data)
         if isinstance(model, keras.Model):
             # Setting classifier for Keras model, todo adding optional parameters
             self._classifier = KerasClassifier(
@@ -75,3 +76,9 @@ class ARTAttack(Attack):
     @abc.abstractmethod
     def conduct(self, model, data):
         raise NotImplementedError
+
+    def verify_clip_values(self, data):
+        if self._classifier_params.get('clip_values') is not None:
+            return
+        input_values = astensor(data.input)
+        self._classifier_params['clip_values'] = (input_values.min().item(), input_values.max().item())

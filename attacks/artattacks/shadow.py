@@ -44,7 +44,7 @@ class Shadow(ARTAttack):
         self.data_samples = []
 
     def conduct(self, model, data):
-        self._set_classifier(model)
+        self._set_classifier(model, data)
         self._set_data(data)
 
         if self._data.input.shape[0] > 1 or self._data.output.shape[0] > 1:

@@ -34,7 +34,7 @@ class FastGradient(ARTAttack):
 
 
     def conduct(self, model, data):
-        self._set_classifier(model)
+        self._set_classifier(model, data)
         self._set_data(data)
 
         # estimator – A trained classifier.

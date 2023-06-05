@@ -39,7 +39,7 @@ def resnet18_cifar100_input(batchsize = 100):
     foolbox_data = Data(torch.from_numpy(input_data).float(), torch.from_numpy(output_data).long())
     art_data = Data(input_data, output_data)
 
-    classifier_parameters_default = {"clip_values": (-1, 256), "loss": art_criterion, "optimizer": art_optimizer, "input_shape": (3, 32, 32), "nb_classes": 100}
+    classifier_parameters_default = {"loss": art_criterion, "optimizer": art_optimizer, "input_shape": (3, 32, 32), "nb_classes": 100}
     attack_parameters_default = {"verbose": True}
     art_parameters_default = ARTParameters(classifier_parameters_default, attack_parameters_default)
     attack_parameters_joker = {}

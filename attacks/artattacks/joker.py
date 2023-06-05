@@ -13,7 +13,7 @@ class Joker(ARTAttack):
         self._attack_params = parameters.attack_parameters
 
     def conduct(self, model, data):
-        self._set_classifier(model)
+        self._set_classifier(model, data)
         self._set_data(data)
 
         return self.to_unified_format(globals()[self.joker](estimator=self._classifier, **self._attack_params).generate(

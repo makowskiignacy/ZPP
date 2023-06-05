@@ -1,7 +1,7 @@
 import unittest
 from utils.logger import *
 
-from tests import input_loader_cloud, input_loader
+from tests import input_loader
 
 from tests.foolbox_tests.test_additive_noise import TestAdditiveNoise
 from tests.foolbox_tests.test_brendel_bethge import TestBrendelBethge
@@ -21,7 +21,7 @@ from tests.other_tests.test_frameworks import *
 # foolbox_model, art_model, foolbox_data, art_data, foolbox_parameters, art_parameters = input_loader.nn_input()
 foolbox_model, art_model, foolbox_data, art_data, foolbox_parameters, art_parameters = input_loader.resnet18_cifar100_input(batchsize = 32)
 
-class AFoolboxTests(unittest.TestCase):
+class FoolboxTests(unittest.TestCase):
 
     def test_AdditiveNoise(self):
         attack_name = "Additive Noise"
@@ -108,7 +108,7 @@ class ArtTests(unittest.TestCase):
         test = TestClassHierarchyArt()
         self.assertEqual(test.test_class_hierarchy(), [True, True, True])
 
-    def dtest_DeepFool(self):
+    def test_DeepFool(self):
         attack_name = "Deep Fool"
         log_attack_start_msg(attack_name)
         parameters = art_parameters.get("deep_fool")

@@ -40,7 +40,7 @@ class Square(ARTAttack):
     # Ten atak ma tylko postać 'celowaną' to znaczy, że podane wartości
     # data.output są traktowane jako docelowe odpowiedzi modelu
     def conduct(self, model, data):
-        self._set_classifier(model)
+        self._set_classifier(model, data)
         self._set_data(data)
 
         return Square.to_unified_format(

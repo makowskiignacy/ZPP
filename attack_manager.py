@@ -80,8 +80,6 @@ class AttackManager:
     @staticmethod
     def get_possible_attacks():
         return {
-            # możliwe, że elementami będą pary (klasa, procedura sprawdzająca)
-
             "Adversarial Patch"         : AttackListEntry(AdversarialPatch, AttackManager.art_parameters_default),
             "DeepFool"                  : AttackListEntry(DeepFool, AttackManager.art_parameters_default),
             "FastGradient"              : AttackListEntry(FastGradient, AttackManager.art_parameters_default),
