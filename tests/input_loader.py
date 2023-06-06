@@ -1,5 +1,9 @@
+import copy
 import csv
 import getpass
+import copy
+
+from tensorflow import keras
 import mlflow
 import os
 import numpy
@@ -23,8 +27,8 @@ from utils.dataloader import DataLoader
 
 def resnet18_cifar100_input(batchsize = 100):
     model = timm.create_model("resnet18_cifar100", pretrained=True)
-    foolbox_model = fb.models.pytorch.PyTorchModel(model, bounds=(-1, 256))
-    art_model = art.estimators.classification.pytorch.PyTorchClassifier(model=model, input_shape=(3, 32, 32), loss=nn.CrossEntropyLoss(), nb_classes=100)
+    foolbox_model = fb.models.pytorch.PyTorchModel(model=model, bounds=(-1, 256))
+    art_model = art.estimators.classification.pytorch.PyTorchClassifier(model=model, clip_values=(-1, 256), input_shape=(3, 32, 32), loss=nn.CrossEntropyLoss(), nb_classes=100)
     art_criterion = nn.CrossEntropyLoss()
     art_optimizer = optim.Adam(art_model._model.parameters(), lr=0.01)
 
@@ -38,8 +42,14 @@ def resnet18_cifar100_input(batchsize = 100):
     output_data = output_data[:batchsize]
     foolbox_data = Data(torch.from_numpy(input_data).float(), torch.from_numpy(output_data).long())
     art_data = Data(input_data, output_data)
+    classifier_parameters_default = {"clip_values": (-1, 256), "loss": art_criterion, "optimizer": art_optimizer, "input_shape": (3, 32, 32), "nb_classes": 100}
 
-    classifier_parameters_default = {"loss": art_criterion, "optimizer": art_optimizer, "input_shape": (3, 32, 32), "nb_classes": 100}
+    predictions = art_model.predict(input_data, training_mode=True)
+    strongest_prediction = numpy.argmax(predictions, axis=1)
+    correct = numpy.sum(strongest_prediction == output_data)
+    accuracy = correct / len(output_data)
+    print(accuracy)
+
     attack_parameters_default = {"verbose": True}
     art_parameters_default = ARTParameters(classifier_parameters_default, attack_parameters_default)
     attack_parameters_joker = {}
@@ -92,7 +102,7 @@ def resnet18_cifar100_input(batchsize = 100):
 
 
 def simple_input(batchsize=4):
-    model = tv_models.resnet18(pretrained=True).eval()
+    model = tv_models.resnet18(pretrained=True)
     preprocessing = dict(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], axis=-3)
     foolbox_model = fb.models.pytorch.PyTorchModel(model, bounds=(0, 1), preprocessing=preprocessing)
 
@@ -103,6 +113,13 @@ def simple_input(batchsize=4):
                                                                         loss=nn.CrossEntropyLoss(),
                                                                         nb_classes=(art_data.output.max() - min(0,
                                                                                                                 art_data.output.min()) + 1))
+
+    predictions = art_model.predict(images.numpy(), training_mode=True)
+    strongest_prediction = numpy.argmax(predictions, axis=1)
+    correct = numpy.sum(strongest_prediction == labels.numpy())
+    accuracy = correct / len(labels.numpy())
+    print(accuracy)
+
     art_criterion = nn.CrossEntropyLoss()
     art_optimizer = optim.Adam(art_model._model.parameters(), lr=0.01)
 

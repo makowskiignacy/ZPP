@@ -12,6 +12,7 @@ from attacks.helpers.data import Data
 from eagerpy.astensor import astensor
 from utils.logger import test_logger
 
+
 class FoolboxAttack(Attack):
 
     def __init__(self, args):
@@ -72,5 +73,9 @@ class FoolboxAttack(Attack):
     def conduct(self, model, data):
         pass
 
-
+    def accuracy(self, model, input, output):
+        if isinstance(model, PyTorchModel):
+            return accuracy(model, input, output)
+        else:
+            return "No accuracy measure for this type of model"
 

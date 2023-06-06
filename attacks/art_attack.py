@@ -1,5 +1,5 @@
 import abc
-
+import numpy
 import sklearn
 from eagerpy.astensor import astensor
 from skorch import NeuralNetBinaryClassifier
@@ -13,6 +13,10 @@ from tensorflow import keras
 from attacks.attack import Attack
 
 import art
+
+from attacks.helpers.data import Data
+
+
 class ARTAttack(Attack):
     # Metoda statyczna służąca do unifikowania formatu danych wyjściowych
     # NOTE aktualnie nie zmienia nic, w przyszłości może znaleźc większe użycie
@@ -36,6 +40,8 @@ class ARTAttack(Attack):
             'clip_values': params.get('clip_values'),
             'use_logits': params.get('use_logits', False)
         }
+
+        self._classifier = None
 
     def _set_data(self, data):
         # TODO dorzucić tu lub wyżej sprawdzanie poprawności danych
@@ -82,3 +88,16 @@ class ARTAttack(Attack):
             return
         input_values = astensor(data.input)
         self._classifier_params['clip_values'] = (input_values.min().item(), input_values.max().item())
+
+    def accuracy(self, model, input_data, output):
+        input_temp = input_data.copy()
+        output_temp = output.copy()
+        if not self._classifier:
+            self._set_classifier(model, Data(input_temp, output_temp))
+
+        self._classifier.model.train()
+        predictions = self._classifier.predict(input_temp, training_mode=True)
+        strongest_prediction = numpy.argmax(predictions, axis=1)
+        correct = numpy.sum(strongest_prediction == output_temp)
+        accuracy = correct / len(output_temp)
+        return accuracy
