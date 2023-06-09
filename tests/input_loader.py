@@ -4,6 +4,7 @@ import getpass
 import copy
 
 from tensorflow import keras
+import tensorflow
 import mlflow
 import os
 import numpy
@@ -17,6 +18,8 @@ import torchvision.models as tv_models
 import foolbox as fb
 import art
 from torch import nn, optim
+from datasets import load_dataset
+from huggingface_hub import from_pretrained_keras
 
 from attacks.helpers.data import Data
 from attacks.helpers.parameters import FoolboxParameters, ARTParameters
@@ -25,35 +28,26 @@ from utils.config import SS_INPUT_ROWS
 from utils.dataloader import DataLoader
 
 
-def resnet18_cifar100_input(batchsize = 100):
-    model = timm.create_model("resnet18_cifar100", pretrained=True)
-    foolbox_model = fb.models.pytorch.PyTorchModel(model=model, bounds=(-1, 256))
-    art_model = art.estimators.classification.pytorch.PyTorchClassifier(model=model, clip_values=(-1, 256), input_shape=(3, 32, 32), loss=nn.CrossEntropyLoss(), nb_classes=100)
-    art_criterion = nn.CrossEntropyLoss()
-    art_optimizer = optim.Adam(art_model._model.parameters(), lr=0.01)
+def cifar10_small_keras_model(batchsize = 100):
+    model = keras.models.load_model('test_models/cifar10_keras.h5')
+    foolbox_model = None
+    art_model = art.estimators.classification.keras.KerasClassifier(model=model, clip_values=(-1, 256))
+    art_criterion = keras.losses.CategoricalCrossentropy()
 
-    cifar100_data_path = 'test_files/cifar100_testing_data'
-    with open(cifar100_data_path, 'rb') as file:
-        whole_data = pickle.load(file, encoding='latin1')
-    input_data = whole_data['data']
-    input_data = input_data.reshape(len(input_data), 3, 32, 32)
-    input_data = input_data[:batchsize, :, :, :]
-    output_data = numpy.array(whole_data['fine_labels'])
-    output_data = output_data[:batchsize]
-    foolbox_data = Data(torch.from_numpy(input_data).float(), torch.from_numpy(output_data).long())
+    (_, _), (test_input, test_output) = keras.datasets.cifar10.load_data()
+    input_data = test_input[:batchsize, :, :, :].astype(numpy.float32)
+    output_data = test_output[:batchsize, 0]
+    foolbox_data = None
     art_data = Data(input_data, output_data)
-    classifier_parameters_default = {"clip_values": (-1, 256), "loss": art_criterion, "optimizer": art_optimizer, "input_shape": (3, 32, 32), "nb_classes": 100}
-
-    predictions = art_model.predict(input_data, training_mode=True)
-    strongest_prediction = numpy.argmax(predictions, axis=1)
-    correct = numpy.sum(strongest_prediction == output_data)
-    accuracy = correct / len(output_data)
-    print(accuracy)
+    classifier_parameters_default = {"clip_values": (-1, 256), "loss": art_criterion,
+                                     "input_shape": (32, 32, 3), "nb_classes": 10, "use_logits": False}
 
     attack_parameters_default = {"verbose": True}
     art_parameters_default = ARTParameters(classifier_parameters_default, attack_parameters_default)
     attack_parameters_joker = {}
     art_parameters_joker = ARTParameters(classifier_parameters_default, attack_parameters_joker)
+    attack_parameters_threshold = {"th": 10}
+    art_parameters_threshold = ARTParameters(classifier_parameters_default, attack_parameters_threshold)
 
     art_parameters = {"deep_fool": art_parameters_default,
                       "fast_gradient": art_parameters_default,
@@ -63,7 +57,46 @@ def resnet18_cifar100_input(batchsize = 100):
                       "shadow": art_parameters_default,
                       "sign_opt": art_parameters_default,
                       "square": art_parameters_default,
-                      "threshold": art_parameters_default,
+                      "threshold": art_parameters_threshold,
+                      "zeroth_order_optimization": art_parameters_default}
+
+    foolbox_parameters = None
+
+    return foolbox_model, model, foolbox_data, art_data, foolbox_parameters, art_parameters
+
+
+def resnet18_cifar100_input(batchsize = 100):
+    model = timm.create_model("resnet18_cifar100", pretrained=True)
+    foolbox_model = fb.models.pytorch.PyTorchModel(model=model, bounds=(-1, 256))
+    art_model = art.estimators.classification.pytorch.PyTorchClassifier(model=model, clip_values=(-1, 256), input_shape=(3, 32, 32), loss=nn.CrossEntropyLoss(), nb_classes=100)
+    art_criterion = nn.CrossEntropyLoss()
+    art_optimizer = optim.Adam(art_model._model.parameters(), lr=0.01)
+
+    (_, _), (test_input, test_output) = keras.datasets.cifar100.load_data()
+    input_data = test_input[:batchsize, :, :, :].astype(numpy.float32)
+    output_data = test_output[:batchsize, 0]
+    input_data = numpy.transpose(input_data, (0, 3, 1, 2))
+
+    foolbox_data = Data(torch.from_numpy(input_data).float(), torch.from_numpy(output_data).long())
+    art_data = Data(input_data, output_data)
+    classifier_parameters_default = {"clip_values": (-1, 256), "loss": art_criterion, "optimizer": art_optimizer, "input_shape": (3, 32, 32), "nb_classes": 100}
+
+    attack_parameters_default = {"verbose": True}
+    art_parameters_default = ARTParameters(classifier_parameters_default, attack_parameters_default)
+    attack_parameters_joker = {}
+    art_parameters_joker = ARTParameters(classifier_parameters_default, attack_parameters_joker)
+    attack_parameters_threshold = {"th": 10}
+    art_parameters_threshold = ARTParameters(classifier_parameters_default, attack_parameters_threshold)
+
+    art_parameters = {"deep_fool": art_parameters_default,
+                      "fast_gradient": art_parameters_default,
+                      "geometric_decision_based": art_parameters_default,
+                      "jacobian_saliency_map": art_parameters_default,
+                      "joker": art_parameters_joker,
+                      "shadow": art_parameters_default,
+                      "sign_opt": art_parameters_default,
+                      "square": art_parameters_default,
+                      "threshold": art_parameters_threshold,
                       "zeroth_order_optimization": art_parameters_default}
 
     generic_parameters_default = {"epsilon_rate": 0.01}
@@ -183,7 +216,7 @@ def simple_input(batchsize=4):
 
 
 def nn_input():
-    if os.path.exists("../ss_nn/"):
+    if os.path.exists("test_models/ss_nn/"):
         ss_nn_pipeline = mlflow.sklearn.load_model("../ss_nn/")
     else:
         test_logger.error("Can't find model directory.")

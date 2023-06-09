@@ -73,9 +73,9 @@ class FoolboxAttack(Attack):
     def conduct(self, model, data):
         pass
 
-    def accuracy(self, model, input, output):
+    def accuracy(self, model, input_data, output):
         if isinstance(model, PyTorchModel):
-            return accuracy(model, input, output)
+            return accuracy(model, input_data, output)
         else:
             return "No accuracy measure for this type of model"
 

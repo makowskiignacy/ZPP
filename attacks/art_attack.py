@@ -95,8 +95,10 @@ class ARTAttack(Attack):
         if not self._classifier:
             self._set_classifier(model, Data(input_temp, output_temp))
 
-        self._classifier.model.train()
-        predictions = self._classifier.predict(input_temp, training_mode=True)
+        if isinstance(self._classifier, PyTorchClassifier):
+            predictions = self._classifier.predict(input_temp, training_mode=True)
+        elif isinstance(self._classifier, KerasClassifier):
+            predictions = self._classifier._model.predict(input_data)
         strongest_prediction = numpy.argmax(predictions, axis=1)
         correct = numpy.sum(strongest_prediction == output_temp)
         accuracy = correct / len(output_temp)
