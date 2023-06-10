@@ -32,7 +32,7 @@ def resnet18_cifar100_input(batchsize = 100):
     art_criterion = nn.CrossEntropyLoss()
     art_optimizer = optim.Adam(art_model._model.parameters(), lr=0.01)
 
-    cifar100_data_path = 'test_files/cifar100_testing_data'
+    cifar100_data_path = 'tests/test_files/cifar100_testing_data'
     with open(cifar100_data_path, 'rb') as file:
         whole_data = pickle.load(file, encoding='latin1')
     input_data = whole_data['data']
