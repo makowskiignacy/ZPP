@@ -1,6 +1,7 @@
 import abc
-
+import numpy
 import sklearn
+from eagerpy.astensor import astensor
 from skorch import NeuralNetBinaryClassifier
 import torch
 from art.estimators.classification \
@@ -12,6 +13,10 @@ from tensorflow import keras
 from attacks.attack import Attack
 
 import art
+
+from attacks.helpers.data import Data
+
+
 class ARTAttack(Attack):
     # Metoda statyczna służąca do unifikowania formatu danych wyjściowych
     # NOTE aktualnie nie zmienia nic, w przyszłości może znaleźc większe użycie
@@ -36,12 +41,14 @@ class ARTAttack(Attack):
             'use_logits': params.get('use_logits', False)
         }
 
+        self._classifier = None
 
     def _set_data(self, data):
         # TODO dorzucić tu lub wyżej sprawdzanie poprawności danych
         self._data = data
 
-    def _set_classifier(self, model):
+    def _set_classifier(self, model, data):
+        self.verify_clip_values(data)
         if isinstance(model, keras.Model):
             # Setting classifier for Keras model, todo adding optional parameters
             self._classifier = KerasClassifier(
@@ -75,3 +82,24 @@ class ARTAttack(Attack):
     @abc.abstractmethod
     def conduct(self, model, data):
         raise NotImplementedError
+
+    def verify_clip_values(self, data):
+        if self._classifier_params.get('clip_values') is not None:
+            return
+        input_values = astensor(data.input)
+        self._classifier_params['clip_values'] = (input_values.min().item(), input_values.max().item())
+
+    def accuracy(self, model, input_data, output):
+        input_temp = input_data.copy()
+        output_temp = output.copy()
+        if not self._classifier:
+            self._set_classifier(model, Data(input_temp, output_temp))
+
+        if isinstance(self._classifier, PyTorchClassifier):
+            predictions = self._classifier.predict(input_temp, training_mode=True)
+        elif isinstance(self._classifier, KerasClassifier):
+            predictions = self._classifier._model.predict(input_data)
+        strongest_prediction = numpy.argmax(predictions, axis=1)
+        correct = numpy.sum(strongest_prediction == output_temp)
+        accuracy = correct / len(output_temp)
+        return accuracy

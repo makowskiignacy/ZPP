@@ -19,19 +19,10 @@ class GenericAdditiveNoise(FoolboxAttack, ABC):
         FoolboxAttack.__init__(self, parameters.generic_parameters)
 
 
-    def verify_bounds(self, data: Data):
-        if hasattr(self, 'min') and hasattr(self, 'max'):
-            return
-        
-        originals, _ = astensor(data.input)
-        self.min = originals.min().item()
-        self.max = originals.max().item()
-
-        return
-
 
     def conduct(self, model, data):
-        self.verify_bounds(data=data)
+        super().verify_bounds(data=data)
+        super().verify_epsilon()
         output = super().flatten_output(data)
         model_correct_format = super().reformat_model(model)
 
@@ -65,11 +56,6 @@ class L2ClippingAwareAdditiveUniformNoise(L2ClippingAwareAdditiveUniformNoiseAtt
         GenericAdditiveNoise.__init__(self, L2ClippingAwareAdditiveUniformNoiseAttack, parameters)
 
 
-class LinfAdditiveUniformNoise(LinfAdditiveUniformNoiseAttack, GenericAdditiveNoise):
-    def __init__(self, parameters):
-        GenericAdditiveNoise.__init__(self, LinfAdditiveUniformNoiseAttack, parameters)
-
-
 class L2RepeatedAdditiveGaussianNoise(L2RepeatedAdditiveGaussianNoiseAttack, GenericAdditiveNoise):
     def __init__(self, parameters):
         GenericAdditiveNoise.__init__(self, L2RepeatedAdditiveGaussianNoiseAttack, parameters)
@@ -88,6 +74,11 @@ class L2ClippingAwareRepeatedAdditiveGaussianNoise(L2ClippingAwareRepeatedAdditi
 class L2ClippingAwareRepeatedAdditiveUniformNoise(L2ClippingAwareRepeatedAdditiveUniformNoiseAttack, GenericAdditiveNoise):
     def __init__(self, parameters):
         GenericAdditiveNoise.__init__(self, L2ClippingAwareRepeatedAdditiveUniformNoiseAttack, parameters)
+
+
+class LinfAdditiveUniformNoise(LinfAdditiveUniformNoiseAttack, GenericAdditiveNoise):
+    def __init__(self, parameters):
+        GenericAdditiveNoise.__init__(self, LinfAdditiveUniformNoiseAttack, parameters)
 
 
 class LinfRepeatedAdditiveUniformNoise(LinfRepeatedAdditiveUniformNoiseAttack, GenericAdditiveNoise):

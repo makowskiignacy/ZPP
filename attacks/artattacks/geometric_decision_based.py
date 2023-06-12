@@ -47,7 +47,7 @@ class GeometricDecisionBased(ARTAttack):
                 self._attack_params[key] = parameters.attack_parameters[key]
 
     def conduct(self, model, data):
-        self._set_classifier(model)
+        self._set_classifier(model, data)
         self._set_data(data)
 
         return GeometricDecisionBased.to_unified_format(

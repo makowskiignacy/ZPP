@@ -107,6 +107,6 @@ class AdversarialPatch(ARTAttack):
         return self._attack.generate(x=x, y=y, **kwargs)
 
     def conduct(self, model, data):
-        self._set_classifier(model)
+        self._set_classifier(model, data)
         self.attack = AdversarialPatch(**self._attack_params)
         return super().conduct(model, data)

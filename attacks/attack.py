@@ -1,4 +1,5 @@
 from foolbox.models.pytorch import PyTorchModel
+from art.estimators.classification import PyTorchClassifier
 import time
 from attacks.helpers.data import Data
 from foolbox.utils import accuracy
@@ -30,13 +31,17 @@ class Attack(ABC):
     def conduct(self, model, data):
         raise NotImplementedError
 
+    @abc.abstractmethod
+    def accuracy(self, model, input, output):
+        raise NotImplementedError
+
 
 def run_attack(attack: Attack, model, data: Data):
     time_start = time.time()
 
     # logger.info(type(model))
-    if isinstance(model, PyTorchModel):
-        test_logger.info(f"Model accuracy before attack: {accuracy(model, data.input, data.output)}")
+    test_logger.info(f"Model accuracy before attack: {attack.accuracy(model, data.input, data.output)}")
+
     test_logger.info(f"Starting attack. ({time.asctime(time.localtime(time_start))})")
 
     adversarials = attack.conduct(model, data)
@@ -45,10 +50,8 @@ def run_attack(attack: Attack, model, data: Data):
     test_logger.info(f"Attack done. ({time.asctime(time.localtime(time_end))})")
     test_logger.info(f"Took {time_end - time_start}")
 
-    if adversarials is not None and isinstance(model, PyTorchModel):
-        test_logger.info(f"Model accuracy after attack: {accuracy(model, adversarials, data.output)}")
-    elif not isinstance(model, PyTorchModel):
-        test_logger.info(f"No accuracy measure for non-PyTorch models?")
+    if adversarials is not None:
+        test_logger.info(f"Model accuracy after attack: {attack.accuracy(model, adversarials, data.output)}")
     else:
         test_logger.info(f"Attack not successfull, adversarials:\n{adversarials}")
     test_logger.info("\n")

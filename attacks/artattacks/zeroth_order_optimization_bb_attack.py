@@ -39,7 +39,7 @@ class ZerothOrderOptimalization(ARTAttack):
 
     def conduct(self, model, data):
         # Ustawiamy atakowany model
-        self._set_classifier(model)
+        self._set_classifier(model, data)
         # Ustawiamy atakowany zbiór
         self._set_data(data)
 

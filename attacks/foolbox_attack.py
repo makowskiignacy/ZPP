@@ -12,6 +12,7 @@ from attacks.helpers.data import Data
 from eagerpy.astensor import astensor
 from utils.logger import test_logger
 
+
 class FoolboxAttack(Attack):
 
     def __init__(self, args):
@@ -22,7 +23,6 @@ class FoolboxAttack(Attack):
         self.min = args.get("min")
         self.max = args.get("max")
         self.criterion = None
-
 
     def verify_bounds(self, data: Data):
         if self.min is not None and self.max is not None:
@@ -73,5 +73,9 @@ class FoolboxAttack(Attack):
     def conduct(self, model, data):
         pass
 
-
+    def accuracy(self, model, input_data, output):
+        if isinstance(model, PyTorchModel):
+            return accuracy(model, input_data, output)
+        else:
+            return "No accuracy measure for this type of model"
 
