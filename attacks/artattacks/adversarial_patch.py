@@ -9,7 +9,42 @@ import numpy as np
 from utils.logger import test_logger
 
 class AdversarialPatch(ARTAttack):
+    '''
+    Klasa otaczająca atak AdversarialPatch z biblioteki ART.
+    Link do pracy - https://arxiv.org/abs/1712.09665
+    '''
     def __init__(self, parameters):
+        '''
+        Inicjalizuje atak AdversarialPatch na podstawie zadanych parametrów.
+        
+        Możliwe parametry ataku
+        -----------------------
+        rotation_max (float)
+            Maksymalny obrót aplikowany do losowych fragmentów (patch).
+            Oczekiwana jest wartość z przediału [0,180].
+        scale_min (float)
+            Minimalne skalowanie przykładane do losowych fragmentów.
+            Wartość powinna być z zakresu [0, 1] oraz mniejsza niż 'scale_max'.
+        scale_max (float)
+            Analogiczne jak w przypadku scale_min.
+        learning_rate (float)
+            Wpółczynnik uczenia optymalizacji.
+        max_iter (int)
+            Maksymalna liczba iteracji algorytmu.
+        batch_size (int)
+            Rozmiar próbki do jednorazowego treningu.
+        patch_shape 
+            Kształt fragmentu wyrażony krotką kształtów.
+            Aktualnie wspierany jedynie dla klasyfikatora klasy
+            TensorFlowV2Classifier. Dla pozostałych kształ ustawiany jest na
+            kształt wejściowych próbek.
+        targeted (bool)
+            Czy atak ma starać się utworzyć przykłady kontradyktoryjne, tak
+            aby odpowiedzi modelu dla zadanych przykładów były
+            zgodne z wartościami przekazanymi w kolumnie odpowiedzi danych.
+        verbose (bool)
+            Czy atak ma wypisywać informacje diagnostyczne o swoim przebiegu
+        '''
         super().__init__(parameters.classifier_parameters)
         self.attack = None
         self._attack_params = {

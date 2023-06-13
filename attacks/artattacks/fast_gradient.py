@@ -9,7 +9,37 @@ from attacks.art_attack import ARTAttack
 
 
 class FastGradient(ARTAttack):
+    '''
+    Klasa otaczająca atak Fast Gradient Method z biblioteki ART.
+    Link do pracy - https://arxiv.org/abs/1412.6572
+    '''
     def __init__(self, parameters):
+        '''
+        Inicjalizuje atak Fast Gradient Method na podstawie zadanych parametrów.
+        
+        Możliwe parametry ataku
+        -----------------------
+        norm
+            Norma w której obliczane są wielkości perturbacji zaburzonych próbek.
+            Wartość ze zbioru {1,2,"inf",np.inf}
+        eps –
+            Wielkość pojedynczego kroku
+        eps_step
+            Wielkość kroku wejściowej wariacji dla obliczenia minimalnego zaburzenia.
+        targeted : bool
+            Czy atak ma starać się utworzyć przykłady kontradyktoryjne, tak
+            aby odpowiedzi modelu dla zadanych przykładów były
+            zgodne z wartościami przekazanymi w kolumnie odpowiedzi danych?
+        num_random_init : int
+            Liczba losowych inicjalizacji wewnątrz epsilonowej kuli naokoło
+            próbki.
+        batch_size : int
+            Rozmiar próbki do jednorazowego treningu.
+        minimal : bool
+            Czy obliczać minimalne zaburzenie?
+        summary_writer : bool | SummaryWriter
+            Aktywuje funkcjonalność SummaryWriter modułu TensorBoard.
+        '''
         # Initialization of the arguments needed for the classifier
         super().__init__(parameters.classifier_parameters)
 

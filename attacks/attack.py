@@ -14,9 +14,15 @@ from utils.logger import test_logger
 # *Abstrakcyjna* klasa będąca uogólnionym atakiem, którym można zaatakować
 # wybrany model o określonym zbiorze danych wejściowych
 class Attack(ABC):
+    '''
+    Klasa abstrakcyjna ogólnego ataku typu Evasion (kontradyktoryjnego).
+    '''
     # Tworzy obiekt ataku ustawiając jego podstawowe parametry
     @abc.abstractmethod
     def __init__(self):
+        '''
+        Inicjacja pól klasy abstrakcyjnej.
+        '''
         # Definiujemy zmienne obiektu, jakich będziemy używać
         self._model = None
         self._data = None
@@ -29,10 +35,38 @@ class Attack(ABC):
     # oraz danych wejściowych
     @abc.abstractmethod
     def conduct(self, model, data):
+        '''
+        Przeprowadza atak na danym modelu i konkretnych danych.
+
+        Parametry
+        ---------
+        model
+            Atakowany model uczenia maszynowego
+        data
+            Dane, dla których zostanie przeprowadzony atak
+        '''
         raise NotImplementedError
 
     @abc.abstractmethod
     def accuracy(self, model, input, output):
+        '''
+        Oblicza skuteczność modelu dla zadanych danych danych wejściowych 
+        i prawidłowych odpowiedzi, jako ułamek poprawnych odpowiedzi.
+
+        Parametry
+        ---------
+        model
+            Sprawdzany model uczenia maszynowego.
+        input
+            Dane wejściowe.
+        output
+            Odpowiadające danym wejściowym poprawne odpowiedzi.
+        
+        Wyjście
+        -------
+        Liczba opisująca ułamek jaki stanowią poprawne odpowiedzi modelu
+        względem wszystkich odpowiedzi.
+        '''
         raise NotImplementedError
 
 

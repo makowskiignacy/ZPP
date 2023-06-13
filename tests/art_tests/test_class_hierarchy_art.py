@@ -2,16 +2,17 @@
 
 import unittest
 
-from attacks.attack import Attack
+
 
 from attacks.art_attack import ARTAttack
+from attacks.attack import Attack
 
 from attacks.artattacks.zeroth_order_optimization_bb_attack\
     import ZerothOrderOptimalization as ZOOAttack
 from attacks.helpers.parameters import ARTParameters
 from utils.logger import test_logger
 
-class TestClassHierarchyArt:
+class TestClassHierarchyArt(unittest.TestCase):
     def test_class_hierarchy(self):
         # # Nie powinno być możliwości utworzenia obiektu klasy abstrakcyjnej
         assertion_vars = []

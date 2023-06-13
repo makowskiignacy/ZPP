@@ -18,10 +18,28 @@ from attacks.helpers.data import Data
 
 
 class ARTAttack(Attack):
+    '''
+    Klasa abstrakcyjna Ataku dla ataków zaimplementowanych w bibliotece
+    Adversarial Robustness Toolbox.
+    '''
     # Metoda statyczna służąca do unifikowania formatu danych wyjściowych
-    # NOTE aktualnie nie zmienia nic, w przyszłości może znaleźc większe użycie
+    # NOTE aktualnie nie zmienia nic, w przyszłości może znaleźć większe użycie
     @staticmethod
     def to_unified_format(data_from_attack):
+        '''
+        Metoda unifikująca dane wyjściowe ataku z odgórnie ustalonym formatem
+        danych.
+
+        Parametry
+        ---------
+        data_from_attack
+            Dane otrzymane po przeprowadzeniu ataku.
+        
+        Wyjście
+        -------
+            Dane otrzymane po przeprowadzeniu ataku w zunifikowanym formacie,
+            gotowe do dalszej obróbki.
+        '''
         # Not implemented yet
         return data_from_attack
 
@@ -48,7 +66,7 @@ class ARTAttack(Attack):
         self._data = data
 
     def _set_classifier(self, model, data):
-        self.verify_clip_values(data)
+        self._verify_clip_values(data)
         if isinstance(model, keras.Model):
             # Setting classifier for Keras model, todo adding optional parameters
             self._classifier = KerasClassifier(
@@ -83,7 +101,7 @@ class ARTAttack(Attack):
     def conduct(self, model, data):
         raise NotImplementedError
 
-    def verify_clip_values(self, data):
+    def _verify_clip_values(self, data):
         if self._classifier_params.get('clip_values') is not None:
             return
         input_values = astensor(data.input)

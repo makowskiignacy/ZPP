@@ -4,7 +4,26 @@ from attacks.art_attack import ARTAttack
 
 
 class DeepFool(ARTAttack):
+    '''
+    Klasa otaczająca atak DeepFool z biblioteki ART.
+    Link do pracy - https://arxiv.org/abs/1511.04599
+    '''
     def __init__(self, parameters):
+        '''
+        Inicjalizuje atak DeepFool na podstawie zadanych parametrów
+        
+        Możliwe parametry ataku
+        -----------------------
+        max_iter : int
+            Maksymalna liczba iteracji algorytmu.
+        epsilon : float
+            Parametr przestrzelenia (overshoot).
+        nb_grads : int
+            Liczba klas względem, których ma być liczony wektor gradientu.
+            Mniejsza liczba przyśpiesza obliczenia.
+        verbose : bool
+            Czy atak ma wypisywać informacje diagnostyczne o swoim przebiegu
+        '''
         # Initialization of the arguments needed for the classifier
         super().__init__(parameters.classifier_parameters)
 
