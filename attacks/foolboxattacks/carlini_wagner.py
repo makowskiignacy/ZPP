@@ -17,10 +17,28 @@ class L2CarliniWagner(L2CarliniWagnerAttack, FoolboxAttack):
         output = super().flatten_output(data)
         model_correct_format = super().reformat_model(model)
 
+        import torch
+        # output = torch.zeros(100)
+        for el in output:
+            el.append(el[0])
+        output = torch.tensor(output, requires_grad=False, dtype=torch.long)
+        # output = torch.reshape(output, (100, 1))
+        # output = torch.cat((output, output), 1)
+        from utils.logger import test_logger
+
         if self.criterion_type == "targeted_misclassification":
+            test_logger.debug(f"L2CarliniWagner - targeted")
             self.criterion = TargetedMisclassification(output)
-        if self.criterion_type == "misclassification":
+        elif self.criterion_type == "misclassification":
+            test_logger.debug(f"L2CarliniWagner - NOT targeted - misclassification")
             self.criterion = Misclassification(output)
+        else:
+            test_logger.error("unknown classification")
+            exit(1)
+
+        import eagerpy as ep
+        x = ep.astensor(data.input)
+        test_logger.debug(f"L2CarliniWagner - {output.shape} {self.criterion.labels} {data.input}, {x}, {x.shape}")
 
         result = super().run(model=model_correct_format, inputs=data.input, criterion=self.criterion)
 
