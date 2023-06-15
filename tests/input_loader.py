@@ -13,11 +13,15 @@ import timm
 import detectors
 import pickle
 
+import eagerpy as ep
 import torchvision.models as tv_models
 import foolbox as fb
 import art
 import art.estimators.classification.pytorch # TODO remove 
-from torch import nn, optim
+from torch import Tensor, nn, optim
+from foolbox.models.base import Model
+from typing import Callable
+from foolbox.attacks.gradient_descent_base import BaseGradientDescent
 
 from attacks.helpers.data import Data
 from attacks.helpers.parameters import FoolboxParameters, ARTParameters
@@ -184,10 +188,10 @@ def simple_input(batchsize=4):
     return foolbox_model, model, foolbox_data, art_data, foolbox_parameters, art_parameters
 
 
-import eagerpy as ep
-from foolbox.models.base import Model
-from typing import Callable
-from foolbox.attacks.gradient_descent_base import BaseGradientDescent
+def is_binary_model(targets: Tensor):
+    assert len(targets.shape) == 2
+    return targets.shape[1] == 1
+
 
 def custom_get_loss_fn(
         self, model: Model, labels: ep.Tensor
@@ -199,17 +203,15 @@ def custom_get_loss_fn(
 
             m = torch.nn.Sigmoid()
             loss = torch.nn.BCELoss()
-            inp = inputs.raw
-            lbl = labels.raw
-            lbl = torch.reshape(lbl, (100, 1))
+            target = torch.reshape(labels.raw, (labels.shape[0], 1))
 
-            logits = model(inp)
+            logits = model(inputs.raw)
 
-            output = loss(m(logits), lbl)
-            output = ep.astensor(output)
-            return output
+            output = loss(m(logits), target)
+            return ep.astensor(output)
 
         return loss_fn
+
 
 def nn_input():
     cwd = os.getcwd()
@@ -240,22 +242,13 @@ def nn_input():
     data = torch.tensor(data, requires_grad=False, dtype=torch.float)
     data, result = torch.hsplit(data, [91, ])
     result = torch.tensor(result, requires_grad=False, dtype=torch.float)
-    # result = torch.reshape(result, (100, 1))
-
-    # m = torch.nn.Sigmoid()
-    # loss = torch.nn.BCELoss()
-    # logits = fmodel(data)
-    # output = loss(m(logits), result)
-    # test_logger.debug(f"################################## binary_cross_entropy: {data.shape} {logits.shape} {result.shape} {type(logits)} {type(data)}")
-    # test_logger.debug(f"################################## binary_cross_entropy: {output} {type(fmodel)} {type(logits)} {type(data)}")
     foolbox_data = Data(data, result)
-    
-    BaseGradientDescent.get_loss_fn = custom_get_loss_fn
 
-    # data = data_df.values
-    # data = torch.tensor(data, requires_grad=False, dtype=torch.float)
+
+    if  is_binary_model(result):
+        BaseGradientDescent.get_loss_fn = custom_get_loss_fn
+
     art_data = Data(data.numpy(), result.numpy())
-
     art_model = art.estimators.classification.pytorch.PyTorchClassifier(model=nn_model,
                                                                         input_shape=art_data.input.shape,
                                                                         loss=nn.CrossEntropyLoss(), nb_classes=int(

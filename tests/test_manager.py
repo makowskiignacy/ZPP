@@ -103,120 +103,120 @@ class FoolboxTests(unittest.TestCase):
         self.assertIsNotNone(test.test_sap())
 
 
-# class ArtTests(unittest.TestCase):
+class ArtTests(unittest.TestCase):
 
-#     def test_ClassHierarchy(self):
-#         test = TestClassHierarchyArt()
-#         self.assertEqual(test.test_class_hierarchy(), [True, True, True])
+    def test_ClassHierarchy(self):
+        test = TestClassHierarchyArt()
+        self.assertEqual(test.test_class_hierarchy(), [True, True, True])
 
-#     def test_DeepFool(self):
-#         attack_name = "Deep Fool"
-#         log_attack_start_msg(attack_name)
-#         parameters = art_parameters.get("deep_fool")
-#         self.assertIsNotNone(parameters, msg=input_err_msg(attack_name))
-#         test = TestDeepFool(art_model, art_data, parameters)
-#         self.assertIsNotNone(test.test())
+    def test_DeepFool(self):
+        attack_name = "Deep Fool"
+        log_attack_start_msg(attack_name)
+        parameters = art_parameters.get("deep_fool")
+        self.assertIsNotNone(parameters, msg=input_err_msg(attack_name))
+        test = TestDeepFool(art_model, art_data, parameters)
+        self.assertIsNotNone(test.test())
 
-#     def test_FastGradient(self):
-#         attack_name = "Fast Gradient"
-#         log_attack_start_msg(attack_name)
-#         parameters = art_parameters.get("fast_gradient")
-#         self.assertIsNotNone(parameters,msg=input_err_msg(attack_name))
-#         test = TestFastGradient(art_model, art_data, parameters)
-#         self.assertIsNotNone(test.test())
+    def test_FastGradient(self):
+        attack_name = "Fast Gradient"
+        log_attack_start_msg(attack_name)
+        parameters = art_parameters.get("fast_gradient")
+        self.assertIsNotNone(parameters,msg=input_err_msg(attack_name))
+        test = TestFastGradient(art_model, art_data, parameters)
+        self.assertIsNotNone(test.test())
 
-#     def test_Joker(self):
-#         attack_name = "Joker"
-#         log_attack_start_msg(attack_name)
-#         parameters = art_parameters.get("joker")
-#         self.assertIsNotNone(parameters, msg=input_err_msg(attack_name))
-#         test = TestJoker(art_model, art_data, parameters)
-#         self.assertIsNotNone(test.test())
+    def test_Joker(self):
+        attack_name = "Joker"
+        log_attack_start_msg(attack_name)
+        parameters = art_parameters.get("joker")
+        self.assertIsNotNone(parameters, msg=input_err_msg(attack_name))
+        test = TestJoker(art_model, art_data, parameters)
+        self.assertIsNotNone(test.test())
 
-#     def test_JacobianSaliencyMap(self):
-#         attack_name = "Jacobian Saliency"
-#         log_attack_start_msg(attack_name)
-#         parameters = art_parameters.get("jacobian_saliency_map")
-#         self.assertIsNotNone(parameters, msg=input_err_msg(attack_name))
-#         test = TestJacobianSaliencyMap(art_model, art_data, parameters)
-#         self.assertIsNotNone(test.test())
+    def test_JacobianSaliencyMap(self):
+        attack_name = "Jacobian Saliency"
+        log_attack_start_msg(attack_name)
+        parameters = art_parameters.get("jacobian_saliency_map")
+        self.assertIsNotNone(parameters, msg=input_err_msg(attack_name))
+        test = TestJacobianSaliencyMap(art_model, art_data, parameters)
+        self.assertIsNotNone(test.test())
 
-#     def test_GeometricDecisionBased(self):
-#         attack_name = "Geometric Decision"
-#         log_attack_start_msg(attack_name)
-#         parameters = art_parameters.get("geometric_decision_based")
-#         self.assertIsNotNone(parameters, msg=input_err_msg(attack_name))
-#         test = TestGeometricDecisionBased(art_model, art_data, parameters)
-#         self.assertIsNotNone(test.test())
+    def test_GeometricDecisionBased(self):
+        attack_name = "Geometric Decision"
+        log_attack_start_msg(attack_name)
+        parameters = art_parameters.get("geometric_decision_based")
+        self.assertIsNotNone(parameters, msg=input_err_msg(attack_name))
+        test = TestGeometricDecisionBased(art_model, art_data, parameters)
+        self.assertIsNotNone(test.test())
 
-#     def test_Shadow(self):
-#         attack_name = "Shadow"
-#         log_attack_start_msg(attack_name)
-#         parameters = art_parameters.get("shadow")
-#         self.assertIsNotNone(parameters, msg=input_err_msg(attack_name))
-#         test = TestShadow(art_model, art_data, parameters)
-#         self.assertIsNotNone(test.test())
+    def test_Shadow(self):
+        attack_name = "Shadow"
+        log_attack_start_msg(attack_name)
+        parameters = art_parameters.get("shadow")
+        self.assertIsNotNone(parameters, msg=input_err_msg(attack_name))
+        test = TestShadow(art_model, art_data, parameters)
+        self.assertIsNotNone(test.test())
 
-#     def test_Threshold(self):
-#         attack_name = "Threshold"
-#         log_attack_start_msg(attack_name)
-#         parameters = art_parameters.get("threshold")
-#         self.assertIsNotNone(parameters, msg=input_err_msg(attack_name))
-#         test = TestThreshold(art_model, art_data, parameters)
-#         self.assertIsNotNone(test.test())
+    def test_Threshold(self):
+        attack_name = "Threshold"
+        log_attack_start_msg(attack_name)
+        parameters = art_parameters.get("threshold")
+        self.assertIsNotNone(parameters, msg=input_err_msg(attack_name))
+        test = TestThreshold(art_model, art_data, parameters)
+        self.assertIsNotNone(test.test())
 
-#     def test_SignOPT(self):
-#         attack_name = "Sign-OPT"
-#         log_attack_start_msg(attack_name)
-#         parameters = art_parameters.get("sign_opt")
-#         self.assertIsNotNone(parameters, msg=input_err_msg(attack_name))
-#         test = TestSignOPT(art_model, art_data, parameters)
-#         self.assertIsNotNone(test.test())
+    def test_SignOPT(self):
+        attack_name = "Sign-OPT"
+        log_attack_start_msg(attack_name)
+        parameters = art_parameters.get("sign_opt")
+        self.assertIsNotNone(parameters, msg=input_err_msg(attack_name))
+        test = TestSignOPT(art_model, art_data, parameters)
+        self.assertIsNotNone(test.test())
 
-#     def test_Square(self):
-#         attack_name = "Square"
-#         log_attack_start_msg(attack_name)
-#         parameters = art_parameters.get("square")
-#         self.assertIsNotNone(parameters, msg=input_err_msg(attack_name))
-#         test = TestSquare(art_model, art_data, parameters)
-#         self.assertIsNotNone(test.test())
+    def test_Square(self):
+        attack_name = "Square"
+        log_attack_start_msg(attack_name)
+        parameters = art_parameters.get("square")
+        self.assertIsNotNone(parameters, msg=input_err_msg(attack_name))
+        test = TestSquare(art_model, art_data, parameters)
+        self.assertIsNotNone(test.test())
 
-#     def test_ZerothOrderOptimalization(self):
-#         attack_name = "Zeroth Order"
-#         log_attack_start_msg(attack_name)
-#         parameters = art_parameters.get("zeroth_order_optimization")
-#         self.assertIsNotNone(parameters, msg=input_err_msg(attack_name))
-#         test = TestZerothOrderOptimalization(art_model, art_data, parameters)
-#         self.assertIsNotNone(test.test())
+    def test_ZerothOrderOptimalization(self):
+        attack_name = "Zeroth Order"
+        log_attack_start_msg(attack_name)
+        parameters = art_parameters.get("zeroth_order_optimization")
+        self.assertIsNotNone(parameters, msg=input_err_msg(attack_name))
+        test = TestZerothOrderOptimalization(art_model, art_data, parameters)
+        self.assertIsNotNone(test.test())
 
-# class TestFrameworks(unittest.TestCase):
+class TestFrameworks(unittest.TestCase):
 
-#     def test_FoolboxWithPytorchUsingFoolbox(self):
-#         test = TestFoolboxWithPytorchUsingFoolbox()
-#         self.assertIsNotNone(test.test_foolbox_L1BasicIterative())
-#         self.assertIsNotNone(test.test_foolbox_ProjectedGradientDescentInf())
+    def test_FoolboxWithPytorchUsingFoolbox(self):
+        test = TestFoolboxWithPytorchUsingFoolbox()
+        self.assertIsNotNone(test.test_foolbox_L1BasicIterative())
+        self.assertIsNotNone(test.test_foolbox_ProjectedGradientDescentInf())
 
-#     def test_FoolboxWithPytorchUsingArt(self):
-#         test = TestFoolboxWithPytorchUsingArt()
-#         self.assertIsNotNone(test.test_foolbox_ProjectedGradientDescentInf())
-#         self.assertIsNotNone(test.test_foolbox_L1BasicIterative())
-#         self.assertIsNotNone(test.test_foolbox_L2BasicIterative())
-#         self.assertIsNotNone(test.test_foolbox_LinfBasicIterative())
+    def test_FoolboxWithPytorchUsingArt(self):
+        test = TestFoolboxWithPytorchUsingArt()
+        self.assertIsNotNone(test.test_foolbox_ProjectedGradientDescentInf())
+        self.assertIsNotNone(test.test_foolbox_L1BasicIterative())
+        self.assertIsNotNone(test.test_foolbox_L2BasicIterative())
+        self.assertIsNotNone(test.test_foolbox_LinfBasicIterative())
 
-#     def test_ArtWithPytorchUsingArt(self):
-#         test = TestArtWithPytorchUsingArt()
-#         #self.assertIsNotNone(test.test_art_AdversarialPatch()) Adversarial Patch is not yet implemented
-#         self.assertIsNotNone(test.test_art_ZerothOrderOptimalization())
-#         self.assertIsNotNone(test.test_art_FastGradient())
+    def test_ArtWithPytorchUsingArt(self):
+        test = TestArtWithPytorchUsingArt()
+        #self.assertIsNotNone(test.test_art_AdversarialPatch()) Adversarial Patch is not yet implemented
+        self.assertIsNotNone(test.test_art_ZerothOrderOptimalization())
+        self.assertIsNotNone(test.test_art_FastGradient())
 
-#     def test_ArtWithPytorchUsingFoolbox(self):
-#         test = TestArtWithPytorchUsingFoolbox()
-#         #self.assertIsNotNone(test.test_art_AdversarialPatch()) Adversarial Patch is not yet implemented
-#         self.assertIsNotNone(test.test_art_ZerothOrderOptimalization())
-#         self.assertIsNotNone(test.test_art_FastGradient())
+    def test_ArtWithPytorchUsingFoolbox(self):
+        test = TestArtWithPytorchUsingFoolbox()
+        #self.assertIsNotNone(test.test_art_AdversarialPatch()) Adversarial Patch is not yet implemented
+        self.assertIsNotNone(test.test_art_ZerothOrderOptimalization())
+        self.assertIsNotNone(test.test_art_FastGradient())
 
-#     def test_ArtWithKerasUsingArt(self):
-#         test = TestArtWithKerasUsingArt()
-#         self.assertIsNotNone(test.test_art_ZerothOrderOptimalization())
-#         #self.assertIsNotNone(test.test_art_AdversarialPatch()) Adversarial Patch is not yet implemented
-#         self.assertIsNotNone(test.test_art_FastGradient())
+    def test_ArtWithKerasUsingArt(self):
+        test = TestArtWithKerasUsingArt()
+        self.assertIsNotNone(test.test_art_ZerothOrderOptimalization())
+        #self.assertIsNotNone(test.test_art_AdversarialPatch()) Adversarial Patch is not yet implemented
+        self.assertIsNotNone(test.test_art_FastGradient())

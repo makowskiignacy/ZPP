@@ -27,10 +27,6 @@ class NewtonFool(NewtonFoolAttack, FoolboxAttack):
         output = super().flatten_output(data)
         model_correct_format = super().reformat_model(model)
         
-        import torch
-        output = torch.zeros(100)
-        output = torch.tensor(output, requires_grad=False, dtype=torch.long)
-
         if self.criterion_type == "targeted_misclassification":
             self.criterion = TargetedMisclassification(output)
         if self.criterion_type == "misclassification":

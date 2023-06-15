@@ -21,12 +21,6 @@ class GenericBasicIterative(FoolboxAttack):
         super().verify_bounds(data=data)
         super().verify_epsilon()
 
-        # TODO remove or use
-        # if output.dim() > 1:
-        #     model_correct_format = super().reformat_model(model)
-        # else:
-        #     model_correct_format = model
-
         model_correct_format = super().reformat_model(model)
 
         if self.criterion_type == "targeted_misclassification":
