@@ -168,7 +168,7 @@ class AttackManager:
 
     # Tworzy i TODO sprawdza poprawność parametrów podanych ataków
     @staticmethod
-    def create_attacks(attack_names_params_list: list[tuple[str, dict[str, ]]]) -> list:
+    def create_attacks(attack_names_params_list: list[tuple[str, dict[str, ]]]) -> list[Attack]:
         '''
         Tworzy ataki podane w liście wraz z zadanymi parametrami.
 
@@ -200,7 +200,7 @@ class AttackManager:
                     
                 attacks.append(
                     # Wywołanie konstruktora ataku pod nazwą "name"
-                    entry.constructor[0](params)
+                    entry.constructor[0](final_params)
                 )
         return attacks
     
