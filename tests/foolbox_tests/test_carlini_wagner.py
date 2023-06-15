@@ -14,9 +14,6 @@ class TestCarliniWagner():
 
     def test_cw_l2(self):
         test_logger.info("L2 Carlini Wagner attack test running")
-        if is_binary_model(self.data.output):
-            test_logger.info("Binary models not supported")
-            return None
         attack_an_l2_g = L2CarliniWagner(self.parameters)
         result_an_l2_g = run_attack(attack_an_l2_g, self.model, self.data)
         return result_an_l2_g
