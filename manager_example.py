@@ -1,4 +1,9 @@
 import getpass
+from os import abort
+import random
+
+import numpy as np
+from skorch import NeuralNet
 
 from attack_manager import AttackManager
 
@@ -10,11 +15,12 @@ from torch import nn, optim
 
 # Docelowo taki skrypt może być zwinięty do pojedynczej procedury, która
 # otrzyma tylko potrzebne dane.
+random.seed(0xc0ffee)
 
 ### Dane wstępne ###
 NEXT_CLOUD_DIR = '/uw_demo'
 
-EXPERIMENT_NAME = '266e5e3e-0a22-4b92-8d70-960718a3b600'
+EXPERIMENT_NAME = '01339e26-a4b9-4d4b-b999-fd598a59576a'
 RUN_NAME = 'skam_search'
 DATA_ID = None #'997e79b1919a46fbb8d71bdafaf4a8ad'
 DATA_FILE_NAME = 'demo_dataset.csv'
@@ -35,6 +41,7 @@ dl = DataLoader(
 dl.UPLOAD_DIRECTORY = NEXT_CLOUD_DIR
 
 ### Pobieranie danych po ID lub po ścieżce do NextCloud
+print(f"Pobieranie danych '{DATA_FILE_NAME}' do folderu {dl.DOWNLOAD_DIRECTORY}")
 if (DATA_ID is not None):
     data_info = dl.download_by_id(DATA_ID, 'dataset_' + DATA_ID + '.csv')
     if ('file_path' not in data_info.keys()):
@@ -49,15 +56,23 @@ else:
     # oraz do ścieżki do pobranego pliku
     data_path = dl.make_local_path(DATA_FILE_NAME)
 
+print("Pobieranie ukończono. Ładownie danych do zmiennej.")
 data = dl.load_to_variable(
     libs=[DataLoader.SupportedLibrary.ART],
     local_file_path=data_path,
-    number_of_samples=1000
+    number_of_samples=15000
 )[0]
 
+print(f"Pobieranie modelu z ekspreymentu '{EXPERIMENT_NAME}'/'{RUN_NAME}'")
 model = get_model(EXPERIMENT_NAME, RUN_NAME, './TEMPORARY')
+print(data.output)
+print(data.output.shape)
 
-art_criterion = nn.CrossEntropyLoss()
+print(f"Uczenie modelu na pobranych danych")
+model.fit(data.input, data.output.flatten())
+print(model.score(data.input, data.output.flatten()))
+
+art_criterion = nn.SmoothL1Loss()
 art_optimizer = optim.Adam(model.module_.parameters(), lr=0.01)
 
 
@@ -68,7 +83,6 @@ additional_classifier_parameters = {"loss": art_criterion,
                                     "nb_classes": int(data.output.max() - min(0, data.output.min()) + 1)}
 
 params = ARTParameters(additional_classifier_parameters, {})
-
 ### Uruchamianie poprzez AttackManager ###
 
 BAD_ATTACK_LIST = [
@@ -77,9 +91,10 @@ BAD_ATTACK_LIST = [
     ("Square", params)
 ]
 
+params.attack_parameters.update({"minimal" : True, "batch_size" : 1024})
+
 ATTACK_LIST = [
-    ("Jacobian Saliency Map",  params),
-    ("Square", params)
+    ("FastGradient", params)
 ]
 
 manager = AttackManager()
@@ -93,8 +108,10 @@ except Exception as e:
 attacks = manager.create_attacks(ATTACK_LIST)
 
 results = manager.conduct_attacks(attacks, model, data)
-
-print(results)
+print(results[0])
+print(results[0].shape)
+print(attacks[0].accuracy(model, data.input, data.output))
+print(attacks[0].accuracy(model, results[0], data.output))
 
 # Usuwamy pobrane pliki danych z systemu, można to zrobić wcześniej
 dl.delete_downloaded()

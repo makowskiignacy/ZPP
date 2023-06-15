@@ -3,6 +3,7 @@
 import itertools
 import os
 import csv
+import random
 import torch
 from enum import Enum
 
@@ -131,18 +132,20 @@ class DataLoader:
         return False
 
     def load_to_variable(self, libs : list[SupportedLibrary], local_file_path : str, number_of_samples : int | None = None, column_names_row : int = 0, labels_column_number : int | None = None):
+        n = -1
+        with open(local_file_path) as f:
+            n = len(f.readlines())
         with open(local_file_path) as f:
             reader = csv.reader(f)
-            if number_of_samples is not None:
-                data = list(list(line) for line in itertools.islice(reader, number_of_samples))
-            else:
-                data = list(list(line) for line in reader)
-                # NOTE czy tutaj chcemy robić ten preprocessing?
-                # Niebrałem udziału w 'ładowniu danych' stąd nie do
-                # końca wiem czy coś tu jeszcze by się przydało
-
-                # Zakładamy domyślnie że pierwszy wiersz to etykiety
+            data = list(list(line) for line in reader)
+            # Zakładamy domyślnie że pierwszy wiersz to etykiety
             data.pop(column_names_row)
+            if number_of_samples is not None:
+                data = random.sample(data, number_of_samples)
+
+        # NOTE czy tutaj chcemy robić ten preprocessing?
+        # Niebrałem udziału w 'ładowniu danych' stąd nie do
+        # końca wiem czy coś tu jeszcze by się przydało
 
         data2 = []
         for row in data:

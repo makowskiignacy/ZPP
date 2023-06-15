@@ -144,7 +144,7 @@ class AttackManager:
 
     # Tworzy i TODO sprawdza poprawność parametrów podanych ataków
     @staticmethod
-    def create_attacks(attack_names_params_list: list[tuple[str, dict[str, ]]]) -> list:
+    def create_attacks(attack_names_params_list: list[tuple[str, dict[str, ]]]) -> list[Attack]:
 
         for name, _ in attack_names_params_list:
             if name not in AttackManager.get_possible_attacks():
