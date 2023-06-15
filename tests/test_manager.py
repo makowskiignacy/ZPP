@@ -18,8 +18,8 @@ from tests.other_tests.test_frameworks import *
 #To run the tests on a different data set, add it to input_loader.py, and then change the line below.
 
 # foolbox_model, art_model, foolbox_data, art_data, foolbox_parameters, art_parameters = input_loader.simple_input(batchsize = 20)
-# foolbox_model, art_model, foolbox_data, art_data, foolbox_parameters, art_parameters = input_loader.nn_input()
-foolbox_model, art_model, foolbox_data, art_data, foolbox_parameters, art_parameters = input_loader.nn_input_cloud()
+foolbox_model, art_model, foolbox_data, art_data, foolbox_parameters, art_parameters = input_loader.nn_input()
+# foolbox_model, art_model, foolbox_data, art_data, foolbox_parameters, art_parameters = input_loader.nn_input_cloud()
 # foolbox_model, art_model, foolbox_data, art_data, foolbox_parameters, art_parameters = input_loader.resnet18_cifar100_input(batchsize = 15)
 
 
