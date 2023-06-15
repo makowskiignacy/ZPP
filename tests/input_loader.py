@@ -187,11 +187,6 @@ def simple_input(batchsize=4):
     return foolbox_model, model, foolbox_data, art_data, foolbox_parameters, art_parameters
 
 
-def is_binary_model(targets: Tensor):
-    assert len(targets.shape) == 2
-    return targets.shape[1] == 1
-
-
 def custom_get_loss_fn(
         self, model: Model, labels: ep.Tensor
     ) -> Callable[[ep.Tensor], ep.Tensor]:
