@@ -1,10 +1,24 @@
 class Parameter:
+    '''
+    Klasa abstrakcyjna uogólniająca parametry przekazywane atakom.
+    '''
     def update(self, other_parameters):
         raise NotImplementedError
     pass
 
 
 class FoolboxParameters(Parameter):
+    '''
+    Klasa realizująca przekazywanie odpowiednich parametrów atakom z bibloteki
+    Foolbox.
+
+    Atrybuty obiektu:
+    -----------------
+    attak_specific_parameters (dict)
+        Parametry odpowiednie tylko dla konkretnego ataku.
+    generic_parameters (dict)
+        Parametry ogólne dla ataków z biblioteki Foolbox.
+    '''
     def __init__(self, attack_specific_parameters, generic_parameters):
         self.attack_specific_parameters = attack_specific_parameters
         self.generic_parameters = generic_parameters
@@ -19,6 +33,17 @@ class FoolboxParameters(Parameter):
 
 
 class ARTParameters(Parameter):
+    '''
+    Klasa realizująca przekazywanie odpowiednich parametrów atakom z bibloteki
+    Adversarial Robustness Toolbox.
+
+    Atrybuty obiektu:
+    -----------------
+    attack_parameters (dict)
+        Parametry odpowiednie tylko dla konkretnego ataku.
+    classifier_parameters (dict)
+        Parametry odpowiednie dla atakowanego klasyfikatora.
+    '''
     def __init__(self, classifier_parameters, attack_parameters):
         self.classifier_parameters=classifier_parameters
         self.attack_parameters=attack_parameters

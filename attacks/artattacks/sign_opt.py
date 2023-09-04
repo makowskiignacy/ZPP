@@ -6,9 +6,43 @@ from art.attacks.evasion import SignOPTAttack
 
 
 class SignOPT(ARTAttack):
+    '''
+    Klasa otaczająca atak SignOPT z biblioteki ART.
+    Link do pracy - https://arxiv.org/pdf/1909.10773.pdf
+    '''
     def __init__(self, parameters : ARTParameters):
         super().__init__(parameters.classifier_parameters)
-
+        '''
+        Inicjalizuje atak AdversarialPatch na podstawie zadanych parametrów.
+        
+        Możliwe parametry ataku
+        -----------------------
+        epsilon (float)
+            Parametr wygładzający (bardzo. mały)
+        num_trial (int)
+            Liczba prób wyliczenia dobrego punktu startowego
+            max_iter (int)
+            Maksymalna liczba iteracji. Dobrze zwiększyć dla ataku celowanego.
+        query_limit (int)
+            Limit zapytań do modelu. Dobrze zwiększyć dla ataku celowanego
+        k (int)
+            Liczb losowych kierunków używanych do estymacji gradientu
+        alpha (float)
+            Długość kroku wyszukiwania liniowego
+        beta (float)
+            Tolerancja wyszukiwania liniowego
+        batch_size (int)
+            Liczba przykładów treningowych wykorzystywanych w jednej iteracji
+            uczenia
+        targeted (bool)
+            Czy atak ma starać się utworzyć przykłady kontradyktoryjne, tak
+            aby odpowiedzi modelu dla zadanych przykładów były
+            zgodne z wartościami przekazanymi w kolumnie odpowiedzi danych.
+        verbose (bool)
+            Czy atak ma wypisywać informacje diagnostyczne o swoim przebiegu
+        eval_perform (bool)
+            Czy ocenić wydajność na 100 losowo wygenerowanych przykładach?
+        '''
         # Wartości domyślne
         self._attack_params = {
             # Parametr wygładzający (b. mały)

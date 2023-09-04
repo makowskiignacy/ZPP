@@ -1,3 +1,7 @@
+# Skrypt pokazujący wykorzytsanie i działanie pełnego modułu.
+# Przedstawia: Logowanie, Pobieranie danych i modelu, Utworzenie ataków
+#              Uruchomienie ataków
+
 import getpass
 
 from attack_manager import AttackManager

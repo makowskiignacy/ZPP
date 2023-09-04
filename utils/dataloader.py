@@ -12,6 +12,10 @@ from attacks.helpers.data import Data
 
 
 class DataLoader:
+    '''
+    Klasa obiektów implementujących zarządzanie pobieraniem danych oraz modeli
+    z platform NextCloud oraz ML Platform.
+    '''
     class SupportedLibrary(Enum):
         ART = 1
         Foolbox = 2
@@ -29,7 +33,29 @@ class DataLoader:
                 ml_client_id : str = 'ml_platform',
                 nc_host : str = 'https://nextcloud.cbitt.nask.pl/'
                  ) -> None:
+        '''
+        Inicjalizuje obiekt zarządzający.
 
+        Parametry inicjalizacji:
+        ------------------------
+        ml_user: (str)
+            Nazwa użytkownika do ML Platform
+        ml_pass: (str)
+            Hasło używkownika do ML Platform
+        nc_user: (str)
+            Nazwa użytkownika do NextCloud
+        nc_pass: (str)
+            Hasło użytkownika do NextCloud
+        ml_platform_address: (str)
+            Adres internetowy usługi ML Platform
+        ml_keycloak_address: (str)
+            Adres internetowy uwierzytelniający do ML Platform
+        ml_realm: (str)
+        ml_client_id: (str)
+            ID klienta usługi ML Platform
+        nc_host: (str)
+            Adres internetowy usługi NextCloud
+        '''
         
         self.__next_cloud = NextCloud(nc_host, nc_user, nc_pass)
         self.__ml_platform_client = MLPlatformClient(
@@ -43,12 +69,21 @@ class DataLoader:
     
     def upload_and_register(self, local_path : str, remote_dir : str | None = None) :
         """
-        Przesyła plik wskazany przez local_path do NextCloud w miejsce określone
-        przez remote_dir lub ustawione wcześniej UPLOAD_DIRECTORY. Następnie
-        rejestruje podany plik w ML_Platform.
+        Przesyła wskazany plik do NextCloud, a następnie rejestruje podany plik
+        w usłudze ML Platform.
+
+        Miejsce docelowe jest określane na podstawie remote_dir lub
+        ustawionego wcześniej UPLOAD_DIRECTORY. 
 
         Na wyjściu przekazuje wynik rejestracji lub None jeżeli przesyłanie
-        lub rejestracja nie powiodły się
+        lub rejestracja nie powiodły się.
+
+        Parametry:
+        ----------
+        local_path: (str)
+            Ścieżka lokalna do przesyłanego pliku
+        remote_dir: (str | None)
+            Ścieżka docelowa pliku do przesłania
         """
         if not self.upload(local_path, remote_dir):
             return None
@@ -77,14 +112,23 @@ class DataLoader:
                             upload_result : dict | None, local_filename : str,
                             local_download_path : str | None = None) -> dict | None:
         """
-        Pobiera plik identyfikowany poprzez wynik jego rejestracji 'upload_result'
-        w miejsce wskazane przez 'local_download_path' i ustawia nazwę na
-        'local_filename'
+        Pobiera plik identyfikowany poprzez wynik jego rejestracji do miejsca
+        wskazanego poprzez parametr lub wcześniej ustawione UPLOAD_DIRECTORY.
 
         W wyniku przekazuje słownik opisujący nazwę i ścieżkę do pliku
         {'file_name': name, 'file_path': file_path}. 
-        Jeżeli rejestracja niepowiodła się ('upload_results' jest None) przekazuje
-        na wyjściu None.
+
+        Jeżeli rejestracja niepowiodła się ('upload_results' jest None)
+        przekazuje na wyjściu None.
+
+        Parametry:
+        ----------
+        upload_result: (dict | None)
+            Wynik rejestracji pliku otrzymany z metody 'upload_and_register()'
+        local_filename: (str)
+            Nazwa pliku ustawiana po pobraniu
+        local_download_path: (str | None)
+            Ścieżka do katalogu, do którego ma zostać pobrany plik
         """
         if upload_result is None:
             return None
@@ -93,9 +137,15 @@ class DataLoader:
     
     def upload(self, local_path : str, remote_dir : str | None = None) -> bool:
         """
-        Przesyła wskazany przez 'local_path' plik do katalogu 'remote_dir'
-        jeżeli podano lub do katalogu UPLOAD_DIRECTORY
+        Przesyła wskazany plik do NextCloud.
         UWAGA: Ta procedura nadpisze istniejący plik.
+
+        Parametry:
+        ----------
+        local_path: (str)
+            Ścieżka lokalna do przesyłanego pliku
+        remote_dir: (str | None)
+            Ścieżka docelowa pliku do przesłania
         """
 
         if remote_dir is None:
@@ -109,9 +159,18 @@ class DataLoader:
                  local_download_path : str | None = None,
                  local_filename : str | None = None) -> bool:
         """
-        Pobiera podany plik spod 'remote_path' do wskazanego przez 'local_download_path'
-        katalogu, po czym zmienia jego nazwę na 'local_filename' jeżeli podano.
+        Pobiera podany plik pod wskazane przez parametr lub wcześniej ustawione
+        DOWNLOAD_DIRECTORY miejsce.
         UWAGA: Ta procedura nadpisze plik o oryginalnej nazwie!
+
+        Parametry:
+        ----------
+        remote_path: (str)
+            Ścieżka do pobieranego pliku
+        local_filename: (str | None)
+            Nowa nazwa pliku ustawiana po pobraniu.
+        local_download_path: (str | None)
+            Ścieżka do katalogu, do którego ma zostać pobrany plik
         """
         if local_download_path is None:
             local_download_path = self.DOWNLOAD_DIRECTORY
@@ -131,6 +190,27 @@ class DataLoader:
         return False
 
     def load_to_variable(self, libs : list[SupportedLibrary], local_file_path : str, number_of_samples : int | None = None, column_names_row : int = 0, labels_column_number : int | None = None):
+        '''
+        Ładuje dane zawarte w wskazanym pliku do zmiennej wyjściowej w formacie
+        kompatybilnym z resztą modułu.
+
+        Parametry:
+        ----------
+        libs: (list[SupportedLibrary])
+            Lista enumetatorów wspieranych bibliotek. W wyjściowej liście
+            pojawią się dane załadowane w odpowiednim formacie dla odpowiedniej
+            biblioteki w kolejności podanej na liście.
+        local_file_path: (str)
+            Ścieżka do pliku z danymi
+        number_of_samples: (int | None)
+            Liczba próbek do wyloswania z danych i następnego załadowania.
+            Wartość 'None' odpowiada załadowaniu wszystkich danych.
+        column_names_row: (int)
+            Numer wiersza z opisami nazw kolumn.
+        labels_column_number: (int)
+            Numer kolumny z wyjściowymi etykietami.
+
+        '''
         with open(local_file_path) as f:
             reader = csv.reader(f)
             if number_of_samples is not None:
@@ -178,11 +258,22 @@ class DataLoader:
         return retlist
 
     def delete_downloaded(self):
+        '''
+        Usuwanie wszystkich pobranych do tej pory plików.
+        '''
         for path in self.downloaded_files:
             os.remove(path)
 
     def make_remote_path(self, remote_file : str):
+        '''
+        Procedura pomocnicza tworząca ścieżkę do pliku zdalnego.
+        Przekazuje: UPLOAD_DIRECTORY/remote_file
+        '''
         return os.path.join(self.UPLOAD_DIRECTORY, remote_file)
     
     def make_local_path(self, local_file : str):
+        '''
+        Procedura pomocnicza tworząca ścieżkę do pliku lokalnego.
+        Przekazuje: DOWNLOAD_DIRECTORY/local_file
+        '''
         return os.path.join(self.DOWNLOAD_DIRECTORY, local_file)

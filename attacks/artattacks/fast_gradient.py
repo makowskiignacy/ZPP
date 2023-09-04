@@ -34,7 +34,8 @@ class FastGradient(ARTAttack):
             Liczba losowych inicjalizacji wewnątrz epsilonowej kuli naokoło
             próbki.
         batch_size : int
-            Rozmiar próbki do jednorazowego treningu.
+            Liczba przykładów treningowych wykorzystywanych w jednej iteracji
+            uczenia
         minimal : bool
             Czy obliczać minimalne zaburzenie?
         summary_writer : bool | SummaryWriter

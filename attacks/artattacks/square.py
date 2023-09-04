@@ -6,20 +6,49 @@ from art.attacks.evasion import SquareAttack
 
 
 class Square(ARTAttack):
+    '''
+    Klasa otaczająca atak Square z biblioteki ART.
+    Link do pracy - https://arxiv.org/abs/1912.00049
+    '''
     def __init__(self,parameters : ARTParameters) :
         super().__init__(parameters.classifier_parameters)
-
+        '''
+        Inicjalizuje atak Square Attack na podstawie zadanych parametrów.
+        
+        Możliwe parametry ataku
+        -----------------------
+        norm ({1,2,"inf"})
+            Norma L_, możliwe wartości to 1,2,"inf"
+        adv_criterion (Callable[[ndarray,ndarray], bool])
+            Funkcja jakiej atak ma użyć aby określić 'kontradyktoryjność'
+            Domyślnie 'None'
+        loss (Callable[[ndarray,ndarray], numpy.ndarray])
+            Funkcja, którą atak ma optymalizować
+        max_iter (int)
+            Maksymalna liczba iteracji
+        eps (float)
+            Maksymalna dozwolona perturbacja
+        p_init (float)
+            Wstępna część elementów
+        nb_restarts (int)
+            Liczba ponownych uruchomień
+        batch_size (int)
+            Liczba przykładów treningowych wykorzystywanych w jednej iteracji
+            uczenia
+        verbose (bool)
+            Czy atak ma wypisywać informacje diagnostyczne o swoim przebiegu
+        '''
         # Wartości domyślne
         self._attack_params = {
             # Norma L_, możliwe wartości to 1,2,"inf"
             "norm" : 2,
             # Funkcja jakiej atak ma użyć aby określić 'kontradyktoryjność'
             "adv_criterion" : None,
-            # Funkcja, jaką atak ma optymalizować
+            # Funkcja, którą atak ma optymalizować
             "loss" : None,
             # Maksymalna liczba iteracji
             "max_iter" : 100,
-            # Maksymalna perturbacja
+            # Maksymalna dozwolona perturbacja
             "eps" : 0.3,
             # Wstępna część elementów
             "p_init": 0.8,

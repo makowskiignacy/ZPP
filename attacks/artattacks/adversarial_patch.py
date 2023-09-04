@@ -32,7 +32,8 @@ class AdversarialPatch(ARTAttack):
         max_iter (int)
             Maksymalna liczba iteracji algorytmu.
         batch_size (int)
-            Rozmiar próbki do jednorazowego treningu.
+            Liczba przykładów treningowych wykorzystywanych w jednej iteracji
+            uczenia
         patch_shape 
             Kształt fragmentu wyrażony krotką kształtów.
             Aktualnie wspierany jedynie dla klasyfikatora klasy

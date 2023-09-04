@@ -60,9 +60,9 @@ class AttackManager:
 
     Atrybuty
     --------
-    art_parameters_default : ARTParameters
+    art_parameters_default: (ARTParameters)
         Domyślne parametry dla klasyfikatora i ataku z biblioteki ART.
-    default_foolbox_parameters_XY : FoolboxParameters
+    default_foolbox_parameters_XY: (FoolboxParameters)
         Domyślne parametry dla klasyfikatora i ataku o inicjałach nazwy XY
         z biblioteki Foolbox. Przykładowo 'default_foolbox_parameters_an' to
         parametry dla ataku 'Additive Noise'.

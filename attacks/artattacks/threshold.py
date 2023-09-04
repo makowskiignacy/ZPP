@@ -6,7 +6,31 @@ from art.attacks.evasion import ThresholdAttack
 
 
 class Threshold(ARTAttack):
+    '''
+    Klasa otaczająca atak Threshold z biblioteki ART.
+    Link do pracy - https://arxiv.org/abs/1906.06026
+    '''
     def __init__(self, parameters : ARTParameters):
+        '''
+        Inicjalizuje atak Threshold Attack na podstawie zadanych parametrów.
+        
+        Możliwe parametry ataku
+        -----------------------
+        th ({int, None})
+            Wartość progowa (opcjonalna)
+        es (int)
+            Czy używać CMAES (0) czy DE (1) jak strategii ewolucyjnej
+            Opcja zero wymaga pakietu "cma"
+        max_iter (int)
+            Maksymalna liczba iteracji metody ewolucyjnej
+        targeted (bool)
+            Czy atak ma starać się utworzyć przykłady kontradyktoryjne, tak
+            aby odpowiedzi modelu dla zadanych przykładów były
+            zgodne z wartościami przekazanymi w kolumnie odpowiedzi danych.
+        verbose (bool)
+            Czy atak ma wypisywać informacje diagnostyczne o swoim przebiegu
+        '''
+
         super().__init__(parameters.classifier_parameters)
 
         # Wartości domyślne

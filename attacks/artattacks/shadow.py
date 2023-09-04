@@ -9,9 +9,40 @@ from utils.logger import test_logger
 
 
 class Shadow(ARTAttack):
+    '''
+    Klasa otaczająca atak Shadow z biblioteki ART.
+    Link do pracy - https://arxiv.org/abs/2003.08937
+    '''
     def __init__(self, parameters : ARTParameters):
         super().__init__(parameters.classifier_parameters)
-
+        '''
+        Inicjalizuje atak Shadow Attack na podstawie zadanych parametrów.
+        
+        Możliwe parametry ataku
+        -----------------------
+        sigma (float)
+            Odchylenie standardowe rozkładu normalnego, z którego czerpie 
+            się szum. 
+        nb_steps (int)
+            Liczba kroków algorytmu Stochastycznego Spadku Gradientu(ang. SGD)
+        learning_rate (float)
+            Wpółczynnik uczenia SGD
+        lambda_tv (float)
+            Waga kary za ogołną wariancję perturbacji
+        lambda_c (float)
+            Waga kary za zmianę średniego koloru na każdym kanale perturbacji
+        lambda_s (float)
+            Waga kary za podobieństwo kanałów koloru perturbacji
+        batch_size (int)
+            Liczba przykładów treningowych wykorzystywanych w jednej iteracji
+            uczenia
+        targeted (bool)
+            Czy atak ma starać się utworzyć przykłady kontradyktoryjne, tak
+            aby odpowiedzi modelu dla zadanych przykładów były
+            zgodne z wartościami przekazanymi w kolumnie odpowiedzi danych.
+        verbose (bool)
+            Czy atak ma wypisywać informacje diagnostyczne o swoim przebiegu
+        '''
         # Wartości domyślne
         self._attack_params = {
             # Odchylenie standardowe rozkładu normalnego, z którego czerpie

@@ -14,6 +14,9 @@ from utils.logger import test_logger
 
 
 class FoolboxAttack(Attack):
+    '''
+    Klasa abstrakcyjna Ataku dla ataków zaimplementowanych w bibliotece Foolbox.
+    '''
 
     def __init__(self, args):
         super().__init__()
@@ -42,6 +45,20 @@ class FoolboxAttack(Attack):
 
     @staticmethod
     def to_unified_format(data_from_attack):
+        '''
+        Metoda unifikująca dane wyjściowe ataku z odgórnie ustalonym formatem
+        danych.
+
+        Parametry
+        ---------
+        data_from_attack
+            Dane otrzymane po przeprowadzeniu ataku.
+        
+        Wyjście
+        -------
+            Dane otrzymane po przeprowadzeniu ataku w zunifikowanym formacie,
+            gotowe do dalszej obróbki.
+        '''
         # Dla celów testowych lepiej żeby funkcja zwracała cokolwiek
         return data_from_attack
 

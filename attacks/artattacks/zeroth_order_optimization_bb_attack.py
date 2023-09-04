@@ -4,7 +4,49 @@ from art.attacks.evasion import ZooAttack as orig_art_zoo_attack
 
 
 class ZerothOrderOptimalization(ARTAttack):
+    '''
+    Klasa otaczająca atak Zeroth-Order Optimization z biblioteki ART.
+    Link do pracy - https://arxiv.org/abs/1708.03999
+    '''
     def __init__(self, parameters):
+        '''
+        Inicjalizuje atak AdversarialPatch na podstawie zadanych parametrów.
+        
+        Możliwe parametry ataku
+        -----------------------
+        confidence:(float)
+            Pewność przykładów kontradyktoryjnych
+        learning_rate (float)
+            Współczynnik uczenia modelu.
+            Im mniejszy tym dokładniejsze wyniki, ale wolniejsze wykonanie.
+        max_iter (int)
+            Mkasymalna liczba iteracji            
+        binary_search_steps (int)
+            Liczba prób przybliżenia stałej przy wykorzystaniu
+            wyszukiwania binarnego
+        initial_const (float)
+            Wstępna wartość stałej kompromisu.
+        abort_early (bool)
+            Czy w przypadku 'utknięcia' przerwać wcześniej
+        use_resize (bool)
+            Czy używać startegii zmiany rozmiaru (resizing strategy)
+        use_importance (bool)
+            Czy używać próbkowania ważności (importance sampling)
+        nb_parallel (int)
+            Liczba zmian koordynatów do uruchomienia równolegle.
+            Preferowane nad dużą wartością pola 'batch_size'
+        batch_size (int)
+            Liczba przykładów treningowych wykorzystywanych w jednej iteracji
+            uczenia
+        variable_h (float)
+            Zmienna używana do numerycznego przybliżenia pochodnej
+        targeted (bool)
+            Czy atak ma starać się utworzyć przykłady kontradyktoryjne, tak
+            aby odpowiedzi modelu dla zadanych przykładów były
+            zgodne z wartościami przekazanymi w kolumnie odpowiedzi danych.
+        verbose (bool)
+            Czy atak ma wypisywać informacje diagnostyczne o swoim przebiegu
+        '''
         # inicjalizacja argumentów potrzebnych dla klasyfikatora, będą one wspólne dla wszystkich ataków
         super().__init__(parameters.classifier_parameters)
         # Definiujemy podstawowe parametry ataku

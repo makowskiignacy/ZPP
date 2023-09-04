@@ -35,7 +35,8 @@ class GeometricDecisionBased(ARTAttack):
         sigma : 0.0002,
             Wariancja perturbacji Gaussowskiej (rozkład normalny)
         batch_size : int
-            Rozmiar próbki do jednorazowego treningu.
+            Liczba przykładów treningowych wykorzystywanych w jednej iteracji
+            uczenia
         verbose (bool)
             Czy atak ma wypisywać informacje diagnostyczne o swoim przebiegu
         '''
