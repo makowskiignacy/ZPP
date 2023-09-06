@@ -4,7 +4,25 @@ from foolbox.attacks.saltandpepper import SaltAndPepperNoiseAttack
 
 
 class SaltAndPepperNoise(SaltAndPepperNoiseAttack, FoolboxAttack):
+    '''
+    Klasa otaczająca atak Salt and Pepper zaimplementowany w bibliotece Foolbox.
+    '''
     def __init__(self, parameters):
+        '''
+        Inicjalizuje atak na podstawie zadanych parametróœ
+
+        Parametry ataku:
+        ----------------
+        steps (int)
+            Liczba kroków do wykonania.
+        across_channels (bool)
+            Czy szum ma być identyczny na wszystkich kanałach obrazu?
+        channel_axis (Optional[int])
+            Oś, względem której szum ma pozostać identyczny na wszystkich
+            kanałach. Ma znaczenie tylko w przypadku ustawienia parametru
+            'across_channels' na True. Jeżeli nie podano, parametr zostanie
+            ustawiony automatycznie na podstawie modelu jeżeli to możliwe.
+        '''
         super().__init__(**parameters.attack_specific_parameters)
         FoolboxAttack.__init__(self, parameters.generic_parameters)
 

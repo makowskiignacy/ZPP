@@ -7,7 +7,23 @@ from eagerpy.astensor import astensor
 
 
 class NewtonFool(NewtonFoolAttack, FoolboxAttack):
+    '''
+    Klasa otaczająca atak Newton Fool zaimplementowany w bibliotece Foolbox.
+
+    Link do pracy - https://dl.acm.org/citation.cfm?id=3134635
+    '''
     def __init__(self, parameters):
+        '''
+        Inicjalizuje atak na podstawie zadanych parametrów
+
+        Parametry ataku:
+        ----------------
+        steps (int)
+            Liczba kroków optymalizacji wykonywanych przy każdym kroku
+            wyszukiwania binarnego.
+        stepsize (float)
+            Wielkość kroku używana do uaktualnienia przykładów.
+        '''
         super().__init__(**parameters.attack_specific_parameters)
         FoolboxAttack.__init__(self, parameters.generic_parameters)
 

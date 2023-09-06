@@ -7,9 +7,36 @@ from eagerpy.astensor import astensor
 
 class GenericProjectedGradientDescent(FoolboxAttack):
     """
+    Klasa generyczna dla ataku typu Projected Gradient Descent z biblioteki
+    Foolbox.
     :param parent - attack specific class from foolbox.attacks module
     """
     def __init__(self, parent, parameters):
+        '''
+        Inicjalizuje obiekt na podstawie wybranego rodzaju ataku Projected 
+        Gradient Descent
+
+        Parametry:
+        ----------
+        parent (foolbox.attacks.projected_gradient_descent)
+            Rodzaj ataku z rodziny Projected Gradeint Descent do
+            zainicjalizowania
+        parameters
+            Parametry odpowiednie dla wybranego ataku
+
+        Parametry ataku:
+        ----------------
+        rel_stepsize (float)
+            Wielkość kroku relatywna względem epsilona.
+        abs_stepsize (Optional[float])
+            Wielkośc bezwzględna kroku. Jeżeli podano ma pierwszweństwo nad
+            wartością parametru 'rel_stepsize'.
+        steps (int)
+            Liczba aktualizacji do wykonania.
+        random_start (bool)
+            Czy perturbacja ma zostać zainicjalizowana losowo lub czy ma
+            zostać zainicjalizowana jako zero.
+        '''
         self.Parent = parent
         self.Parent.__init__(self, **parameters.attack_specific_parameters)
         FoolboxAttack.__init__(self, parameters.generic_parameters)

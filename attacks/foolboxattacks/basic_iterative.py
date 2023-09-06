@@ -7,9 +7,31 @@ from foolbox.attacks.basic_iterative_method import L1AdamBasicIterativeAttack, L
 
 class GenericBasicIterative(FoolboxAttack):
     """
-    :param parent - attack specific class from foolbox.attacks.basic_iterative_method module
+    Klasa generyczna dla ataku typu Basic Iterative z biblioteki Foolbox
     """
     def __init__(self, parent, parameters):
+        '''
+        Inicjalizuje obiekt na podstawie wybranego rodzaju ataku Basic Iterative
+
+        Parametry:
+        ----------
+        parent (foolbox.attacks.basic_iterative_method)
+            Rodzaj ataku z rodziny Basic Iterative do zainicjalizowania
+        parameters
+            Parametry odpowiednie dla wybranego ataku
+        
+        Parametry ataku:
+        ----------------
+        rel_stepsize (float)
+            Wielkość kroku relatywna względem epsilona.
+        abs_stepsize (Optional[float])
+            Wielkośc bezwzględna kroku. Jeżeli podano ma pierwszweństwo nad
+            wartością parametru 'rel_stepsize'.
+        steps (int)
+            Liczba aktualizacji do wykonania.
+        random_start (bool)
+            Czy rozpocząć w losowym punkcie wewnątrz epsilonowej kuli?
+        '''
         self.Parent = parent
         self.Parent.__init__(self, **parameters.attack_specific_parameters)
         FoolboxAttack.__init__(self, parameters.generic_parameters)
