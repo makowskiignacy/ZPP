@@ -13,3 +13,5 @@ python3 -m unittest discover
 
 ### Moduł cloud config
 W pliku `/utils/cloud_config.py` należy podać swój login oraz hasło, by umożliwić połączenie z zasobami NASK
+
+Do przeprowadzenia testów z wykorzystaniem platformy klienta - np. dataloader_test - potrzebny jest dostęp do sieci wewnętrznej klienta. Z uwagi na poufnośc danych, taki dostęp nie może zostać przyznany innym osobom poza zespołem bez zgody NASKu.
